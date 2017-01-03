@@ -1,0 +1,12 @@
+
+<fluent> x : 1 .. 10.
+<fluent> y : 5 .. 6.
+
+<asp>int(y).</asp>
+
+<inertial> x,y.
+
+x:=X <where> int(X).
+
+% 2 States
+% 2 Transitions

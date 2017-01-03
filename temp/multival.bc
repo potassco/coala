@@ -1,0 +1,8 @@
+<asp>b(1..5).</asp>
+
+<fluent> a=1,a=2,a=3.
+<fluent> x.
+<fluent> b=X <where> b(X).
+
+x <if> a=2.
+

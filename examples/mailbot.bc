@@ -1,0 +1,56 @@
+% FLUENTS + ACTIONS
+<fluent> at(X) <where> office(X).
+<fluent> request(X,Y) <where> office(X), office(Y).
+<fluent> holding(X,Y) <where> office(X), office(Y).
+<fluent> fullbags(X) <where> capacity(X).
+
+<inertial> at(X) <where> office(X).
+<inertial> request(X,Y) <where> office(X), office(Y).
+<inertial> holding(X,Y) <where> office(X), office(Y).
+<inertial> fullbags(X) <where> capacity(X).
+
+<action> go(D) <where> dir(D).
+<action> pickup(From, To) <where> office(From), office(To).
+<action> deliver(From, To) <where> office(From), office(To).
+
+% Nonexecutable
+<nonexecutable> go(up), go(down).
+<nonexecutable> go(D), pickup(From,To) <where> dir(D), office(From), office(To). 
+<nonexecutable> deliver(From,To), pickup(To,To2) <where> office(From), office(To), office(To2). 
+<nonexecutable> go(D), deliver(From,To) <where> dir(D), office(From), office(To). 
+
+% For single actions; However it would be better to include that in the action choice.
+%<nonexecutable> A, B <where> <action> A, <action> B, A != B.
+
+<nonexecutable> go(up) <if> at(X) <where> notofficeplusone(X).
+<nonexecutable> go(down) <if> at(X) <where> notofficeminusone(X).
+<nonexecutable> deliver(From,To) <if> -holding(From,To) <where> office(From), office(To). 
+<nonexecutable> deliver(From,To) <if> -at(To) <where> office(From), office(To). 
+<nonexecutable> pickup(From,To) <if> -request(From,To) <where> office(From), office(To). 
+<nonexecutable> pickup(From,To) <if> -at(From) <where> office(From), office(To).
+<nonexecutable> pickup(From,To) <if> fullbags(X) <where> notcapacityplusone(X), office(From), office(To).
+
+% Dynamic laws
+-at(X),at(X1) <after> go(up), at(X) <where> officeplusone(X,X1).
+-at(X),at(X1) <after> go(down), at(X) <where> officeplusone(X1,X).
+
+%holding+requests
+-request(From, To), holding(From, To) <after> pickup(From, To), request(From, To), at(From) <where> office(From), office(To).
+-holding(From, To) <after> deliver(From, To), holding(From, To), at(To) <where> office(From), office(To).
+
+-fullbags(F1),fullbags(F2) <after> pickup(From, To), fullbags(F1) <where> capacityplusone(F1,F2), office(From), office(To).
+-fullbags(F1),fullbags(F2) <after> deliver(From, To), fullbags(F1) <where> capacityplusone(F2,F1), office(From), office(To).
+
+% Initially
+
+<initially> at(1).
+<initially> -at(X) <where> officeplusone(Y,X).
+<initially> request(X,Y) <where> initialrequest(X,Y).
+<initially> -request(X,Y) <where> notinitialrequest(X,Y).
+<initially> -holding(X,Y) <where> office(X), office(Y).
+<initially> fullbags(0).
+<initially> -fullbags(X) <where> capacityplusone(Y,X).
+
+% GOAL
+<goal> -holding(X,Y) <where> office(X), office(Y).
+<goal> -request(X,Y) <where> office(X), office(Y).

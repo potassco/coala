@@ -1,0 +1,25 @@
+{
+dir(up;down).
+office(1..4).
+capacity(0..3).
+
+%initial_request(X,Y) :- office(X), office(Y), X!=Y.
+
+%initial_request(1,2..4).
+%initial_request(2,3..4).
+%initial_request(3,4).
+%initial_request(4,1..3).
+%initial_request(3,1..2).
+%initial_request(2,1).
+
+initialrequest(X,Y) :- office(X), office(Y), X!=Y.
+notinitialrequest(X,X) :- office(X).
+officeplusone(X,X+1) :- office(X), office(X+1).
+notofficeplusone(X) :- office(X), not office(X+1).
+notofficeminusone(X) :- office(X), not office(X-1).
+notcapacityplusone(X) :- capacity(X), not capacity(X+1). 
+capacityplusone(X,X+1) :- capacity(X), capacity(X+1).  
+capacityplusone(X) :- capacity(X), capacity(X+1). 
+capacityminusone(X) :- capacity(X), capacity(X-1). 
+office_order(X,Y) :- office(X), office(Y), X < Y.
+}

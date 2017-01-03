@@ -1,0 +1,132 @@
+
+%
+% FLUENTS + ACTIONS
+%
+
+<fluent> at(X)                <where> office(X).
+<fluent> request(X,Y)         <where> office(X), office(Y).
+<fluent> holding(X,Y)         <where> office(X), office(Y).
+<fluent> fullbags(X)         <where> capacity(X).
+
+<inertial> at(X) <where> office(X).
+<inertial> request(X,Y) <where> office(X), office(Y).
+<inertial> holding(X,Y) <where> office(X), office(Y).
+<inertial> fullbags(X) <where> capacity(X).
+
+
+<action> go(D)                <where> dir(D).
+<action> pickup(From, To)     <where> office(From), office(To).
+<action> deliver(From, To)    <where> office(From), office(To).
+
+
+
+%
+% POSS - BC does not have this one.
+%
+
+%<executable> go(up)              <if> at(X)                                      <where> officeplusone(X,X1).
+%<executable> go(down)            <if> at(X)                                      <where> officeplusone(X1,X).
+%<executable> pickup(From, To)    <if> at(From), request(From, To), fullbags(X)  <where> office(From), office(To), capacityplusone(X).
+%<executable> deliver(From, To)   <if> at(To), holding(From, To)                  <where> office(From), office(To).
+% Here is some translation
+<nonexecutable> go(up) <if> at(X) <where> notofficeplusone(X).
+<nonexecutable> go(down) <if> at(X) <where> notofficeminusone(X).
+<nonexecutable> pickup(From, To) <if> at(From), request(From, To), fullbags(X) <where> office(From), office(To), notcapacityplusone(X).
+<nonexecutable> deliver(From, To)   <if> -at(To)    <where> office(From), office(To).
+<nonexecutable> deliver(From, To)   <if> -holding(From, To) <where> office(From), office(To).
+
+
+
+%
+% CAUSES
+%
+
+%movement
+go(up)               <causes> at(X1)               <if> at(X)              <where> officeplusone(X,X1).
+go(down)             <causes> at(X1)               <if> at(X)              <where> officeplusone(X1,X).
+go(D)                <causes> -at(X)               <if> at(X)              <where> dir(D), office(X).
+
+%holding+requests
+pickup(From, To)     <causes> holding(From, To)    <if> request(From, To)  <where> office(From), office(To).
+pickup(From, To)     <causes> -request(From, To)   <if> request(From, To)  <where> office(From), office(To).
+deliver(From, To)    <causes> -holding(From, To)   <if> holding(From, To)  <where> office(From), office(To).
+
+%capacity
+pickup(From, To)     <causes> fullbags(F2)        <if> fullbags(F1)      <where> capacityplusone(F1,F2), office(From), office(To).
+deliver(From, To)    <causes> fullbags(F2)        <if> fullbags(F1)      <where> capacityplusone(F2,F1), office(From), office(To).
+
+deliver(From, To)    <causes> -fullbags(F)        <if> fullbags(F)       <where> capacity(F), office(From), office(To).
+pickup(From, To)     <causes> -fullbags(F)        <if> fullbags(F)       <where> capacity(F), office(From), office(To).
+
+
+
+%
+% INITIAL STATE
+%
+
+<initially> at(1).
+<initially> -at(X) <where> officeplusone(Y,X).
+<initially> fullbags(0).
+%<initially> -fullbags(X) <where> capacityplusone(F1). % NO ERROR MESSAGE!!!
+<initially> -fullbags(X) <where> capacityminusone(X).
+<initially> request(X,Y) <where> initialrequest(X,Y).
+<initially> -request(X,Y) <where> office(X), office(Y), notinitialrequest(X,Y).
+
+%<initially> request(X,Y) <where> office(X), office(Y), X!=Y. % REMODDEL X!=Y
+
+
+
+%
+% GOAL
+%
+
+%<defined fluent> tasksremaining.
+<fluent> tasksremaining.
+<default> -tasksremaining.
+tasksremaining <if> request(X,Y) <where> office(X), office(Y).
+tasksremaining <if> holding(X,Y) <where> office(X), office(Y).
+
+<goal> -tasksremaining.
+
+
+
+%
+% CONSTRAINTS
+%
+
+%never go up then down (or down then up)
+%<defined fluent> wentup.
+%<defined fluent> wentdown.
+<static fluent> wentup, wentdown.
+<default> -wentup, -wentdown.
+go(up)   <causes> wentup.
+go(down) <causes> wentdown.
+
+<nonexecutable> go(up)     <if> wentdown.
+<nonexecutable> go(down)   <if> wentup.
+
+%don't move away if you could deliver
+<nonexecutable> go(Dir)    <if> at(Y), holding(X,Y)  <where> office(X), office(Y), dir(Dir).
+
+%don't move if you could pick up (and aren't already holding anything)
+%this one might be unsound :) ... but it's restricted to completely empty mail bags
+<nonexecutable> go(Dir)    <if> at(X), request(X,Y), fullbags(0)  <where> office(X), office(Y), dir(Dir).
+
+%
+%<defined fluent> somethingabove.
+%<defined fluent> somethingbelow.
+<static fluent> somethingabove,somethingbelow.
+<default> -somethingabove, -somethingbelow.
+somethingabove   <if> at(X), request(From,To)     <where> office(X), office(From), office(To), officeorder(X,From).
+somethingabove   <if> at(X), holding(From,To)     <where> office(X), office(From), office(To), officeorder(X,To).
+somethingbelow   <if> at(X), request(From,To)     <where> office(X), office(From), office(To), officeorder(From,X).
+somethingbelow   <if> at(X), holding(From,To)     <where> office(X), office(From), office(To), officeorder(To,X).
+
+<nonexecutable> go(up)     <if> -somethingabove.
+<nonexecutable> go(down)   <if> -somethingbelow.
+
+%pickup the earliest package first
+<nonexecutable> pickup(X, Later) <if> at(X), request(X, Earlier), request(X, Later) <where> office(X), office(Earlier), office(Later), officeorder(Earlier,Later).
+
+
+

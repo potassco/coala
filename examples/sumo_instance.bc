@@ -1,0 +1,11 @@
+<asp>
+#const l=4.
+
+sumo(a).
+sumo(b).
+slot(1..l).
+
+#show holds(F,T) : holds(val(F,true),T).
+#show occurs/2.
+</asp>
+

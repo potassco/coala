@@ -1,0 +1,58 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+%\usepackage[german]{babel}
+%\usepackage{amsmath}
+%\usepackage{amsfonts}
+%\usepackage{amssymb}
+\begin{document}
+
+\section{BC BNF}
+    program : $\epsilon$ $|$ program rule '.' \\
+    rule : fact $|$ law $|$ query \\
+    fact : act\_fact $|$ flu\_fact \\
+    law : static\_law $|$ dynamic\_law $|$ inertial\_law \\
+    \hspace*{1 cm} $|$ default\_law $|$ impossible\_law $|$ nonexecutable\_law \\
+%    query : initial\_law $|$ goal \\
+    \\    
+    act\_fact : '$<$action$>$' action\_list \\
+    flu\_fact : '$<$fluent$>$' literal\_list \\
+    \hspace*{1 cm} $|$ '$<$defined fluent$>$' literal\_list \\
+    \\
+    static\_law : formula '$<$if$>$' formula  \\
+    \hspace*{1 cm}  $|$ formula '$<$ifcons$>$' formula \\
+    \hspace*{1 cm}  $|$ formula '$<$if$>$' formula '$<$ifcons$>$' formula \\
+    \\
+    dynamic\_law : formula '$<$after$>$' action\_formula  \\
+%    \hspace*{1 cm}  $|$ formula '$<$ifcons$>$' formula \\ & this is a static law
+    \hspace*{1 cm}  $|$ formula '$<$after$>$' action\_formula '$<$ifcons$>$' formula  \\
+    \hspace*{1 cm}  $|$ action\_list '$<$causes$>$' formula \\
+    \hspace*{1 cm}  $|$ action\_list '$<$causes$>$' formula '$<$if$>$' formula \\
+    \\
+    inertial\_law : '$<$inertial$>$' literal\_list \\
+    %
+    default\_law : '$<$default$>$' formula   \\
+    \hspace*{1 cm}  $|$ '$<$default$>$' formula '$<$if$>$' formula  \\
+    \hspace*{1 cm}  $|$ '$<$default$>$' formula '$<$after$>$' action\_formula  \\
+    %
+    impossible\_law : '$<$impossible$>$' formula \\
+    \hspace*{1 cm} $|$ '$<$impossible$>$' formula '$<$ifcons$>$' formula\\
+    %
+    nonexecutable\_law : '$<$nonexecutable$>$' action\_list   \\
+    \hspace*{1 cm}  $|$ '$<$nonexecutable$>$' action\_list '$<$if$>$' formula \\
+    \hspace*{1 cm}  $|$ '$<$nonexecutable$>$' action\_list '$<$ifcons$>$' formula \\
+    \hspace*{1 cm}  $|$ '$<$nonexecutable$>$' action\_list '$<$if$>$' formula '$<$ifcons$>$' formula\\
+    \\
+%    initial\_law : '$<$initially$>$' formula \\
+%    goal : '$<$goal$>$' formula \\
+%    \\
+    formula : atom $|$ formula ',' atom \\
+    action\_formula : atom $|$ action\_atom $|$ action\_formula ',' atom \\
+    \hspace*{1 cm} $|$ action\_formula ',' action\_atom \\
+    action\_list : action $|$ action\_list ',' action \\
+    atom : literal $|$ '-' literal $|$ literal '=' IDENTIFIER \\ %Boolean case
+    literal\_list : literal $|$ literal\_list ',' literal \\
+    action\_atom : action $|$ '-' action \\
+    literal : IDENTIFIER \\
+    action : IDENTIFIER \\
+    
+\end{document}

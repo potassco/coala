@@ -1,0 +1,12 @@
+
+<fluent> x : 5 .. 100.
+<fluent> y : 1 .. 10.
+<action> increase.
+
+<inertial> x,y.
+
+x:=2+5*x+1+y*10+3 <after> increase, y=1. % 2 + 5 * 10 + 1 + 1 * 10 + 3 = 66
+y=1 <if> y=1.
+
+<initially> x=10.
+<initially> y=1.

@@ -1,0 +1,32 @@
+
+fluent velocity : <int>. % : -1000 .. 1000. % last digit is a decimal position.
+fluent height : <int>. %-1000 .. 1000. % last digit is a decimal position.
+
+fluent bounce, fall.
+
+action drop.
+action catch.
+
+default -bounce.
+inertial height, velocity, fall.
+
+
+bounce if velocity > 0, height < velocity.
+
+fall after drop.
+-fall, velocity:=0 after catch.
+
+%Gravity!
+velocity:=velocity+98 after not bounce ifcons fall.
+
+height:=height-velocity after height-velocity > 0.
+height:=velocity-height after height-velocity <= 0. % Bounce reflection
+
+velocity:= -velocity after bounce ifcons fall.
+
+%nonexecutable drop if fall.
+%nonexecutable catch if -fall.
+%impossible height < 0.
+
+% 10 States
+% 6 Transitions

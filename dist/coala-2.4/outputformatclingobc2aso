@@ -1,0 +1,38 @@
+#!/usr/bin/python
+import sys
+import re
+
+ans=re.compile("^Answer: (\d*)")
+
+next_answer = False
+next_answer_number = 0
+answer_sets = {}
+status = None
+
+def natural_keys(text):
+    return [ int(c) if c.isdigit() else c for c in re.split('(\d+)', text) ]
+
+for line in sys.stdin:
+    mat = ans.match(line)
+    if mat is not None:
+        next_answer = True
+        next_answer_number = mat.group(0)
+    elif next_answer:
+        answer = line.strip().split(" ")
+        answer.sort(key=natural_keys)
+        answer_sets[str(next_answer_number)] = answer
+        next_answer = False
+        print next_answer_number
+        #print "\n".join(x for x in answer)
+        interesting = []
+        for x in answer:
+            if x.startswith("holds") or x.startswith("occurs"):
+                interesting.append(x)
+        print "\n".join(x for x in interesting)
+        print ""
+    else:
+        if line.strip() in ["UNSATISFIABLE","SATISFIABLE","UNKNOWN"]:
+            status = line
+            break
+
+print status

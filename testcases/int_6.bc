@@ -1,0 +1,14 @@
+
+<fluent> x : 1 .. 30.
+<fluent> y : 1 .. 20.
+<fluent> z : 1 .. 10.
+%<action> increase.
+
+<inertial> x,y,z.
+
+x:=y+z.
+y:=x-z.
+z:=5.
+
+% 20 States
+% 20 Transitions // When loops would be allowed: 800

@@ -1,0 +1,7 @@
+%<fluent> ab(at(A,L)) <where> fluent(at(A,L)).
+%<fluent> ab(out(A)) <where> fluent(out(A)).
+
+-at(A,L) <if> at(A1,L) <where> sumo(A), sumo(A1), A!=A1, slot(L).
+
+%<default> -ab(at(A,L)) <where> fluent(at(A,L)).
+%<default> -ab(out(A)) <where> fluent(out(A)).

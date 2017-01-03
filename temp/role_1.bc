@@ -1,0 +1,13 @@
+<asp>agent(1,rob(1,1,1)).</asp>
+<role rob(a,b,c)>
+<action> jump.
+<fluent> x.
+<fluent> z.
+<fluent> x(1).
+<visible> y.
+<inertial> x,z,y.
+z <if> x.
+x(a) <if> x(b) <ifcons> x(c).
+</role>
+
+% 6 States, 12 Transitions

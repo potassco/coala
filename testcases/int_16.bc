@@ -1,0 +1,16 @@
+
+<fluent> s,e,n,d,m,o,r,y : 0 .. 9.
+
+<asp>letter(s;e;n;d;m;o;r;y).</asp>
+
+<inertial> X <where> letter(X).
+
+
+1000*s+100*e+10*n+d+1000*m+100*o+10*r+e-10000*m-1000*o-100*n-10*e-y == 0.
+<impossible> m == 0.
+<impossible> X == Y <where> letter(X), letter(Y), X != Y.
+
+%y=2 r=8 o=0 m=1 s=9 e=5 n=6 d=7
+
+% 1 States
+% 1 Transitions

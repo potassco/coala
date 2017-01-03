@@ -1,0 +1,37 @@
+<action> a.
+<fluent> z : 1 .. 100.
+<fluent> x(v(w)).
+
+-z=5 <if> -z=5,-x(v(w)).
+-z=5 <if> -z=5,-x(v(w)) <ifcons> x(v(w)). %a.
+z=5 <ifcons> -z=5.
+
+-z=5,-x(v(w)) <after> a.
+-z=5,-x(v(w)) <after> a <ifcons> -z=5,-x(v(w)).
+a <causes> -z=5,-x(v(w)).
+a <causes> -z=5,-x(v(w)) <if> -z=5,-x(v(w)).
+
+<default> -z=5,-x(v(w)).
+<default> -z=5,-x(v(w)) <if> -z=5,-x(v(w)).
+<default> -z=5,-x(v(w)) <after> -z=5,-x(v(w)).
+% comment : <default> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+% comment : <default> -z=5,-x(v(w)) <if> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+% comment : <default> -z=5,-x(v(w)) <after> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+
+<inertial> z=5,x(v(w)).
+
+<impossible> -z=5,-x(v(w)).
+<impossible> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+
+<nonexecutable> a.
+<nonexecutable> a <if> -z=5,-x(v(w)).
+<nonexecutable> a <if> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+% comment: <nonexecutable> a <after> -z=5,-x(v(w)).
+% comment: <nonexecutable> a <after> -z=5,-x(v(w)) <ifcons> -z=5,-x(v(w)).
+
+<initially> -z=5,-x(v(w)).
+
+<goal> -z=5,-x(v(w)).
+
+% 199 States
+% 100 Transitions

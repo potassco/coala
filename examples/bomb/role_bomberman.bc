@@ -1,0 +1,44 @@
+<role bomberman>
+
+<visible> at(X,Y) <where> map(X,Y).
+<fluent> at(X,Y) <where> map(X,Y).
+<inertial> at(X,Y) <where> map(X,Y).
+
+<visible> someoneat(X,Y) <where> map(X,Y).
+<inertial> someoneat(X,Y) <where> map(X,Y).
+
+<fluent> alive.
+<fluent> win.
+<inertial> alive.
+<inertial> win.
+
+<visible> bomb(V,X,Y) <where> bombcounter(V), map(X,Y).
+<default> -bomb(V,X,Y) <where> bombcounter(V), map(X,Y).
+
+<action> move(X,Y) <where> map(X,Y), not block(X,Y).
+<action> placebomb.
+
+<impossible> at(X,Y), at(X2,Y2) <where> map(X,Y), map(X2,Y2), X != X2.
+<impossible> at(X,Y), at(X,Y2) <where> map(X,Y), map(X,Y2), Y != Y2.
+
+<nonexecutable> move(X,Y), at(X2,Y2) <where> map(X,Y), map(X2,Y2), not adiacent(X,Y,X2,Y2).
+<nonexecutable> move(X,Y), -alive <where> map(X,Y).
+<nonexecutable> placebomb, -alive.
+
+at(X,Y),-at(X2,Y2) <after> move(X,Y), at(X2,Y2) <where> map(X,Y), map(X2,Y2).
+bomb(M,X,Y) <after> placebomb, at(X,Y) <where> map(X,Y), maxbomb(M).
+bomb(B2,X,Y) <after> bomb(B,X,Y) <where> map(X,Y), bombcounter(B), bombcounter(B2), B2 = B-1.
+
+-alive <after> bomb(0,X,Y) <ifcons> at(X,Y2) <where> map(X,Y2), map(X,Y).
+-alive <after> bomb(0,X,Y) <ifcons> at(X2,Y) <where> map(X2,Y), map(X,Y).
+
+win <after> bomb(0,X,Y) <ifcons> alive, someoneat(X,Y2) <where> map(X,Y), map(X,Y2).
+win <after> bomb(0,X,Y) <ifcons> alive, someoneat(X2,Y) <where> map(X,Y), map(X2,Y).
+
+<initially> alive.
+<initially> -win.
+<initially> -bomb(B,X,Y) <where> bombcounter(B), map(X,Y).
+
+<goal> win.
+
+</role>

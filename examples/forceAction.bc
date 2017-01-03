@@ -1,0 +1,9 @@
+%<action> a.
+<action> b.
+
+<fluent> c.
+<default> -c.
+-c <if> c.
+
+%b <after> a.
+b <if> -c.

@@ -1,0 +1,15 @@
+
+<fluent> x : 1 .. 100.
+<fluent> y : 10 .. 12.
+
+%<asp>int(y).</asp>
+
+<inertial> x,y.
+
+%x:=X*2+3+3*y+C <where> int(X), C = 2.
+x:= y * 5 + 5.
+% y * 2 + 3 + y * 3 + 2 
+% == y * 5 + 5
+
+% 3 States
+% 3 Transitions

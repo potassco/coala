@@ -1,0 +1,21 @@
+<fluent> infected.
+<fluent> hydrated.
+<fluent> dead.
+<action> drink(cup(water)).
+<action> medicate.
+<action> look.
+
+%test, test comment...
+
+%-hydrated <if> dead <ifcons> -hydrated, dead.
+
+<inertial> dead.
+<inertial> hydrated.
+<inertial> infected.
+
+drink(cup(water)) <causes> hydrated.
+medicate <causes> dead <if> -hydrated, infected.
+-infected <after> medicate <ifcons> hydrated.
+
+<nonexecutable> drink(cup(water)) <if> dead.
+<nonexecutable> medicate, medicate <if> dead, dead.

@@ -1,0 +1,7 @@
+<asp>c(1).c(2).c(3).</asp>
+<action> a(T) <where> c(T).
+<fluent> b(Z) <where> <action> a(Z).
+
+<inertial> B <where> <fluent> B.
+
+% 8 States, 64 Transitions

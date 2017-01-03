@@ -1,0 +1,9 @@
+<asp>
+
+external(a).
+save(1).
+
+</asp>
+
+<fluent> F <where> external(F).
+<fluent> F <where> save(F).

@@ -1,0 +1,18 @@
+%%%% Initial State
+
+<asp> 
+init(rob1,1,2). init(rob2,2,1).
+%initially(val(F,false)) :- fluent(F), not initially(val(F,true)).
+agent(rob1,bomberman).agent(rob2,bomberman).
+environment_step_delay(1).
+</asp>
+
+<fluent> ag(Ag,at(X,Y)) <where> map(X,Y), agent(Ag,_).
+<inertial> ag(Ag,at(X,Y)) <where> map(X,Y), agent(Ag,_).% <fluent> ag(Ag,at(X,Y)).
+%
+<initially> ag(Ag,at(X,Y)) <where> init(Ag,X,Y).
+<initially> -ag(Ag,at(X,Y)) <where> not init(Ag,X,Y), agent(Ag,_), map(X,Y).
+
+<fluent> ag(Ag,someoneat(X,Y)) <where> agent(Ag,bomberman), map(X,Y).
+<default> -ag(Ag,someoneat(X,Y)) <where> agent(Ag,bomberman), map(X,Y).
+ag(Aga,someoneat(X,Y)) <if> ag(Ag,at(X,Y)) <where> agent(Ag,bomberman), agent(Aga,bomberman), map(X,Y).

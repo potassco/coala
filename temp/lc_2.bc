@@ -1,0 +1,5 @@
+<int> x : 1 .. 2000.
+<fluent> a.
+<inertial> x.
+<default> a.
+x=10 <if> a.

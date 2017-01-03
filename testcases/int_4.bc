@@ -1,0 +1,14 @@
+
+<fluent> x : 1 .. 100.
+<fluent> y : 1 .. 200.
+<action> increase.
+
+%<inertial> x.%%%%%%%%ERR when commented out!
+<inertial> y.
+
+<nonexecutable> increase, y <= 1.
+y:=10 <after> increase.
+x:=y+1 <ifcons> y > 2. 
+
+% 297 States
+% 294 Transitions

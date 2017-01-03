@@ -1,0 +1,26 @@
+
+fluent speed : -10 .. 10.
+fluent floor : -5 .. 10000.
+
+fluent crash.
+
+action stop.
+action up.
+action down.
+
+inertial crash.
+inertial speed, floor.
+
+floor:=floor+speed after speed > 0, floor+speed <= 10000, floor-speed >= -5.
+floor:=10000 after speed > 0, floor+speed > 10000.
+crash after speed > 0, floor+speed > 10000.
+floor:=-5 after speed < 0, floor+speed < -5.
+crash after speed < 0, floor-speed < -5.
+
+speed:=0 after stop.
+speed:=speed+1 after up.
+speed:=speed-1 after down.
+
+impossible crash, speed > 3. % Slow after crash
+impossible crash, speed < -3.
+ 

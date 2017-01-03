@@ -1,0 +1,10 @@
+<asp>
+myfluent(fluent).
+</asp>
+<action> action.
+<fluent> F <where> myfluent(F).
+<inertial> F <where> myfluent(F).
+<initially> -F <where> myfluent(F).
+% there is a bug with the line below if the bc encoding includes an action
+<initially> F <where> myfluent(F).
+%<initially> F <where> <fluent> F, myfluent(F). 

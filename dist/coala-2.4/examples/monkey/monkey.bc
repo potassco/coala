@@ -1,0 +1,48 @@
+fluent monkey=(onground,onchair).
+fluent position(monkey)=(left,middle,right).
+fluent position(chair)=(left,middle,right).
+fluent has(banana).
+
+action push(left), push(right).
+action move(left), move(right).
+action climb.
+action grasp.
+
+inertial monkey, position(monkey), position(chair), has(banana).
+
+position(chair)=middle after position(monkey)=left, push(right), position(chair)=left.
+position(chair)=middle after position(monkey)=right, push(left), position(chair)=right.
+
+position(chair)=left after position(monkey)=middle, push(left), position(chair)=middle.
+position(chair)=right after position(monkey)=middle, push(right), position(chair)=middle.
+
+position(monkey)=left after move(left), position(monkey)=middle.
+position(monkey)=middle after move(left), position(monkey)=right.
+position(monkey)=right after move(right), position(monkey)=middle.
+position(monkey)=middle after move(right), position(monkey)=left.
+
+monkey=onchair after climb, monkey=onground ifcons position(monkey)=X, position(chair)=X where fluent position(monkey)=X.
+monkey=onground after climb, monkey=onchair ifcons position(monkey)=X, position(chair)=X <where> fluent position(monkey)=X.
+
+nonexecutable grasp, monkey=onground.
+nonexecutable grasp, has(banana).
+nonexecutable push(left), position(monkey)=left.
+nonexecutable push(right), position(monkey)=right.
+%nonexecutable push(right), position(monkey)=X, position(chair)=Y where X != Y, fluent position(monkey)=X, fluent position(chair)=Y.
+%nonexecutable push(left), position(monkey)=X, position(chair)=Y where X != Y, fluent position(monkey)=X, fluent position(chair)=Y.
+
+nonexecutable A,B where action A, action B, A != B.
+
+impossible monkey=onchair, position(monkey)=X, position(chair)=Y where X != Y, fluent position(monkey)=X, fluent position(chair)=Y.
+
+has(banana) after grasp, position(monkey)=middle, monkey=onchair.
+
+initially not has(banana).
+initially monkey=onground, position(monkey)=left.
+initially position(chair)=right.
+goal has(banana).
+
+% plan: move(right)*2, push(left), move(left), climb, grasp.
+
+%initially monkey=onground, position(monkey)=left, position(chair)=middle.
+% plan: move(right), climb, grasp.

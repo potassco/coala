@@ -1,0 +1,24 @@
+NOTE:
+
+This line is extra in base.lp (line 8):
+  holds(val(F,B), 0) :- fluent(F), initially(val(F,B)).
+
+-----------
+
+Action decision modified to produce only 1 action per step (line 12 in base.lp)
+							###
+  { occurs(A,T) : action(A) }1 :- step(T), T < k.
+
+-----------
+
+I translate using:
+
+~/Desktop/PandaCoala/exec.sh -o walkertrans.lp walkerencoding.bc
+
+-----------
+
+clingo version 4.5.1
+
+I run the encoding like this:
+
+clingo walkertrans.lp walkerinstance.lp base_translation.lp -c k=$STEPS 0 

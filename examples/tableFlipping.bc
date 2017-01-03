@@ -1,0 +1,58 @@
+
+<asp>cup(1..7).</asp>
+%cup(cup1).cup(cup2).
+place(table),place(dishwasher).place(counter).
+
+<action> pickup(C),iscupclean(C),cleanupcup(C),putindishwasher(C),putdown(C,counter) <where> cup(C).
+<action> goto(P) <where> place(P).
+
+<fluent> know(C), checked(C), holds(C), clean(C) <where> cup(C). %TODO make know external!!!
+<fluent> at(C,P) <where> cup(C), place(P).
+<fluent> at(P) <where> place(P).
+
+<inertial> know(C), checked(C), holds(C), clean(C) <where> cup(C).
+<inertial> at(C,P) <where> cup(C), place(P).
+<inertial> at(P) <where> place(P).
+
+checked(C) <after> iscupclean(C) <ifcons> holds(C) <where> cup(C).
+-at(C,table),-holds(C) <after> cleanupcup(C) <where> cup(C).
+-at(C,table),at(C,dishwasher),-holds(C) <after> putindishwasher(C) <where> cup(C).
+-at(C,table),at(C,counter),-holds(C) <after> putdown(C,counter) <where> cup(C).
+holds(C) <after> pickup(C) <where> cup(C).
+
+at(P),-at(Q) <after> goto(P),at(Q) <where> place(P), place(Q).
+
+<nonexecutable> pickup(C), holds(B) <where> cup(C), cup(B).
+<nonexecutable> pickup(C), -at(table) <where> cup(C).
+<nonexecutable> putindishwasher(C), -at(dishwasher) <where> cup(C).
+<nonexecutable> putdown(C,counter), -at(counter) <where> cup(C).
+
+<nonexecutable> cleanupcup(C), -checked(C) <where> cup(C).
+<nonexecutable> cleanupcup(C), -holds(C) <where> cup(C).
+<nonexecutable> cleanupcup(C), know(C) <where> cup(C).
+<nonexecutable> putindishwasher(C), -know(C) <where> cup(C).
+<nonexecutable> putindishwasher(C), -holds(C) <where> cup(C).
+<nonexecutable> putindishwasher(C), clean(C) <where> cup(C).
+<nonexecutable> putdown(C,counter), -know(C) <where> cup(C).
+<nonexecutable> putdown(C,counter), -holds(C) <where> cup(C).
+<nonexecutable> putdown(C,counter), -clean(C) <where> cup(C).
+
+<initially> at(table).
+<initially> -at(dishwasher).
+<initially> -at(counter).
+<initially> at(C,table) <where> cup(C).
+<initially> -at(C,dishwasher) <where> cup(C).
+<initially> -at(C,counter) <where> cup(C).
+
+%<initially> -know(C) <where> cup(C). % Toying: States are unknown
+<initially> know(C) <where> cup(C). % Toying: States are known
+<initially> -checked(C) <where> cup(C).
+<initially> -holds(C) <where> cup(C).
+<initially> -clean(C) <where> cup(C).
+
+<goal> -at(C,table) <where> cup(C).
+
+%%<nonexecutable> A, B <where> <action> A, <action> B, A!=B.
+%%
+%% Add external clean(C)
+%%

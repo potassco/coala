@@ -1,0 +1,11 @@
+<asp>b(1..5).</asp>
+
+<fluent> a=(1,2,3,4,5).
+<fluent> a=100.
+<fluent> b=(apfel,birne,pflaume).
+<fluent> a=(something(else(here)),someother(here)).
+<fluent> x.
+<fluent> b=X <where> b(X).
+
+x <if> a=2.
+

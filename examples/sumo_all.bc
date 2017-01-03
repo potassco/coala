@@ -1,0 +1,33 @@
+<fluent> at(A,L) <where> sumo(A), slot(L).
+<fluent>  out(A) <where> sumo(A).
+
+<action>  left(A) <where> sumo(A).
+<action> right(A) <where> sumo(A).
+
+-at(A,L) <if> at(A,L1) <where> sumo(A), slot(L), slot(L1), L != L1.
+
+ -out(A) <if> at(A,L)  <where> sumo(A), slot(L).
+-at(A,L) <if>  out(A)  <where> sumo(A), slot(L).
+
+% <impossible> -at(A,L) : slot(L), out(A) <where> sumo(A).
+<impossible> -at(A,1), -at(A,2), -at(A,3), -at(A,4), -out(A) <where> sumo(A).
+
+at(A,L) <after>  left(A), at(A,L2) <where> sumo(A), slot(L), slot(L2), L=L2-1.
+at(A,L) <after> right(A), at(A,L2) <where> sumo(A), slot(L), slot(L2), L=L2+1.
+
+out(A) <after>  left(A), at(A,1) <where> sumo(A), slot(L).
+out(A) <after> right(A), at(A,l) <where> sumo(A), slot(L).
+
+<nonexecutable>  left(A) <if> out(A) <where> sumo(A), slot(L).
+<nonexecutable> right(A) <if> out(A) <where> sumo(A), slot(L).
+
+<inertial> at(A,L), out(A) <where> sumo(A), slot(L).
+
+<initially> at(A,1) <where> sumo(A), slot(1).
+<initially> -at(A,L) <where> sumo(A), slot(L), L != 1.
+<goal> at(A,4) <where> sumo(A), slot(4).
+
+
+%ASP
+<asp>sumo(a).
+slot(1..4).</asp>

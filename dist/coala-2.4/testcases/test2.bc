@@ -1,0 +1,35 @@
+<action> a,b(1,2,c(33)).
+<fluent> z,y(1,2,x(33)).
+<fluent> arg.
+
+arg <if> z,y(1,2,x(33)) <ifcons> z.
+arg <ifcons> z.
+
+z,y(1,2,x(33)) <after> a,b(1,2,c(33)).
+z,y(1,2,x(33)) <after> a,b(1,2,c(33)) <ifcons> z,y(1,2,x(33)).
+a <causes> z,y(1,2,x(33)).
+a <causes> z,y(1,2,x(33)) <if> z,y(1,2,x(33)).
+
+<default> z,y(1,2,x(33)).
+<default> z,y(1,2,x(33)) <if> z,y(1,2,x(33)).
+<default> z,y(1,2,x(33)) <after> z,y(1,2,x(33)).
+% comment : <default> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+% comment : <default> z,y(1,2,x(33)) <if> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+% comment : <default> z,y(1,2,x(33)) <after> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+
+<inertial> z,y(1,2,x(33)).
+
+<impossible> z,y(1,2,x(33)).
+<impossible> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+
+<nonexecutable> a,b(1,2,c(33)).
+<nonexecutable> a,b(1,2,c(33)) <if> z,y(1,2,x(33)).
+<nonexecutable> a,b(1,2,c(33)) <if> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+% comment: <nonexecutable> a,b(1,2,c(33)) <after> z,y(1,2,x(33)).
+% comment: <nonexecutable> a,b(1,2,c(33)) <after> z,y(1,2,x(33)) <ifcons> z,y(1,2,x(33)).
+
+<initially> z,y(1,2,x(33)).
+
+<goal> z,y(1,2,x(33)).
+
+% 3 States, 10 Transitions

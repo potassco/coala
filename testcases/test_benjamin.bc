@@ -1,0 +1,10 @@
+<action> a.
+<defined fluent> b(1).
+<defined fluent> b(2).
+<defined fluent> b(3).
+
+<default> -b(1).
+<default> b(2).
+b(3) <if> b(2).
+
+% 1 State, 2 Transitions

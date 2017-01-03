@@ -1,0 +1,6 @@
+<action> a.
+<fluent> f.
+
+<default> -f.
+
+f <after> a.

@@ -1,0 +1,34 @@
+<action> a.
+<fluent> z.
+<fluent> x(v(w)).
+
+-z <if> -z,-x(v(w)).
+-z <if> -z,-x(v(w)) <ifcons> a.
+z <ifcons> -z.
+
+-z,-x(v(w)) <after> a.
+-z,-x(v(w)) <after> a <ifcons> -z,-x(v(w)).
+a <causes> -z,-x(v(w)).
+a <causes> -z,-x(v(w)) <if> -z,-x(v(w)).
+
+<default> -z,-x(v(w)).
+<default> -z,-x(v(w)) <if> -z,-x(v(w)).
+<default> -z,-x(v(w)) <after> -z,-x(v(w)).
+% comment : <default> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+% comment : <default> -z,-x(v(w)) <if> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+% comment : <default> -z,-x(v(w)) <after> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+
+<inertial> z,x(v(w)).
+
+<impossible> -z,-x(v(w)).
+<impossible> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+
+<nonexecutable> a.
+<nonexecutable> a <if> -z,-x(v(w)).
+<nonexecutable> a <if> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+% comment: <nonexecutable> a <after> -z,-x(v(w)).
+% comment: <nonexecutable> a <after> -z,-x(v(w)) <ifcons> -z,-x(v(w)).
+
+<initially> -z,-x(v(w)).
+
+<goal> -z,-x(v(w)).

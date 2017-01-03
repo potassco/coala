@@ -1,0 +1,4 @@
+<fluent> a(1), a(2), a(3).
+<fluent> b(X) <where> a(X).
+
+b(X) <after> a(X) <ifcons> a(X) <where> a(X), b(X).

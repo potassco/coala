@@ -1,0 +1,10 @@
+* states
+
+  exec.sh examples/sumo.bc  | clingo5 - examples/sumo.asp encodings/fixed_translated_impossible.lp 0 -c k=0
+  
+  NOT POSSIBLE WITHOUT CHANGING l IN ENCODING -> <impossible> ...
+  exec.sh examples/sumo.bc  | clingo5 - examples/sumo.asp encodings/fixed_translated_impossible.lp 0 -c l=2 -c k=0
+
+* transitions
+
+  exec.sh examples/sumo.bc  | clingo5 - examples/sumo.asp encodings/fixed_translated_impossible.lp 0 -c l=4 -c k=1

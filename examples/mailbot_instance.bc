@@ -1,0 +1,15 @@
+<asp>
+dir(up;down).
+office(1..4).
+capacity(0..3).
+
+officeplusone(X,X+1) :- office(X), office(X+1).
+notofficeplusone(X) :- office(X), not office(X+1).
+notofficeminusone(X) :- office(X), not office(X-1).
+
+capacityplusone(X,X+1) :- capacity(X), capacity(X+1).
+notcapacityplusone(X) :- capacity(X), not capacity(X+1).
+
+initialrequest(X,Y) :- office(X), office(Y), X!=Y.
+notinitialrequest(X,X) :- office(X).
+</asp>

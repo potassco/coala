@@ -1,0 +1,12 @@
+<fluent>   at(X) <where> office(X).
+<inertial> at(X) <where> office(X).
+
+<action> go(D) <where> dir(D).
+
+<nonexecutable> go(left), go(right).
+
+<nonexecutable> go(left)  <if> at(X) <where>  leftmostOffice(X).
+<nonexecutable> go(right) <if> at(X) <where> rightmostOffice(X).
+
+-at(X),at(X1) <after> go(right), at(X) <where> nextOffice(X,X1).
+-at(X),at(X1) <after> go(left),  at(X) <where> nextOffice(X1,X).

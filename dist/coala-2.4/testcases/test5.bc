@@ -1,0 +1,30 @@
+<asp>
+dir(left;right).
+office(1..3).
+
+nextOffice(X,X+1) :- office(X), office(X+1).
+
+rightmostOffice(X) :- office(X), not office(X+1).
+leftmostOffice(X) :-  office(X), not office(X-1).
+</asp>
+<fluent>   at(X) <where> office(X).
+<inertial> at(X) <where> office(X).
+
+<action> go(D) <where> dir(D).
+
+<nonexecutable> go(left), go(right).
+
+<nonexecutable> go(left)  <if> at(X) <where>  leftmostOffice(X).
+<nonexecutable> go(right) <if> at(X) <where> rightmostOffice(X).
+
+-at(X),at(X1) <after> go(right), at(X) <where> nextOffice(X,X1).
+-at(X),at(X1) <after> go(left),  at(X) <where> nextOffice(X1,X).
+
+<impossible> at(X), at(X1) <where> <fluent> at(X), <fluent> at(X1), X != X1.
+
+<initially> at(1).
+<initially> -at(X) <where> office(X), X!=1.
+
+<goal> at(3).
+
+% 4 States, 10 Transitions

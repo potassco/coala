@@ -1,0 +1,9 @@
+<asp>agent(1,rob).</asp>
+<role rob>
+<action> jump.
+<fluent> x.
+<fluent> z.
+<visible> y.
+<inertial> x,z,y.
+z <if> x.
+</role>

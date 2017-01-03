@@ -1,0 +1,17 @@
+
+<fluent> x : 1 .. 1000.
+<fluent> y : 5 .. 8.
+
+<asp>int(y).</asp>
+
+<inertial> x,y.
+
+x:=X*2+2*y+y+y+y+y+5*y+y+y+X+2*X <where> int(X).
+% x = y * (2+2+1+1+1+1+5+1+1+1+2) = y * (8 +5 +5) = 18*y = {90, 108, 126, 144}
+
+<impossible> x < 100. 
+% 90 is no solution for x
+
+
+% 3 States
+% 3 Transitions

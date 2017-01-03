@@ -1,0 +1,25 @@
+<action> initialize.
+
+<fluent> result(sat).
+<fluent> result(unsat).
+<fluent> result(unknown).
+<fluent> grounded(0).
+%<fluent> grounded(S) <where> dom(S).
+<fluent> possible(A) <where> <action> A.
+
+<default> -result(sat).
+<default> -result(unsat).
+<default> -result(unknown).
+<default> -possible(A) <where> <action> A.
+
+<inertial> grounded(0).
+%<inertial> grounded(S) <where> dom(S).
+
+possible(initialize) <if> -result(sat), -result(unsat), -result(unknown), -grounded(0).
+
+grounded(0) <after> initialize.
+
+<nonexecutable> initialize <if> -possible(initialize).
+
+<initially> -F <where> <fluent> F.
+

@@ -1,0 +1,4 @@
+<asp>a(1..5).b(2).</asp>
+<fluent> d(X) <where> a(X).
+<fluent> c(X) <where> a(X), not b(X).
+% 

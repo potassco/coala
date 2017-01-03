@@ -1,0 +1,2448 @@
+Created by PLY version 3.8 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> <empty>
+Rule 2     program -> program ESCAPE_ASP
+Rule 3     program -> program rule DOT
+Rule 4     rule -> fact
+Rule 5     rule -> law
+Rule 6     rule -> query
+Rule 7     fact -> pred_fact
+Rule 8     fact -> act_fact
+Rule 9     fact -> flu_fact
+Rule 10    law -> static_law
+Rule 11    law -> dynamic_law
+Rule 12    law -> inertial_law
+Rule 13    law -> default_law
+Rule 14    law -> imposs_law
+Rule 15    law -> nonexe_law
+Rule 16    law -> observe_law
+Rule 17    query -> init_rule
+Rule 18    query -> goal_query
+Rule 19    pred_fact -> formula where_part
+Rule 20    act_fact -> ACT fluent_formula where_part
+Rule 21    flu_fact -> FLU fluent_formula where_part
+Rule 22    flu_fact -> DFLU fluent_formula where_part
+Rule 23    static_law -> formula IF formula ifcons_part where_part
+Rule 24    static_law -> formula IFCONS formula where_part
+Rule 25    dynamic_law -> formula after_part ifcons_part where_part
+Rule 26    dynamic_law -> formula CAUSES formula where_part
+Rule 27    dynamic_law -> formula CAUSES formula IF formula where_part
+Rule 28    inertial_law -> INERTIAL fluent_formula where_part
+Rule 29    default_law -> DEFAULT formula where_part
+Rule 30    default_law -> DEFAULT formula IF formula where_part
+Rule 31    default_law -> DEFAULT formula AFTER formula where_part
+Rule 32    imposs_law -> IMPOSSIBLE formula ifcons_part where_part
+Rule 33    nonexe_law -> NONEXE formula if_part ifcons_part where_part
+Rule 34    observe_law -> OBSERVES formula if_part where_part
+Rule 35    observe_law -> OBSERVES formula after_part ifcons_part where_part
+Rule 36    init_rule -> INIT formula where_part
+Rule 37    goal_query -> GOAL formula where_part
+Rule 38    if_part -> <empty>
+Rule 39    if_part -> IF formula
+Rule 40    after_part -> AFTER formula
+Rule 41    ifcons_part -> <empty>
+Rule 42    ifcons_part -> IFCONS formula
+Rule 43    where_part -> <empty>
+Rule 44    where_part -> WHERE bindings
+Rule 45    bindings -> binding
+Rule 46    bindings -> bindings COMMA binding
+Rule 47    binding -> ACT fluent
+Rule 48    binding -> FLU fluent equalpart
+Rule 49    binding -> NOT asp_term
+Rule 50    binding -> MINUS asp_term
+Rule 51    binding -> asp_term
+Rule 52    formula -> tfa
+Rule 53    formula -> formula COMMA tfa
+Rule 54    tfa -> atom
+Rule 55    tfa -> TRUE
+Rule 56    tfa -> FALSE
+Rule 57    atom -> fluent equalpart
+Rule 58    atom -> NOT fluent equalpart
+Rule 59    atom -> MINUS fluent equalpart
+Rule 60    fluent_formula -> fluent equalpart
+Rule 61    fluent_formula -> fluent_formula COMMA fluent equalpart
+Rule 62    equalpart -> <empty>
+Rule 63    equalpart -> EQ fluent
+Rule 64    fluent -> IDENTIFIER
+Rule 65    fluent -> var_term
+Rule 66    fluent -> IDENTIFIER LBRAC term_list RBRAC
+Rule 67    term_list -> term
+Rule 68    term_list -> term COMMA term_list
+Rule 69    term -> var_term
+Rule 70    term -> IDENTIFIER
+Rule 71    term -> NUMBER
+Rule 72    term -> IDENTIFIER LBRAC term_list RBRAC
+Rule 73    var_term -> VARIABLE
+Rule 74    asp_term -> asp_operation
+Rule 75    asp_term -> asp_operation asp_eqoperator asp_operation
+Rule 76    asp_operation -> term
+Rule 77    asp_operation -> asp_operation asp_operator term
+Rule 78    asp_eqoperator -> EQQ
+Rule 79    asp_eqoperator -> EQ
+Rule 80    asp_eqoperator -> NEQ
+Rule 81    asp_eqoperator -> LT
+Rule 82    asp_eqoperator -> GT
+Rule 83    asp_eqoperator -> LE
+Rule 84    asp_eqoperator -> GE
+Rule 85    asp_operator -> PLUS
+Rule 86    asp_operator -> MINUS
+Rule 87    asp_operator -> TIMES
+Rule 88    asp_operator -> DIV
+
+Terminals, with rules where they appear
+
+ACT                  : 20 47
+AFTER                : 31 40
+CAUSES               : 26 27
+COMMA                : 46 53 61 68
+DEFAULT              : 29 30 31
+DFLU                 : 22
+DIV                  : 88
+DOT                  : 3
+EQ                   : 63 79
+EQQ                  : 78
+ESCAPE_ASP           : 2
+FALSE                : 56
+FLU                  : 21 48
+GE                   : 84
+GOAL                 : 37
+GT                   : 82
+IDENTIFIER           : 64 66 70 72
+IF                   : 23 27 30 39
+IFCONS               : 24 42
+IMPOSSIBLE           : 32
+INERTIAL             : 28
+INIT                 : 36
+LBRAC                : 66 72
+LE                   : 83
+LT                   : 81
+MINUS                : 50 59 86
+NEQ                  : 80
+NONEXE               : 33
+NOT                  : 49 58
+NUMBER               : 71
+OBSERVES             : 34 35
+PLUS                 : 85
+RBRAC                : 66 72
+TIMES                : 87
+TRUE                 : 55
+VARIABLE             : 73
+WHERE                : 44
+error                : 
+
+Nonterminals, with rules where they appear
+
+act_fact             : 8
+after_part           : 25 35
+asp_eqoperator       : 75
+asp_operation        : 74 75 75 77
+asp_operator         : 77
+asp_term             : 49 50 51
+atom                 : 54
+binding              : 45 46
+bindings             : 44 46
+default_law          : 13
+dynamic_law          : 11
+equalpart            : 48 57 58 59 60 61
+fact                 : 4
+flu_fact             : 9
+fluent               : 47 48 57 58 59 60 61 63
+fluent_formula       : 20 21 22 28 61
+formula              : 19 23 23 24 24 25 26 26 27 27 27 29 30 30 31 31 32 33 34 35 36 37 39 40 42 53
+goal_query           : 18
+if_part              : 33 34
+ifcons_part          : 23 25 32 33 35
+imposs_law           : 14
+inertial_law         : 12
+init_rule            : 17
+law                  : 5
+nonexe_law           : 15
+observe_law          : 16
+pred_fact            : 7
+program              : 2 3 0
+query                : 6
+rule                 : 3
+static_law           : 10
+term                 : 67 68 76 77
+term_list            : 66 68 72
+tfa                  : 52 53
+var_term             : 65 69
+where_part           : 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> .
+    (2) program -> . program ESCAPE_ASP
+    (3) program -> . program rule DOT
+
+    ESCAPE_ASP      reduce using rule 1 (program -> .)
+    ACT             reduce using rule 1 (program -> .)
+    FLU             reduce using rule 1 (program -> .)
+    DFLU            reduce using rule 1 (program -> .)
+    INERTIAL        reduce using rule 1 (program -> .)
+    DEFAULT         reduce using rule 1 (program -> .)
+    IMPOSSIBLE      reduce using rule 1 (program -> .)
+    NONEXE          reduce using rule 1 (program -> .)
+    OBSERVES        reduce using rule 1 (program -> .)
+    INIT            reduce using rule 1 (program -> .)
+    GOAL            reduce using rule 1 (program -> .)
+    TRUE            reduce using rule 1 (program -> .)
+    FALSE           reduce using rule 1 (program -> .)
+    NOT             reduce using rule 1 (program -> .)
+    MINUS           reduce using rule 1 (program -> .)
+    IDENTIFIER      reduce using rule 1 (program -> .)
+    VARIABLE        reduce using rule 1 (program -> .)
+    $end            reduce using rule 1 (program -> .)
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+    (2) program -> program . ESCAPE_ASP
+    (3) program -> program . rule DOT
+    (4) rule -> . fact
+    (5) rule -> . law
+    (6) rule -> . query
+    (7) fact -> . pred_fact
+    (8) fact -> . act_fact
+    (9) fact -> . flu_fact
+    (10) law -> . static_law
+    (11) law -> . dynamic_law
+    (12) law -> . inertial_law
+    (13) law -> . default_law
+    (14) law -> . imposs_law
+    (15) law -> . nonexe_law
+    (16) law -> . observe_law
+    (17) query -> . init_rule
+    (18) query -> . goal_query
+    (19) pred_fact -> . formula where_part
+    (20) act_fact -> . ACT fluent_formula where_part
+    (21) flu_fact -> . FLU fluent_formula where_part
+    (22) flu_fact -> . DFLU fluent_formula where_part
+    (23) static_law -> . formula IF formula ifcons_part where_part
+    (24) static_law -> . formula IFCONS formula where_part
+    (25) dynamic_law -> . formula after_part ifcons_part where_part
+    (26) dynamic_law -> . formula CAUSES formula where_part
+    (27) dynamic_law -> . formula CAUSES formula IF formula where_part
+    (28) inertial_law -> . INERTIAL fluent_formula where_part
+    (29) default_law -> . DEFAULT formula where_part
+    (30) default_law -> . DEFAULT formula IF formula where_part
+    (31) default_law -> . DEFAULT formula AFTER formula where_part
+    (32) imposs_law -> . IMPOSSIBLE formula ifcons_part where_part
+    (33) nonexe_law -> . NONEXE formula if_part ifcons_part where_part
+    (34) observe_law -> . OBSERVES formula if_part where_part
+    (35) observe_law -> . OBSERVES formula after_part ifcons_part where_part
+    (36) init_rule -> . INIT formula where_part
+    (37) goal_query -> . GOAL formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    ESCAPE_ASP      shift and go to state 6
+    ACT             shift and go to state 9
+    FLU             shift and go to state 23
+    DFLU            shift and go to state 34
+    INERTIAL        shift and go to state 38
+    DEFAULT         shift and go to state 3
+    IMPOSSIBLE      shift and go to state 28
+    NONEXE          shift and go to state 20
+    OBSERVES        shift and go to state 22
+    INIT            shift and go to state 16
+    GOAL            shift and go to state 31
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    imposs_law                     shift and go to state 2
+    act_fact                       shift and go to state 4
+    flu_fact                       shift and go to state 5
+    dynamic_law                    shift and go to state 8
+    query                          shift and go to state 10
+    pred_fact                      shift and go to state 29
+    inertial_law                   shift and go to state 13
+    default_law                    shift and go to state 15
+    observe_law                    shift and go to state 17
+    formula                        shift and go to state 18
+    nonexe_law                     shift and go to state 21
+    goal_query                     shift and go to state 24
+    tfa                            shift and go to state 25
+    static_law                     shift and go to state 26
+    atom                           shift and go to state 27
+    law                            shift and go to state 12
+    var_term                       shift and go to state 32
+    init_rule                      shift and go to state 33
+    rule                           shift and go to state 35
+    fluent                         shift and go to state 36
+    fact                           shift and go to state 39
+
+state 2
+
+    (14) law -> imposs_law .
+
+    DOT             reduce using rule 14 (law -> imposs_law .)
+
+
+state 3
+
+    (29) default_law -> DEFAULT . formula where_part
+    (30) default_law -> DEFAULT . formula IF formula where_part
+    (31) default_law -> DEFAULT . formula AFTER formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 40
+
+state 4
+
+    (8) fact -> act_fact .
+
+    DOT             reduce using rule 8 (fact -> act_fact .)
+
+
+state 5
+
+    (9) fact -> flu_fact .
+
+    DOT             reduce using rule 9 (fact -> flu_fact .)
+
+
+state 6
+
+    (2) program -> program ESCAPE_ASP .
+
+    ESCAPE_ASP      reduce using rule 2 (program -> program ESCAPE_ASP .)
+    ACT             reduce using rule 2 (program -> program ESCAPE_ASP .)
+    FLU             reduce using rule 2 (program -> program ESCAPE_ASP .)
+    DFLU            reduce using rule 2 (program -> program ESCAPE_ASP .)
+    INERTIAL        reduce using rule 2 (program -> program ESCAPE_ASP .)
+    DEFAULT         reduce using rule 2 (program -> program ESCAPE_ASP .)
+    IMPOSSIBLE      reduce using rule 2 (program -> program ESCAPE_ASP .)
+    NONEXE          reduce using rule 2 (program -> program ESCAPE_ASP .)
+    OBSERVES        reduce using rule 2 (program -> program ESCAPE_ASP .)
+    INIT            reduce using rule 2 (program -> program ESCAPE_ASP .)
+    GOAL            reduce using rule 2 (program -> program ESCAPE_ASP .)
+    TRUE            reduce using rule 2 (program -> program ESCAPE_ASP .)
+    FALSE           reduce using rule 2 (program -> program ESCAPE_ASP .)
+    NOT             reduce using rule 2 (program -> program ESCAPE_ASP .)
+    MINUS           reduce using rule 2 (program -> program ESCAPE_ASP .)
+    IDENTIFIER      reduce using rule 2 (program -> program ESCAPE_ASP .)
+    VARIABLE        reduce using rule 2 (program -> program ESCAPE_ASP .)
+    $end            reduce using rule 2 (program -> program ESCAPE_ASP .)
+
+
+state 7
+
+    (73) var_term -> VARIABLE .
+
+    EQ              reduce using rule 73 (var_term -> VARIABLE .)
+    IF              reduce using rule 73 (var_term -> VARIABLE .)
+    IFCONS          reduce using rule 73 (var_term -> VARIABLE .)
+    CAUSES          reduce using rule 73 (var_term -> VARIABLE .)
+    COMMA           reduce using rule 73 (var_term -> VARIABLE .)
+    WHERE           reduce using rule 73 (var_term -> VARIABLE .)
+    AFTER           reduce using rule 73 (var_term -> VARIABLE .)
+    DOT             reduce using rule 73 (var_term -> VARIABLE .)
+    PLUS            reduce using rule 73 (var_term -> VARIABLE .)
+    MINUS           reduce using rule 73 (var_term -> VARIABLE .)
+    TIMES           reduce using rule 73 (var_term -> VARIABLE .)
+    DIV             reduce using rule 73 (var_term -> VARIABLE .)
+    EQQ             reduce using rule 73 (var_term -> VARIABLE .)
+    NEQ             reduce using rule 73 (var_term -> VARIABLE .)
+    LT              reduce using rule 73 (var_term -> VARIABLE .)
+    GT              reduce using rule 73 (var_term -> VARIABLE .)
+    LE              reduce using rule 73 (var_term -> VARIABLE .)
+    GE              reduce using rule 73 (var_term -> VARIABLE .)
+    RBRAC           reduce using rule 73 (var_term -> VARIABLE .)
+
+
+state 8
+
+    (11) law -> dynamic_law .
+
+    DOT             reduce using rule 11 (law -> dynamic_law .)
+
+
+state 9
+
+    (20) act_fact -> ACT . fluent_formula where_part
+    (60) fluent_formula -> . fluent equalpart
+    (61) fluent_formula -> . fluent_formula COMMA fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    fluent                         shift and go to state 41
+    fluent_formula                 shift and go to state 42
+
+state 10
+
+    (6) rule -> query .
+
+    DOT             reduce using rule 6 (rule -> query .)
+
+
+state 11
+
+    (59) atom -> MINUS . fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 43
+    var_term                       shift and go to state 32
+
+state 12
+
+    (5) rule -> law .
+
+    DOT             reduce using rule 5 (rule -> law .)
+
+
+state 13
+
+    (12) law -> inertial_law .
+
+    DOT             reduce using rule 12 (law -> inertial_law .)
+
+
+state 14
+
+    (55) tfa -> TRUE .
+
+    COMMA           reduce using rule 55 (tfa -> TRUE .)
+    IFCONS          reduce using rule 55 (tfa -> TRUE .)
+    WHERE           reduce using rule 55 (tfa -> TRUE .)
+    DOT             reduce using rule 55 (tfa -> TRUE .)
+    IF              reduce using rule 55 (tfa -> TRUE .)
+    AFTER           reduce using rule 55 (tfa -> TRUE .)
+    CAUSES          reduce using rule 55 (tfa -> TRUE .)
+
+
+state 15
+
+    (13) law -> default_law .
+
+    DOT             reduce using rule 13 (law -> default_law .)
+
+
+state 16
+
+    (36) init_rule -> INIT . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 44
+
+state 17
+
+    (16) law -> observe_law .
+
+    DOT             reduce using rule 16 (law -> observe_law .)
+
+
+state 18
+
+    (19) pred_fact -> formula . where_part
+    (23) static_law -> formula . IF formula ifcons_part where_part
+    (24) static_law -> formula . IFCONS formula where_part
+    (25) dynamic_law -> formula . after_part ifcons_part where_part
+    (26) dynamic_law -> formula . CAUSES formula where_part
+    (27) dynamic_law -> formula . CAUSES formula IF formula where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+    (40) after_part -> . AFTER formula
+
+    IF              shift and go to state 52
+    IFCONS          shift and go to state 48
+    CAUSES          shift and go to state 51
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+    AFTER           shift and go to state 47
+
+    where_part                     shift and go to state 46
+    after_part                     shift and go to state 50
+
+state 19
+
+    (64) fluent -> IDENTIFIER .
+    (66) fluent -> IDENTIFIER . LBRAC term_list RBRAC
+
+    EQ              reduce using rule 64 (fluent -> IDENTIFIER .)
+    COMMA           reduce using rule 64 (fluent -> IDENTIFIER .)
+    DOT             reduce using rule 64 (fluent -> IDENTIFIER .)
+    WHERE           reduce using rule 64 (fluent -> IDENTIFIER .)
+    IF              reduce using rule 64 (fluent -> IDENTIFIER .)
+    AFTER           reduce using rule 64 (fluent -> IDENTIFIER .)
+    IFCONS          reduce using rule 64 (fluent -> IDENTIFIER .)
+    CAUSES          reduce using rule 64 (fluent -> IDENTIFIER .)
+    LBRAC           shift and go to state 53
+
+
+state 20
+
+    (33) nonexe_law -> NONEXE . formula if_part ifcons_part where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 54
+
+state 21
+
+    (15) law -> nonexe_law .
+
+    DOT             reduce using rule 15 (law -> nonexe_law .)
+
+
+state 22
+
+    (34) observe_law -> OBSERVES . formula if_part where_part
+    (35) observe_law -> OBSERVES . formula after_part ifcons_part where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 55
+
+state 23
+
+    (21) flu_fact -> FLU . fluent_formula where_part
+    (60) fluent_formula -> . fluent equalpart
+    (61) fluent_formula -> . fluent_formula COMMA fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    fluent                         shift and go to state 41
+    fluent_formula                 shift and go to state 56
+
+state 24
+
+    (18) query -> goal_query .
+
+    DOT             reduce using rule 18 (query -> goal_query .)
+
+
+state 25
+
+    (52) formula -> tfa .
+
+    COMMA           reduce using rule 52 (formula -> tfa .)
+    WHERE           reduce using rule 52 (formula -> tfa .)
+    DOT             reduce using rule 52 (formula -> tfa .)
+    IF              reduce using rule 52 (formula -> tfa .)
+    IFCONS          reduce using rule 52 (formula -> tfa .)
+    AFTER           reduce using rule 52 (formula -> tfa .)
+    CAUSES          reduce using rule 52 (formula -> tfa .)
+
+
+state 26
+
+    (10) law -> static_law .
+
+    DOT             reduce using rule 10 (law -> static_law .)
+
+
+state 27
+
+    (54) tfa -> atom .
+
+    COMMA           reduce using rule 54 (tfa -> atom .)
+    IFCONS          reduce using rule 54 (tfa -> atom .)
+    WHERE           reduce using rule 54 (tfa -> atom .)
+    DOT             reduce using rule 54 (tfa -> atom .)
+    IF              reduce using rule 54 (tfa -> atom .)
+    AFTER           reduce using rule 54 (tfa -> atom .)
+    CAUSES          reduce using rule 54 (tfa -> atom .)
+
+
+state 28
+
+    (32) imposs_law -> IMPOSSIBLE . formula ifcons_part where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 57
+
+state 29
+
+    (7) fact -> pred_fact .
+
+    DOT             reduce using rule 7 (fact -> pred_fact .)
+
+
+state 30
+
+    (56) tfa -> FALSE .
+
+    COMMA           reduce using rule 56 (tfa -> FALSE .)
+    IFCONS          reduce using rule 56 (tfa -> FALSE .)
+    WHERE           reduce using rule 56 (tfa -> FALSE .)
+    DOT             reduce using rule 56 (tfa -> FALSE .)
+    IF              reduce using rule 56 (tfa -> FALSE .)
+    AFTER           reduce using rule 56 (tfa -> FALSE .)
+    CAUSES          reduce using rule 56 (tfa -> FALSE .)
+
+
+state 31
+
+    (37) goal_query -> GOAL . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 58
+
+state 32
+
+    (65) fluent -> var_term .
+
+    EQ              reduce using rule 65 (fluent -> var_term .)
+    COMMA           reduce using rule 65 (fluent -> var_term .)
+    DOT             reduce using rule 65 (fluent -> var_term .)
+    WHERE           reduce using rule 65 (fluent -> var_term .)
+    IF              reduce using rule 65 (fluent -> var_term .)
+    AFTER           reduce using rule 65 (fluent -> var_term .)
+    IFCONS          reduce using rule 65 (fluent -> var_term .)
+    CAUSES          reduce using rule 65 (fluent -> var_term .)
+
+
+state 33
+
+    (17) query -> init_rule .
+
+    DOT             reduce using rule 17 (query -> init_rule .)
+
+
+state 34
+
+    (22) flu_fact -> DFLU . fluent_formula where_part
+    (60) fluent_formula -> . fluent equalpart
+    (61) fluent_formula -> . fluent_formula COMMA fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    fluent                         shift and go to state 41
+    fluent_formula                 shift and go to state 59
+
+state 35
+
+    (3) program -> program rule . DOT
+
+    DOT             shift and go to state 60
+
+
+state 36
+
+    (57) atom -> fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    IF              reduce using rule 62 (equalpart -> .)
+    IFCONS          reduce using rule 62 (equalpart -> .)
+    CAUSES          reduce using rule 62 (equalpart -> .)
+    COMMA           reduce using rule 62 (equalpart -> .)
+    WHERE           reduce using rule 62 (equalpart -> .)
+    AFTER           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 62
+
+state 37
+
+    (58) atom -> NOT . fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 63
+    var_term                       shift and go to state 32
+
+state 38
+
+    (28) inertial_law -> INERTIAL . fluent_formula where_part
+    (60) fluent_formula -> . fluent equalpart
+    (61) fluent_formula -> . fluent_formula COMMA fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    fluent                         shift and go to state 41
+    fluent_formula                 shift and go to state 64
+
+state 39
+
+    (4) rule -> fact .
+
+    DOT             reduce using rule 4 (rule -> fact .)
+
+
+state 40
+
+    (29) default_law -> DEFAULT formula . where_part
+    (30) default_law -> DEFAULT formula . IF formula where_part
+    (31) default_law -> DEFAULT formula . AFTER formula where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    IF              shift and go to state 67
+    AFTER           shift and go to state 66
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 65
+
+state 41
+
+    (60) fluent_formula -> fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    COMMA           reduce using rule 62 (equalpart -> .)
+    WHERE           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 68
+
+state 42
+
+    (20) act_fact -> ACT fluent_formula . where_part
+    (61) fluent_formula -> fluent_formula . COMMA fluent equalpart
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 70
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 69
+
+state 43
+
+    (59) atom -> MINUS fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    IF              reduce using rule 62 (equalpart -> .)
+    IFCONS          reduce using rule 62 (equalpart -> .)
+    CAUSES          reduce using rule 62 (equalpart -> .)
+    COMMA           reduce using rule 62 (equalpart -> .)
+    WHERE           reduce using rule 62 (equalpart -> .)
+    AFTER           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 71
+
+state 44
+
+    (36) init_rule -> INIT formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 72
+
+state 45
+
+    (44) where_part -> WHERE . bindings
+    (45) bindings -> . binding
+    (46) bindings -> . bindings COMMA binding
+    (47) binding -> . ACT fluent
+    (48) binding -> . FLU fluent equalpart
+    (49) binding -> . NOT asp_term
+    (50) binding -> . MINUS asp_term
+    (51) binding -> . asp_term
+    (74) asp_term -> . asp_operation
+    (75) asp_term -> . asp_operation asp_eqoperator asp_operation
+    (76) asp_operation -> . term
+    (77) asp_operation -> . asp_operation asp_operator term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    ACT             shift and go to state 73
+    FLU             shift and go to state 74
+    NOT             shift and go to state 84
+    MINUS           shift and go to state 77
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    term                           shift and go to state 82
+    asp_operation                  shift and go to state 78
+    var_term                       shift and go to state 83
+    binding                        shift and go to state 81
+    bindings                       shift and go to state 76
+    asp_term                       shift and go to state 79
+
+state 46
+
+    (19) pred_fact -> formula where_part .
+
+    DOT             reduce using rule 19 (pred_fact -> formula where_part .)
+
+
+state 47
+
+    (40) after_part -> AFTER . formula
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 85
+
+state 48
+
+    (24) static_law -> formula IFCONS . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 86
+
+state 49
+
+    (53) formula -> formula COMMA . tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 87
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+
+state 50
+
+    (25) dynamic_law -> formula after_part . ifcons_part where_part
+    (41) ifcons_part -> .
+    (42) ifcons_part -> . IFCONS formula
+
+    WHERE           reduce using rule 41 (ifcons_part -> .)
+    DOT             reduce using rule 41 (ifcons_part -> .)
+    IFCONS          shift and go to state 88
+
+    ifcons_part                    shift and go to state 89
+
+state 51
+
+    (26) dynamic_law -> formula CAUSES . formula where_part
+    (27) dynamic_law -> formula CAUSES . formula IF formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 90
+
+state 52
+
+    (23) static_law -> formula IF . formula ifcons_part where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 91
+
+state 53
+
+    (66) fluent -> IDENTIFIER LBRAC . term_list RBRAC
+    (67) term_list -> . term
+    (68) term_list -> . term COMMA term_list
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 83
+    term                           shift and go to state 92
+    term_list                      shift and go to state 93
+
+state 54
+
+    (33) nonexe_law -> NONEXE formula . if_part ifcons_part where_part
+    (53) formula -> formula . COMMA tfa
+    (38) if_part -> .
+    (39) if_part -> . IF formula
+
+    COMMA           shift and go to state 49
+    IFCONS          reduce using rule 38 (if_part -> .)
+    WHERE           reduce using rule 38 (if_part -> .)
+    DOT             reduce using rule 38 (if_part -> .)
+    IF              shift and go to state 95
+
+    if_part                        shift and go to state 94
+
+state 55
+
+    (34) observe_law -> OBSERVES formula . if_part where_part
+    (35) observe_law -> OBSERVES formula . after_part ifcons_part where_part
+    (53) formula -> formula . COMMA tfa
+    (38) if_part -> .
+    (39) if_part -> . IF formula
+    (40) after_part -> . AFTER formula
+
+    COMMA           shift and go to state 49
+    WHERE           reduce using rule 38 (if_part -> .)
+    DOT             reduce using rule 38 (if_part -> .)
+    IF              shift and go to state 95
+    AFTER           shift and go to state 47
+
+    if_part                        shift and go to state 96
+    after_part                     shift and go to state 97
+
+state 56
+
+    (21) flu_fact -> FLU fluent_formula . where_part
+    (61) fluent_formula -> fluent_formula . COMMA fluent equalpart
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 70
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 98
+
+state 57
+
+    (32) imposs_law -> IMPOSSIBLE formula . ifcons_part where_part
+    (53) formula -> formula . COMMA tfa
+    (41) ifcons_part -> .
+    (42) ifcons_part -> . IFCONS formula
+
+    COMMA           shift and go to state 49
+    WHERE           reduce using rule 41 (ifcons_part -> .)
+    DOT             reduce using rule 41 (ifcons_part -> .)
+    IFCONS          shift and go to state 88
+
+    ifcons_part                    shift and go to state 99
+
+state 58
+
+    (37) goal_query -> GOAL formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 100
+
+state 59
+
+    (22) flu_fact -> DFLU fluent_formula . where_part
+    (61) fluent_formula -> fluent_formula . COMMA fluent equalpart
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 70
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 101
+
+state 60
+
+    (3) program -> program rule DOT .
+
+    ESCAPE_ASP      reduce using rule 3 (program -> program rule DOT .)
+    ACT             reduce using rule 3 (program -> program rule DOT .)
+    FLU             reduce using rule 3 (program -> program rule DOT .)
+    DFLU            reduce using rule 3 (program -> program rule DOT .)
+    INERTIAL        reduce using rule 3 (program -> program rule DOT .)
+    DEFAULT         reduce using rule 3 (program -> program rule DOT .)
+    IMPOSSIBLE      reduce using rule 3 (program -> program rule DOT .)
+    NONEXE          reduce using rule 3 (program -> program rule DOT .)
+    OBSERVES        reduce using rule 3 (program -> program rule DOT .)
+    INIT            reduce using rule 3 (program -> program rule DOT .)
+    GOAL            reduce using rule 3 (program -> program rule DOT .)
+    TRUE            reduce using rule 3 (program -> program rule DOT .)
+    FALSE           reduce using rule 3 (program -> program rule DOT .)
+    NOT             reduce using rule 3 (program -> program rule DOT .)
+    MINUS           reduce using rule 3 (program -> program rule DOT .)
+    IDENTIFIER      reduce using rule 3 (program -> program rule DOT .)
+    VARIABLE        reduce using rule 3 (program -> program rule DOT .)
+    $end            reduce using rule 3 (program -> program rule DOT .)
+
+
+state 61
+
+    (63) equalpart -> EQ . fluent
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 102
+    var_term                       shift and go to state 32
+
+state 62
+
+    (57) atom -> fluent equalpart .
+
+    COMMA           reduce using rule 57 (atom -> fluent equalpart .)
+    IFCONS          reduce using rule 57 (atom -> fluent equalpart .)
+    WHERE           reduce using rule 57 (atom -> fluent equalpart .)
+    DOT             reduce using rule 57 (atom -> fluent equalpart .)
+    IF              reduce using rule 57 (atom -> fluent equalpart .)
+    AFTER           reduce using rule 57 (atom -> fluent equalpart .)
+    CAUSES          reduce using rule 57 (atom -> fluent equalpart .)
+
+
+state 63
+
+    (58) atom -> NOT fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    IF              reduce using rule 62 (equalpart -> .)
+    IFCONS          reduce using rule 62 (equalpart -> .)
+    CAUSES          reduce using rule 62 (equalpart -> .)
+    COMMA           reduce using rule 62 (equalpart -> .)
+    WHERE           reduce using rule 62 (equalpart -> .)
+    AFTER           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 103
+
+state 64
+
+    (28) inertial_law -> INERTIAL fluent_formula . where_part
+    (61) fluent_formula -> fluent_formula . COMMA fluent equalpart
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 70
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 104
+
+state 65
+
+    (29) default_law -> DEFAULT formula where_part .
+
+    DOT             reduce using rule 29 (default_law -> DEFAULT formula where_part .)
+
+
+state 66
+
+    (31) default_law -> DEFAULT formula AFTER . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 105
+
+state 67
+
+    (30) default_law -> DEFAULT formula IF . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 106
+
+state 68
+
+    (60) fluent_formula -> fluent equalpart .
+
+    COMMA           reduce using rule 60 (fluent_formula -> fluent equalpart .)
+    WHERE           reduce using rule 60 (fluent_formula -> fluent equalpart .)
+    DOT             reduce using rule 60 (fluent_formula -> fluent equalpart .)
+
+
+state 69
+
+    (20) act_fact -> ACT fluent_formula where_part .
+
+    DOT             reduce using rule 20 (act_fact -> ACT fluent_formula where_part .)
+
+
+state 70
+
+    (61) fluent_formula -> fluent_formula COMMA . fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 107
+    var_term                       shift and go to state 32
+
+state 71
+
+    (59) atom -> MINUS fluent equalpart .
+
+    COMMA           reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    IFCONS          reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    WHERE           reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    DOT             reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    IF              reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    AFTER           reduce using rule 59 (atom -> MINUS fluent equalpart .)
+    CAUSES          reduce using rule 59 (atom -> MINUS fluent equalpart .)
+
+
+state 72
+
+    (36) init_rule -> INIT formula where_part .
+
+    DOT             reduce using rule 36 (init_rule -> INIT formula where_part .)
+
+
+state 73
+
+    (47) binding -> ACT . fluent
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 108
+    var_term                       shift and go to state 32
+
+state 74
+
+    (48) binding -> FLU . fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    fluent                         shift and go to state 109
+    var_term                       shift and go to state 32
+
+state 75
+
+    (71) term -> NUMBER .
+
+    EQQ             reduce using rule 71 (term -> NUMBER .)
+    EQ              reduce using rule 71 (term -> NUMBER .)
+    NEQ             reduce using rule 71 (term -> NUMBER .)
+    LT              reduce using rule 71 (term -> NUMBER .)
+    GT              reduce using rule 71 (term -> NUMBER .)
+    LE              reduce using rule 71 (term -> NUMBER .)
+    GE              reduce using rule 71 (term -> NUMBER .)
+    PLUS            reduce using rule 71 (term -> NUMBER .)
+    MINUS           reduce using rule 71 (term -> NUMBER .)
+    TIMES           reduce using rule 71 (term -> NUMBER .)
+    DIV             reduce using rule 71 (term -> NUMBER .)
+    COMMA           reduce using rule 71 (term -> NUMBER .)
+    DOT             reduce using rule 71 (term -> NUMBER .)
+    RBRAC           reduce using rule 71 (term -> NUMBER .)
+
+
+state 76
+
+    (44) where_part -> WHERE bindings .
+    (46) bindings -> bindings . COMMA binding
+
+    DOT             reduce using rule 44 (where_part -> WHERE bindings .)
+    COMMA           shift and go to state 110
+
+
+state 77
+
+    (50) binding -> MINUS . asp_term
+    (74) asp_term -> . asp_operation
+    (75) asp_term -> . asp_operation asp_eqoperator asp_operation
+    (76) asp_operation -> . term
+    (77) asp_operation -> . asp_operation asp_operator term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    term                           shift and go to state 82
+    asp_operation                  shift and go to state 78
+    var_term                       shift and go to state 83
+    asp_term                       shift and go to state 111
+
+state 78
+
+    (74) asp_term -> asp_operation .
+    (75) asp_term -> asp_operation . asp_eqoperator asp_operation
+    (77) asp_operation -> asp_operation . asp_operator term
+    (78) asp_eqoperator -> . EQQ
+    (79) asp_eqoperator -> . EQ
+    (80) asp_eqoperator -> . NEQ
+    (81) asp_eqoperator -> . LT
+    (82) asp_eqoperator -> . GT
+    (83) asp_eqoperator -> . LE
+    (84) asp_eqoperator -> . GE
+    (85) asp_operator -> . PLUS
+    (86) asp_operator -> . MINUS
+    (87) asp_operator -> . TIMES
+    (88) asp_operator -> . DIV
+
+    COMMA           reduce using rule 74 (asp_term -> asp_operation .)
+    DOT             reduce using rule 74 (asp_term -> asp_operation .)
+    EQQ             shift and go to state 113
+    EQ              shift and go to state 122
+    NEQ             shift and go to state 124
+    LT              shift and go to state 117
+    GT              shift and go to state 112
+    LE              shift and go to state 118
+    GE              shift and go to state 115
+    PLUS            shift and go to state 119
+    MINUS           shift and go to state 123
+    TIMES           shift and go to state 116
+    DIV             shift and go to state 121
+
+    asp_eqoperator                 shift and go to state 120
+    asp_operator                   shift and go to state 114
+
+state 79
+
+    (51) binding -> asp_term .
+
+    COMMA           reduce using rule 51 (binding -> asp_term .)
+    DOT             reduce using rule 51 (binding -> asp_term .)
+
+
+state 80
+
+    (70) term -> IDENTIFIER .
+    (72) term -> IDENTIFIER . LBRAC term_list RBRAC
+
+    EQQ             reduce using rule 70 (term -> IDENTIFIER .)
+    EQ              reduce using rule 70 (term -> IDENTIFIER .)
+    NEQ             reduce using rule 70 (term -> IDENTIFIER .)
+    LT              reduce using rule 70 (term -> IDENTIFIER .)
+    GT              reduce using rule 70 (term -> IDENTIFIER .)
+    LE              reduce using rule 70 (term -> IDENTIFIER .)
+    GE              reduce using rule 70 (term -> IDENTIFIER .)
+    PLUS            reduce using rule 70 (term -> IDENTIFIER .)
+    MINUS           reduce using rule 70 (term -> IDENTIFIER .)
+    TIMES           reduce using rule 70 (term -> IDENTIFIER .)
+    DIV             reduce using rule 70 (term -> IDENTIFIER .)
+    COMMA           reduce using rule 70 (term -> IDENTIFIER .)
+    DOT             reduce using rule 70 (term -> IDENTIFIER .)
+    RBRAC           reduce using rule 70 (term -> IDENTIFIER .)
+    LBRAC           shift and go to state 125
+
+
+state 81
+
+    (45) bindings -> binding .
+
+    COMMA           reduce using rule 45 (bindings -> binding .)
+    DOT             reduce using rule 45 (bindings -> binding .)
+
+
+state 82
+
+    (76) asp_operation -> term .
+
+    EQQ             reduce using rule 76 (asp_operation -> term .)
+    EQ              reduce using rule 76 (asp_operation -> term .)
+    NEQ             reduce using rule 76 (asp_operation -> term .)
+    LT              reduce using rule 76 (asp_operation -> term .)
+    GT              reduce using rule 76 (asp_operation -> term .)
+    LE              reduce using rule 76 (asp_operation -> term .)
+    GE              reduce using rule 76 (asp_operation -> term .)
+    PLUS            reduce using rule 76 (asp_operation -> term .)
+    MINUS           reduce using rule 76 (asp_operation -> term .)
+    TIMES           reduce using rule 76 (asp_operation -> term .)
+    DIV             reduce using rule 76 (asp_operation -> term .)
+    COMMA           reduce using rule 76 (asp_operation -> term .)
+    DOT             reduce using rule 76 (asp_operation -> term .)
+
+
+state 83
+
+    (69) term -> var_term .
+
+    EQQ             reduce using rule 69 (term -> var_term .)
+    EQ              reduce using rule 69 (term -> var_term .)
+    NEQ             reduce using rule 69 (term -> var_term .)
+    LT              reduce using rule 69 (term -> var_term .)
+    GT              reduce using rule 69 (term -> var_term .)
+    LE              reduce using rule 69 (term -> var_term .)
+    GE              reduce using rule 69 (term -> var_term .)
+    PLUS            reduce using rule 69 (term -> var_term .)
+    MINUS           reduce using rule 69 (term -> var_term .)
+    TIMES           reduce using rule 69 (term -> var_term .)
+    DIV             reduce using rule 69 (term -> var_term .)
+    COMMA           reduce using rule 69 (term -> var_term .)
+    DOT             reduce using rule 69 (term -> var_term .)
+    RBRAC           reduce using rule 69 (term -> var_term .)
+
+
+state 84
+
+    (49) binding -> NOT . asp_term
+    (74) asp_term -> . asp_operation
+    (75) asp_term -> . asp_operation asp_eqoperator asp_operation
+    (76) asp_operation -> . term
+    (77) asp_operation -> . asp_operation asp_operator term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    term                           shift and go to state 82
+    asp_operation                  shift and go to state 78
+    var_term                       shift and go to state 83
+    asp_term                       shift and go to state 126
+
+state 85
+
+    (40) after_part -> AFTER formula .
+    (53) formula -> formula . COMMA tfa
+
+    IFCONS          reduce using rule 40 (after_part -> AFTER formula .)
+    WHERE           reduce using rule 40 (after_part -> AFTER formula .)
+    DOT             reduce using rule 40 (after_part -> AFTER formula .)
+    COMMA           shift and go to state 49
+
+
+state 86
+
+    (24) static_law -> formula IFCONS formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 127
+
+state 87
+
+    (53) formula -> formula COMMA tfa .
+
+    COMMA           reduce using rule 53 (formula -> formula COMMA tfa .)
+    WHERE           reduce using rule 53 (formula -> formula COMMA tfa .)
+    DOT             reduce using rule 53 (formula -> formula COMMA tfa .)
+    IF              reduce using rule 53 (formula -> formula COMMA tfa .)
+    IFCONS          reduce using rule 53 (formula -> formula COMMA tfa .)
+    AFTER           reduce using rule 53 (formula -> formula COMMA tfa .)
+    CAUSES          reduce using rule 53 (formula -> formula COMMA tfa .)
+
+
+state 88
+
+    (42) ifcons_part -> IFCONS . formula
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 128
+
+state 89
+
+    (25) dynamic_law -> formula after_part ifcons_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 129
+
+state 90
+
+    (26) dynamic_law -> formula CAUSES formula . where_part
+    (27) dynamic_law -> formula CAUSES formula . IF formula where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    IF              shift and go to state 131
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 130
+
+state 91
+
+    (23) static_law -> formula IF formula . ifcons_part where_part
+    (53) formula -> formula . COMMA tfa
+    (41) ifcons_part -> .
+    (42) ifcons_part -> . IFCONS formula
+
+    COMMA           shift and go to state 49
+    WHERE           reduce using rule 41 (ifcons_part -> .)
+    DOT             reduce using rule 41 (ifcons_part -> .)
+    IFCONS          shift and go to state 88
+
+    ifcons_part                    shift and go to state 132
+
+state 92
+
+    (67) term_list -> term .
+    (68) term_list -> term . COMMA term_list
+
+    RBRAC           reduce using rule 67 (term_list -> term .)
+    COMMA           shift and go to state 133
+
+
+state 93
+
+    (66) fluent -> IDENTIFIER LBRAC term_list . RBRAC
+
+    RBRAC           shift and go to state 134
+
+
+state 94
+
+    (33) nonexe_law -> NONEXE formula if_part . ifcons_part where_part
+    (41) ifcons_part -> .
+    (42) ifcons_part -> . IFCONS formula
+
+    WHERE           reduce using rule 41 (ifcons_part -> .)
+    DOT             reduce using rule 41 (ifcons_part -> .)
+    IFCONS          shift and go to state 88
+
+    ifcons_part                    shift and go to state 135
+
+state 95
+
+    (39) if_part -> IF . formula
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 136
+
+state 96
+
+    (34) observe_law -> OBSERVES formula if_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 137
+
+state 97
+
+    (35) observe_law -> OBSERVES formula after_part . ifcons_part where_part
+    (41) ifcons_part -> .
+    (42) ifcons_part -> . IFCONS formula
+
+    WHERE           reduce using rule 41 (ifcons_part -> .)
+    DOT             reduce using rule 41 (ifcons_part -> .)
+    IFCONS          shift and go to state 88
+
+    ifcons_part                    shift and go to state 138
+
+state 98
+
+    (21) flu_fact -> FLU fluent_formula where_part .
+
+    DOT             reduce using rule 21 (flu_fact -> FLU fluent_formula where_part .)
+
+
+state 99
+
+    (32) imposs_law -> IMPOSSIBLE formula ifcons_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 139
+
+state 100
+
+    (37) goal_query -> GOAL formula where_part .
+
+    DOT             reduce using rule 37 (goal_query -> GOAL formula where_part .)
+
+
+state 101
+
+    (22) flu_fact -> DFLU fluent_formula where_part .
+
+    DOT             reduce using rule 22 (flu_fact -> DFLU fluent_formula where_part .)
+
+
+state 102
+
+    (63) equalpart -> EQ fluent .
+
+    IF              reduce using rule 63 (equalpart -> EQ fluent .)
+    IFCONS          reduce using rule 63 (equalpart -> EQ fluent .)
+    CAUSES          reduce using rule 63 (equalpart -> EQ fluent .)
+    COMMA           reduce using rule 63 (equalpart -> EQ fluent .)
+    WHERE           reduce using rule 63 (equalpart -> EQ fluent .)
+    AFTER           reduce using rule 63 (equalpart -> EQ fluent .)
+    DOT             reduce using rule 63 (equalpart -> EQ fluent .)
+
+
+state 103
+
+    (58) atom -> NOT fluent equalpart .
+
+    COMMA           reduce using rule 58 (atom -> NOT fluent equalpart .)
+    IFCONS          reduce using rule 58 (atom -> NOT fluent equalpart .)
+    WHERE           reduce using rule 58 (atom -> NOT fluent equalpart .)
+    DOT             reduce using rule 58 (atom -> NOT fluent equalpart .)
+    IF              reduce using rule 58 (atom -> NOT fluent equalpart .)
+    AFTER           reduce using rule 58 (atom -> NOT fluent equalpart .)
+    CAUSES          reduce using rule 58 (atom -> NOT fluent equalpart .)
+
+
+state 104
+
+    (28) inertial_law -> INERTIAL fluent_formula where_part .
+
+    DOT             reduce using rule 28 (inertial_law -> INERTIAL fluent_formula where_part .)
+
+
+state 105
+
+    (31) default_law -> DEFAULT formula AFTER formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 140
+
+state 106
+
+    (30) default_law -> DEFAULT formula IF formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 141
+
+state 107
+
+    (61) fluent_formula -> fluent_formula COMMA fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    COMMA           reduce using rule 62 (equalpart -> .)
+    WHERE           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 142
+
+state 108
+
+    (47) binding -> ACT fluent .
+
+    COMMA           reduce using rule 47 (binding -> ACT fluent .)
+    DOT             reduce using rule 47 (binding -> ACT fluent .)
+
+
+state 109
+
+    (48) binding -> FLU fluent . equalpart
+    (62) equalpart -> .
+    (63) equalpart -> . EQ fluent
+
+    COMMA           reduce using rule 62 (equalpart -> .)
+    DOT             reduce using rule 62 (equalpart -> .)
+    EQ              shift and go to state 61
+
+    equalpart                      shift and go to state 143
+
+state 110
+
+    (46) bindings -> bindings COMMA . binding
+    (47) binding -> . ACT fluent
+    (48) binding -> . FLU fluent equalpart
+    (49) binding -> . NOT asp_term
+    (50) binding -> . MINUS asp_term
+    (51) binding -> . asp_term
+    (74) asp_term -> . asp_operation
+    (75) asp_term -> . asp_operation asp_eqoperator asp_operation
+    (76) asp_operation -> . term
+    (77) asp_operation -> . asp_operation asp_operator term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    ACT             shift and go to state 73
+    FLU             shift and go to state 74
+    NOT             shift and go to state 84
+    MINUS           shift and go to state 77
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    term                           shift and go to state 82
+    asp_operation                  shift and go to state 78
+    var_term                       shift and go to state 83
+    binding                        shift and go to state 144
+    asp_term                       shift and go to state 79
+
+state 111
+
+    (50) binding -> MINUS asp_term .
+
+    COMMA           reduce using rule 50 (binding -> MINUS asp_term .)
+    DOT             reduce using rule 50 (binding -> MINUS asp_term .)
+
+
+state 112
+
+    (82) asp_eqoperator -> GT .
+
+    IDENTIFIER      reduce using rule 82 (asp_eqoperator -> GT .)
+    NUMBER          reduce using rule 82 (asp_eqoperator -> GT .)
+    VARIABLE        reduce using rule 82 (asp_eqoperator -> GT .)
+
+
+state 113
+
+    (78) asp_eqoperator -> EQQ .
+
+    IDENTIFIER      reduce using rule 78 (asp_eqoperator -> EQQ .)
+    NUMBER          reduce using rule 78 (asp_eqoperator -> EQQ .)
+    VARIABLE        reduce using rule 78 (asp_eqoperator -> EQQ .)
+
+
+state 114
+
+    (77) asp_operation -> asp_operation asp_operator . term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 83
+    term                           shift and go to state 145
+
+state 115
+
+    (84) asp_eqoperator -> GE .
+
+    IDENTIFIER      reduce using rule 84 (asp_eqoperator -> GE .)
+    NUMBER          reduce using rule 84 (asp_eqoperator -> GE .)
+    VARIABLE        reduce using rule 84 (asp_eqoperator -> GE .)
+
+
+state 116
+
+    (87) asp_operator -> TIMES .
+
+    IDENTIFIER      reduce using rule 87 (asp_operator -> TIMES .)
+    NUMBER          reduce using rule 87 (asp_operator -> TIMES .)
+    VARIABLE        reduce using rule 87 (asp_operator -> TIMES .)
+
+
+state 117
+
+    (81) asp_eqoperator -> LT .
+
+    IDENTIFIER      reduce using rule 81 (asp_eqoperator -> LT .)
+    NUMBER          reduce using rule 81 (asp_eqoperator -> LT .)
+    VARIABLE        reduce using rule 81 (asp_eqoperator -> LT .)
+
+
+state 118
+
+    (83) asp_eqoperator -> LE .
+
+    IDENTIFIER      reduce using rule 83 (asp_eqoperator -> LE .)
+    NUMBER          reduce using rule 83 (asp_eqoperator -> LE .)
+    VARIABLE        reduce using rule 83 (asp_eqoperator -> LE .)
+
+
+state 119
+
+    (85) asp_operator -> PLUS .
+
+    IDENTIFIER      reduce using rule 85 (asp_operator -> PLUS .)
+    NUMBER          reduce using rule 85 (asp_operator -> PLUS .)
+    VARIABLE        reduce using rule 85 (asp_operator -> PLUS .)
+
+
+state 120
+
+    (75) asp_term -> asp_operation asp_eqoperator . asp_operation
+    (76) asp_operation -> . term
+    (77) asp_operation -> . asp_operation asp_operator term
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    term                           shift and go to state 82
+    asp_operation                  shift and go to state 146
+    var_term                       shift and go to state 83
+
+state 121
+
+    (88) asp_operator -> DIV .
+
+    IDENTIFIER      reduce using rule 88 (asp_operator -> DIV .)
+    NUMBER          reduce using rule 88 (asp_operator -> DIV .)
+    VARIABLE        reduce using rule 88 (asp_operator -> DIV .)
+
+
+state 122
+
+    (79) asp_eqoperator -> EQ .
+
+    IDENTIFIER      reduce using rule 79 (asp_eqoperator -> EQ .)
+    NUMBER          reduce using rule 79 (asp_eqoperator -> EQ .)
+    VARIABLE        reduce using rule 79 (asp_eqoperator -> EQ .)
+
+
+state 123
+
+    (86) asp_operator -> MINUS .
+
+    IDENTIFIER      reduce using rule 86 (asp_operator -> MINUS .)
+    NUMBER          reduce using rule 86 (asp_operator -> MINUS .)
+    VARIABLE        reduce using rule 86 (asp_operator -> MINUS .)
+
+
+state 124
+
+    (80) asp_eqoperator -> NEQ .
+
+    IDENTIFIER      reduce using rule 80 (asp_eqoperator -> NEQ .)
+    NUMBER          reduce using rule 80 (asp_eqoperator -> NEQ .)
+    VARIABLE        reduce using rule 80 (asp_eqoperator -> NEQ .)
+
+
+state 125
+
+    (72) term -> IDENTIFIER LBRAC . term_list RBRAC
+    (67) term_list -> . term
+    (68) term_list -> . term COMMA term_list
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 83
+    term                           shift and go to state 92
+    term_list                      shift and go to state 147
+
+state 126
+
+    (49) binding -> NOT asp_term .
+
+    COMMA           reduce using rule 49 (binding -> NOT asp_term .)
+    DOT             reduce using rule 49 (binding -> NOT asp_term .)
+
+
+state 127
+
+    (24) static_law -> formula IFCONS formula where_part .
+
+    DOT             reduce using rule 24 (static_law -> formula IFCONS formula where_part .)
+
+
+state 128
+
+    (42) ifcons_part -> IFCONS formula .
+    (53) formula -> formula . COMMA tfa
+
+    WHERE           reduce using rule 42 (ifcons_part -> IFCONS formula .)
+    DOT             reduce using rule 42 (ifcons_part -> IFCONS formula .)
+    COMMA           shift and go to state 49
+
+
+state 129
+
+    (25) dynamic_law -> formula after_part ifcons_part where_part .
+
+    DOT             reduce using rule 25 (dynamic_law -> formula after_part ifcons_part where_part .)
+
+
+state 130
+
+    (26) dynamic_law -> formula CAUSES formula where_part .
+
+    DOT             reduce using rule 26 (dynamic_law -> formula CAUSES formula where_part .)
+
+
+state 131
+
+    (27) dynamic_law -> formula CAUSES formula IF . formula where_part
+    (52) formula -> . tfa
+    (53) formula -> . formula COMMA tfa
+    (54) tfa -> . atom
+    (55) tfa -> . TRUE
+    (56) tfa -> . FALSE
+    (57) atom -> . fluent equalpart
+    (58) atom -> . NOT fluent equalpart
+    (59) atom -> . MINUS fluent equalpart
+    (64) fluent -> . IDENTIFIER
+    (65) fluent -> . var_term
+    (66) fluent -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    TRUE            shift and go to state 14
+    FALSE           shift and go to state 30
+    NOT             shift and go to state 37
+    MINUS           shift and go to state 11
+    IDENTIFIER      shift and go to state 19
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 32
+    tfa                            shift and go to state 25
+    fluent                         shift and go to state 36
+    atom                           shift and go to state 27
+    formula                        shift and go to state 148
+
+state 132
+
+    (23) static_law -> formula IF formula ifcons_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 149
+
+state 133
+
+    (68) term_list -> term COMMA . term_list
+    (67) term_list -> . term
+    (68) term_list -> . term COMMA term_list
+    (69) term -> . var_term
+    (70) term -> . IDENTIFIER
+    (71) term -> . NUMBER
+    (72) term -> . IDENTIFIER LBRAC term_list RBRAC
+    (73) var_term -> . VARIABLE
+
+    IDENTIFIER      shift and go to state 80
+    NUMBER          shift and go to state 75
+    VARIABLE        shift and go to state 7
+
+    var_term                       shift and go to state 83
+    term                           shift and go to state 92
+    term_list                      shift and go to state 150
+
+state 134
+
+    (66) fluent -> IDENTIFIER LBRAC term_list RBRAC .
+
+    EQ              reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    COMMA           reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    DOT             reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    WHERE           reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    IF              reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    AFTER           reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    IFCONS          reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+    CAUSES          reduce using rule 66 (fluent -> IDENTIFIER LBRAC term_list RBRAC .)
+
+
+state 135
+
+    (33) nonexe_law -> NONEXE formula if_part ifcons_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 151
+
+state 136
+
+    (39) if_part -> IF formula .
+    (53) formula -> formula . COMMA tfa
+
+    IFCONS          reduce using rule 39 (if_part -> IF formula .)
+    WHERE           reduce using rule 39 (if_part -> IF formula .)
+    DOT             reduce using rule 39 (if_part -> IF formula .)
+    COMMA           shift and go to state 49
+
+
+state 137
+
+    (34) observe_law -> OBSERVES formula if_part where_part .
+
+    DOT             reduce using rule 34 (observe_law -> OBSERVES formula if_part where_part .)
+
+
+state 138
+
+    (35) observe_law -> OBSERVES formula after_part ifcons_part . where_part
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 152
+
+state 139
+
+    (32) imposs_law -> IMPOSSIBLE formula ifcons_part where_part .
+
+    DOT             reduce using rule 32 (imposs_law -> IMPOSSIBLE formula ifcons_part where_part .)
+
+
+state 140
+
+    (31) default_law -> DEFAULT formula AFTER formula where_part .
+
+    DOT             reduce using rule 31 (default_law -> DEFAULT formula AFTER formula where_part .)
+
+
+state 141
+
+    (30) default_law -> DEFAULT formula IF formula where_part .
+
+    DOT             reduce using rule 30 (default_law -> DEFAULT formula IF formula where_part .)
+
+
+state 142
+
+    (61) fluent_formula -> fluent_formula COMMA fluent equalpart .
+
+    COMMA           reduce using rule 61 (fluent_formula -> fluent_formula COMMA fluent equalpart .)
+    WHERE           reduce using rule 61 (fluent_formula -> fluent_formula COMMA fluent equalpart .)
+    DOT             reduce using rule 61 (fluent_formula -> fluent_formula COMMA fluent equalpart .)
+
+
+state 143
+
+    (48) binding -> FLU fluent equalpart .
+
+    COMMA           reduce using rule 48 (binding -> FLU fluent equalpart .)
+    DOT             reduce using rule 48 (binding -> FLU fluent equalpart .)
+
+
+state 144
+
+    (46) bindings -> bindings COMMA binding .
+
+    COMMA           reduce using rule 46 (bindings -> bindings COMMA binding .)
+    DOT             reduce using rule 46 (bindings -> bindings COMMA binding .)
+
+
+state 145
+
+    (77) asp_operation -> asp_operation asp_operator term .
+
+    EQQ             reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    EQ              reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    NEQ             reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    LT              reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    GT              reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    LE              reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    GE              reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    PLUS            reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    MINUS           reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    TIMES           reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    DIV             reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    COMMA           reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+    DOT             reduce using rule 77 (asp_operation -> asp_operation asp_operator term .)
+
+
+state 146
+
+    (75) asp_term -> asp_operation asp_eqoperator asp_operation .
+    (77) asp_operation -> asp_operation . asp_operator term
+    (85) asp_operator -> . PLUS
+    (86) asp_operator -> . MINUS
+    (87) asp_operator -> . TIMES
+    (88) asp_operator -> . DIV
+
+    COMMA           reduce using rule 75 (asp_term -> asp_operation asp_eqoperator asp_operation .)
+    DOT             reduce using rule 75 (asp_term -> asp_operation asp_eqoperator asp_operation .)
+    PLUS            shift and go to state 119
+    MINUS           shift and go to state 123
+    TIMES           shift and go to state 116
+    DIV             shift and go to state 121
+
+    asp_operator                   shift and go to state 114
+
+state 147
+
+    (72) term -> IDENTIFIER LBRAC term_list . RBRAC
+
+    RBRAC           shift and go to state 153
+
+
+state 148
+
+    (27) dynamic_law -> formula CAUSES formula IF formula . where_part
+    (53) formula -> formula . COMMA tfa
+    (43) where_part -> .
+    (44) where_part -> . WHERE bindings
+
+    COMMA           shift and go to state 49
+    DOT             reduce using rule 43 (where_part -> .)
+    WHERE           shift and go to state 45
+
+    where_part                     shift and go to state 154
+
+state 149
+
+    (23) static_law -> formula IF formula ifcons_part where_part .
+
+    DOT             reduce using rule 23 (static_law -> formula IF formula ifcons_part where_part .)
+
+
+state 150
+
+    (68) term_list -> term COMMA term_list .
+
+    RBRAC           reduce using rule 68 (term_list -> term COMMA term_list .)
+
+
+state 151
+
+    (33) nonexe_law -> NONEXE formula if_part ifcons_part where_part .
+
+    DOT             reduce using rule 33 (nonexe_law -> NONEXE formula if_part ifcons_part where_part .)
+
+
+state 152
+
+    (35) observe_law -> OBSERVES formula after_part ifcons_part where_part .
+
+    DOT             reduce using rule 35 (observe_law -> OBSERVES formula after_part ifcons_part where_part .)
+
+
+state 153
+
+    (72) term -> IDENTIFIER LBRAC term_list RBRAC .
+
+    EQQ             reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    EQ              reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    NEQ             reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    LT              reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    GT              reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    LE              reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    GE              reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    PLUS            reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    MINUS           reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    TIMES           reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    DIV             reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    COMMA           reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    DOT             reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+    RBRAC           reduce using rule 72 (term -> IDENTIFIER LBRAC term_list RBRAC .)
+
+
+state 154
+
+    (27) dynamic_law -> formula CAUSES formula IF formula where_part .
+
+    DOT             reduce using rule 27 (dynamic_law -> formula CAUSES formula IF formula where_part .)
+

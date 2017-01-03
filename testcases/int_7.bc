@@ -1,0 +1,11 @@
+
+<fluent> x : 1 .. 30.
+<fluent> y : 1 .. 21.
+
+<inertial> x,y.
+
+x:=y.
+y:=x.
+
+% 21 States
+% 21 Transitions

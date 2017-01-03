@@ -1,0 +1,13 @@
+<asp>
+vals(1..5).
+asp(1).
+</asp>
+
+<action> move.
+
+<fluent> x(X) <where> vals(X).
+<default> -x(X) <where> vals(X).
+
+x(X) <after> move <where> <fluent> x(X), not asp(X). 
+
+x(Y) <if> x(X) <where> <fluent> x(X), Y = X +1, X-1 > 1+1. 

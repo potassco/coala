@@ -1,0 +1,9 @@
+<fluent> a,b,c,d.
+<action> ac(A) <where> <fluent> A.
+
+<default> -a,-b,-c,-d.
+
+a <after> ac(a).
+b <if> b.
+%a <after> ac(a) <ifcons> a.
+%c <if> b.

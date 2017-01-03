@@ -1,0 +1,24 @@
+
+<fluent> x : 1 .. 50.
+<fluent> y : 5 .. 8.
+
+<asp>int(y).</asp>
+
+<inertial> x,y.
+
+x:=X*2+3+2*y+C <where> int(X), C = 2.
+% y = 5 -> x = 25
+% y = 6 -> x = 29
+% y = 7 -> x = 33
+% y = 8 -> x = 37
+
+<impossible> x < 25.
+
+%Wrong:
+% y = 5 -> x = 15
+% y = 6 -> x = 17
+% y = 7 -> x = 19
+% y = 8 -> x = 21
+
+% 4 States
+% 4 Transitions

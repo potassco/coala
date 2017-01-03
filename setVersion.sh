@@ -1,0 +1,7 @@
+echo "TODO: Set Version Numbers (coala/coala , README , MANIFEST)"
+echo "TODO: Copy to Doktor/Clean/coala/"
+echo "TODO: python setup.py sdist"
+echo "TODO: ssh mol sshfs wvwww@chevaux:/home/wv/WWW ~/w"
+echo "TODO: scp FILE mol:~/w/coala/"
+echo "TODO: Write Version Number and file in index.html"
+echo "TODO: ssh mol fusermount -u ~/w"

@@ -1,0 +1,145 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  domain (see domain.lp):
+%    time_step(S)        : a step in the plan of the solver
+%    end(E)              : the last step in the plan of the solver
+%    next(R,S)           : S is the step after R in the plan of the solver
+%    diff(S1,S2)         : S1 and S2 are two different steps in the plan of the solver
+%
+% actions:
+%    assign_external(E,V)           : assign the external E in the sovler value V {true,false}.
+%    assign_messages(S)             : add all pending messages to the solver for time step S (via externals)
+%    commit_actions(S)              : commits (via externals) the solver to the actions of step S and publishes them via /rosoclingo/out
+%    exit                           : terminates rosoclingo
+%    ground(S)                      : ground state, incremental and query for step S
+%    idle                           : does nothing
+%    initialize                     : ground the base part of the solver's encoding as well as state and query for step 0
+%    publish                        : publish the last answer set found by the solver via /rosoclingo/out
+%    release_external(E)            : releases the external E
+%    release_time_step(S)           : releases all marked externals of time step S that are not true
+%    reset(S)                          : TODO
+%    solve                          : send a solving request to the solver
+%
+% external fluents (see domain.lp):
+%    result(sat)         : the solver returned sat on its last call
+%    result(unsat)       : the solver returned unsat on its last call
+%    result(unknown)     : the solver returned unknown on its last call
+%    pending_actions     : there is at least one unfinished action in current step
+%    pending_requests    : there is at least one request pending to be added to the solver (via external)
+%    pending_messages    : there is at least one messages pending to be added to the solver (via external)
+%
+% saved fluents(see doain.lp): 
+%    current_horizon(S)
+%    current_time_step(S)
+%    done
+%    grounded(S)
+%    next_horizon(S)
+%    released_external(query(S)))
+%    released_time_step(S))
+%    solved
+%
+% to be solved with bc.lp and domain.lp
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<action> assign_external(query(S),true) <where> time_step(S).
+<action> assign_external(query(S),false) <where> time_step(S).
+<action> assign_messages(S) <where> time_step(S).
+<action> commit_actions(S) <where> time_step(S).
+<action> exit.
+<action> ground(S) <where> time_step(S).
+<action> idle.
+<action> initialize.
+<action> publish.
+<action> release_external(query(S)) <where> time_step(S).
+<action> release_time_step(S) <where> time_step(S).
+<action> reset(S) <where> time_step(S).
+<action> solve.
+
+<fluent> all_querys_released.
+<fluent> all_steps_released.
+<fluent> current_horizon(S) <where> time_step(S).
+<fluent> current_time_step(S) <where> time_step(S).
+<fluent> done.
+<fluent> executing.
+<fluent> grounded(S) <where> time_step(S).
+<fluent> new_requests.
+<fluent> next_horizon(S) <where> time_step(S).
+<fluent> pending_actions.
+<fluent> pending_messages.
+<fluent> pending_requests.
+<fluent> possible(A) <where> <action> A.
+<fluent> released_external(query(S)) <where> time_step(S).
+<fluent> released_time_step(S) <where> time_step(S).
+<fluent> result(sat).
+<fluent> result(unknown).
+<fluent> result(unsat).
+<fluent> solved.
+
+% external
+<default> -new_requests.
+<default> -pending_actions.
+<default> -pending_messages.
+<default> -pending_requests.
+<default> -result(sat).
+<default> -result(unknown).
+<default> -result(unsat).
+% internal
+<default> -possible(A) <where> <action> A.
+<default> all_querys_released.
+<default> all_steps_released.
+<default> -executing.
+
+<inertial> F <where> save(F).
+<initially> -F <where> save(F).
+
+-all_steps_released <if> grounded(S), -released_time_step(S) <where> time_step(S).
+-all_querys_released <if> grounded(R), -released_external(query(R)) <where> next(R,S).
+
+-current_horizon(S2) <after> assign_external(query(S1),false), current_horizon(S2) <where> time_step(S1), time_step(S2).
+
+executing <if> A <where> <action> A.
+
+current_horizon(S) <after> assign_external(query(S),true) <where> time_step(S).
+-next_horizon(S2) <after> assign_external(query(S1),true), next_horizon(S2) <where> time_step(S1), time_step(S2).
+-solved <after> assign_external(query(S),true) <where> time_step(S).
+next_horizon(S) <after> assign_external(query(R),false) <where> next(R,S).
+-solved <after> assign_messages(S) <where> time_step(S).
+current_time_step(S) <after> commit_actions(S) <where> time_step(S).
+-current_time_step(S2) <after> commit_actions(S1), current_time_step(S2) <where> diff(S1,S2).
+done <after> exit.
+grounded(S) <after> ground(S) <where> time_step(S).
+-solved <after> ground(S) <where> time_step(S).
+grounded(0) <after> initialize.
+current_time_step(0) <after> initialize.
+next_horizon(0) <after> initialize.
+released_external(query(S)) <after> release_external(query(S)) <where> time_step(S).
+-current_horizon(S) <after> release_external(query(S)) <where> time_step(S).
+next_horizon(S) <after> release_external(query(R)) <where> next(R,S).
+released_time_step(S) <after> release_time_step(S) <where> time_step(S).
+current_time_step(0) <after> reset(S) <where> time_step(S).
+-current_time_step(S) <after> reset(S), -current_time_step(0) <where> time_step(S).
+-current_horizon(S) <after> reset(R), current_horizon(S) <where> time_step(R), time_step(S).
+next_horizon(0) <after> reset(S) <where> time_step(S).
+solved <after> solve.
+
+<impossible> current_horizon(S1), current_horizon(S2) <where> diff(S1,S2).
+
+<nonexecutable> A <if> -possible(A) <where> <action> A.
+<nonexecutable> A <if> done <where> <action> A.
+<nonexecutable> -executing.
+<nonexecutable> A,B <where> <action> A, <action> B, A != B.
+
+<nonexecutable> assign_external(query(S),true) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> assign_external(query(S),true) <if> released_external(query(S)) <where> time_step(S).
+<nonexecutable> assign_external(query(S),false) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> assign_external(query(S),false) <if> released_external(query(S)) <where> time_step(S).
+<nonexecutable> assign_messages(S) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> assign_messages(S) <if> released_time_step(S) <where> time_step(S).
+<nonexecutable> commit_actions(S) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> release_external(query(S)) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> release_external(query(S)) <if> released_external(query(S)) <where> time_step(S).
+<nonexecutable> release_time_step(S) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> release_time_step(S) <if> released_time_step(S) <where> time_step(S).
+<nonexecutable> reset(S) <if> -grounded(S) <where> time_step(S).
+<nonexecutable> ground(S) <if> grounded(S) <where> time_step(S).

@@ -1,0 +1,35 @@
+<role pawn>
+
+%A <observes> at(B,X,Y) <where> pawn(A), <fluent> at(B,X,Y). %TODO
+%<observes> at(B,X,Y) <where> <fluent> at(B,X,Y).
+
+<fluent> at(X,Y) <where> pos(X,Y).
+<fluent> dead.
+<visible> at(X,Y).
+
+<inertial> at(X,Y) <where> <fluent> at(X,Y).
+<inertial> dead.
+<default> -occupied(X,Y) <where> pos(X,Y).
+
+<action> move(0,1).
+<action> attack(1,1).
+<action> attack(-1,1).
+
+occupied(X,Y) <if> at(X,Y) <where> <fluent> at(X,Y).
+
+<nonexecutable> move(0,1) <if> at(X,Y), at(X,Y2) <where> pawn(A), Y2 = Y + 1, <fluent> at(X,Y), <visible> at(X,Y2).
+<nonexecutable> move(0,1) <if> at(X,Y) <where> pawn(A), dimension(Z,Y),<fluent> at(X,Y).
+<nonexecutable> attack(V,1) <if> at(X,Y), -occupied(X2,Y2) <where> Y2 = Y+1, X2=X+V, <action> attack(V,1), <fluent> at(X,Y), pos(X2,Y2).
+<nonexecutable> attack(V,1) <if> at(X,Y) <where> Y2 = Y+1, X2=X+V, <action> attack(V,1), <fluent> at(X,Y), -pos(X2,Y2).
+
+-at(X,Y),at(X,Y2) <after> move(0,1), at(X,Y) <where> Y2 = Y + 1, <fluent> at(X,Y), <fluent> at(X,Y2).
+-at(X,Y),dead(B),at(X2,Y2) <after> attack(V,1), at(X,Y), at(X2,Y2) <where> X2 = X + V, Y2 = Y + 1, <fluent> at(X,Y), <visible> at(X2,Y2), <action> attack(V,1).
+<impossible> at(X,Y), at(X2,Y2) <where> X != X2, <fluent> at(X,Y), <fluent> at(X2,Y2).
+<impossible> at(X,Y), at(X2,Y2) <where> Y != Y2, <fluent> at(X,Y), <fluent> at(X2,Y2).
+
+<nonexecutable> move(0,1) <if> dead.
+<nonexecutable> attack(V,1) <if> dead <where> <action> attack(V,1).
+
+<nonexecutable> move(0,1), attack(V,1) <where> <action> attack(V,1).
+<nonexecutable> attack(1,1), attack(-1,1).
+</role>

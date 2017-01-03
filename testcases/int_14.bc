@@ -1,0 +1,15 @@
+
+<fluent> x : 1 .. 1000.
+<fluent> y : 1 .. 10.
+
+<asp>int(y).</asp>
+
+<inertial> x,y.
+
+x:=C*X+X*C+(X)*C+(C*X)+X*(C)+X <where> int(X), C = 3.
+% 16 .. 160
+
+<impossible> x < 113. 
+
+% 3 States
+% 3 Transitions

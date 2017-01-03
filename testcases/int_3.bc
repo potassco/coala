@@ -1,0 +1,13 @@
+
+<fluent> x : 1 .. 100.
+<fluent> y : 1 .. 2.
+<action> increase.
+
+%<inertial> x.
+<inertial> y.
+
+x:=x*2 <after> increase, y = 2.
+<nonexecutable> increase, y <= 1.
+
+% 200 States
+% 50 Transitions

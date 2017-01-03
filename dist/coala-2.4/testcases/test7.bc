@@ -1,0 +1,6 @@
+<action> a(1,aaasds(bbbb(asdasdasd,a(1))),5).
+<fluent> b(1,bbbbsds(bbbb(bsdbsdbsdb,b(1))),5).
+
+b(1,bbbbsds(bbbb(bsdbsdbsdb,b(1))),5) <after> b(1,bbbbsds(bbbb(bsdbsdbsdb,b(1))),5), a(1,aaasds(bbbb(asdasdasd,a(1))),5).
+
+% States 2, Transition 1

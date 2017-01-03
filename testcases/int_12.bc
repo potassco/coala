@@ -1,0 +1,6 @@
+<asp>&dom {10..11} = y.
+&show {x;y}.
+&sum {x*1; -5*y} = 5.</asp>
+
+% 2 States
+% 2 Transitions (Empty)

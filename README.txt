@@ -1,4 +1,3 @@
-# coala
 
 	coala - Action Language Translation Tool
 

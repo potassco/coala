@@ -1,0 +1,7 @@
+<int> x : 1 .. 2000.
+<int> y.
+<int> z : 1..5.
+<fluent> a.
+<inertial> x.
+<default> a.
+x=y+z <after> a.
