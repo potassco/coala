@@ -1,0 +1,6 @@
+<asp>
+location(table).
+location(floor).
+</asp>
+
+fluent loc(b1)=L where location(L).

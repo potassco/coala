@@ -1,0 +1,92 @@
+% Our Translation for Joohyung Lee's example
+% Besides the declaration part we use nearly the same syntax.
+% However, our declarations are (from our point of view) closer to the style of the BC-laws rather than Joohyung Lee's.
+% Since we allow direct asp inclusion for facts, we have different options of expressing sorts and objects without having to stick to this concept.
+% Currently we don't support global variables.
+%
+% Joohyung Lee's version:
+%
+%:- sorts
+%	loc >> block.
+%
+%:- objects
+%	b1, b2, b3, b4 :: block;
+%	table :: loc.
+%
+%:- constants
+%	loc(block) 		:: inertialFluent(loc);
+%	in_tower(block)	:: sdFluent;
+%	move(block, loc):: action.
+%
+%:- variables
+%	B, B1, B2 	:: block;
+%	L, L1 		:: loc.
+%
+%% location
+%impossible loc(B1) = B, loc(B2) = B where B1\=B2.
+%
+%% Definition of a tower
+%default -in_tower(B).
+%in_tower(B) if loc(B) = table.
+%in_tower(B) if loc(B) = B1, in_tower(B1).
+%
+%% Blocks don't float in the air
+%impossible -in_tower(B).
+%
+%% Moving a block
+%move(B,L) causes loc(B)=L.
+%
+%nonexecutable move(B,L) if loc(B1) = B.
+%
+%:- query
+%	label :: stack;
+%	0: loc(B)=table;
+%	maxstep: loc(b4)=b3, loc(b3)=b2, loc(b2)=b1.
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Our translation:
+
+%%%%%%%%%%%%
+% Instead of using sorts, we allow direct usage of asp-code to create such behavior
+
+% Direct asp code is wrapped by <asp> </asp> tags. Note that the tanslater doesn't check anything inside it.
+<asp>
+location(table).
+location(B) :- block(B).
+block(b1).block(b2).block(b3).block(b4).
+</asp>
+
+% Declare all fluents
+fluent loc(B) = L where block(B),location(L).
+fluent in_tower(B) where block(B).
+
+% Set loc inertial
+inertial loc(B) where block(B).
+
+% Declare actions
+action move(B,L) where block(B), location(L), L!=B.
+
+%%%%%%%%%%%%
+% We don't use global variables, each is declared in a where block.
+
+% location
+impossible loc(B1) = B, loc(B2) = B where B1!=B2, block(B1), block(B2), block(B).
+
+% Definition of a tower
+default -in_tower(B) where block(B).
+in_tower(B) if loc(B) = table where block(B).
+in_tower(B) if loc(B) = B1, in_tower(B1) where block(B1), block(B2), block(B).
+
+% Moving a block
+move(B,L) causes loc(B)=L where location(L), block(B), B!=L.
+
+% Blocks don't float in the air
+impossible -in_tower(B) where block(B).
+
+nonexecutable move(B,L) if loc(B1) = B where block(B), block(B1), location(L).
+
+% Definition an initial state and the definition of a goal state.
+initially loc(B)=table where block(B).
+goal loc(b2)=b1, loc(b3)=b2, loc(b4)=b3. % These rules can also be separated, as all goals have to be fullfilled.
+
