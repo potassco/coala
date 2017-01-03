@@ -1,7 +1,4 @@
-# coala
-
-	coala - Action Language Translation Tool
-
+# coala - Action Language Translation Tool
 
 Copyright (c) 2016, Christian Schulz-Hanke<br>
 christian.schulz-hanke( at )cs.uni-potsdam.de
