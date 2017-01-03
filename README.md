@@ -1,44 +1,47 @@
-# coala
+# coala - Action Language Translation Tool
 
-	coala - Action Language Translation Tool
-
-
-Copyright (c) 2016, Christian Schulz-Hanke
+Copyright (c) 2016, Christian Schulz-Hanke<br>
 christian.schulz-hanke( at )cs.uni-potsdam.de
 
-http://www.cs.uni-potsdam.de/wv/coala/
+http://www.cs.uni-potsdam.de/wv/coala2/
 
 
 If you unpack the tar file, there will be a "coala-Version" directory.
 
-From there you can either install it using the setup.py script as super user ( sudo python setup.py install )
+From there you can either install it using the setup.py script as super user ( sudo python setup.py install )<br>
 Or you can run the tool directly from it's subfolder (python coala/coala examples/medical.bc)
 
-For the Input language, there is an "coala-Version/examples" folder with 3 small examples.
-(additionally, there are more files in the "coala-Version/testcases" directory;
+For the Input language, there is an "coala-Version/examples" folder with 3 small examples.<br>
+(additionally, there are more files in the "coala-Version/testcases" directory;<br>
 Note that the files role_X.bc must be run with:
-    python coala/coala -l bce testcases/role_1.bc
+
+	python coala/coala examples/medical.bc
+	
 or after installing with
-    coala -l bce testcases/role_1.bc
+
+	coala examples/medical.bc
+	
 )
 
 The implementation does also allow to use variables (bound in a <where> part).
 
 
 Installation:
-    sudo python setup.py install
+
+	sudo python setup.py install
 
 
-Note that coala does not include solving options if it cannot find the gringo python library.
+Note that coala does not include solving options if it cannot find the gringo python library.<br>
 If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.
 
 
 PLEASE refer to page/index.html for further details, examples and more!!!
 
 
+```
 Usage:
 	coala [Arguments] Inputfiles
-
+	
 Arguments:
 	--mode <arg>, -m <arg>	States what Coala will do. Default =  translate
 		translate, t	Translate all Input into ASP Facts
@@ -71,3 +74,4 @@ Solve arguments
 	--max_horizon <arg>, -z <arg>	Set the maximal horizon. 0 equals no horizon; Default =  10
 	--encoding_i <arg>	Set the encoding for solving iteratively
 	--encoding_f <arg>	Set the encoding for solving with fixed horizon
+```
