@@ -476,7 +476,9 @@ def main(argv):
 				(mypath+"testcases/flu.bc",4,0),
 				(mypath+"testcases/neg.bc",512,0),
 				(mypath+"testcases/dom_1.bc",25,0),
-				(mypath+"testcases/dom_2.bc",15,27)]
+				(mypath+"testcases/dom_2.bc",15,27),
+				(mypath+"testcases/dom_3.bc",120,0),
+				(mypath+"testcases/dom_4.bc",3,0)]
 	
 	if negated_actions:
 		testcases.append((mypath+"testcases/test_neg_act.bc",1,4))

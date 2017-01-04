@@ -1,5 +1,0 @@
-<asp>domain(1..2000).</asp>
-<fluent> num=X, oth=X <where> domain(X).
-
-<inertial> num.
-oth=Y <if> num=X <where> domain(X), Y = X + 5.

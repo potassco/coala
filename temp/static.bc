@@ -1,7 +1,0 @@
-<defined fluent> s.
-<fluent> f.
-<action> a.
-
-<default> -s.
-s <if> f.
-f <after> a. 

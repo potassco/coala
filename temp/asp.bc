@@ -1,5 +1,0 @@
-{a(1).a(2).a(3).}
-<pred> a(4).
-<fluent> f(X,Y) <where> a(X), a(Y), X != Y+1*2.
-<defined fluent> b(Z) <where> a(Z).
-<action> a.

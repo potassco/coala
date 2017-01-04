@@ -1,9 +1,0 @@
-
-<fluent> x : 5 .. 100.
-<action> increase.
-
-<inertial> x.
-
-x:=x+1 <after> increase.
-
-<initially> x=10.

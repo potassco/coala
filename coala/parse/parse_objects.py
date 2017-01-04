@@ -1505,7 +1505,7 @@ class equation(parse_object):
     def simplify(self, negation=False):
         if self.replacement is not None:
             return self.replacement.simplify(negation)
-        if type(self.left) in [unknown,str] and self.operator in ["=","=="]:
+        if type(self.left) in [unknown,predicate,str] and self.operator in ["=","=="]:
             if self.right == "<true>": #in ["<true>","true"] : 
                 return fluent(self.left,not negation)
             if self.right == "<false>": #in ["<false>","false"] : 

@@ -1,6 +1,0 @@
-<action> a.
-<fluent> b.
-
-%a <if> b.
-
-% 2 States, 0 Transitions

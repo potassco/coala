@@ -1,9 +1,0 @@
-<action> a,b.
-<defined fluent> x,y,z.
-
-<default> -x,-y,-z.
-x <after> -a.
-y <after> -a,-b.
-z <after> a,-b.
-<impossible> y,z.
-<impossible> x,z.

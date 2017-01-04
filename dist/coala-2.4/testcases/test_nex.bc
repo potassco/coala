@@ -1,5 +1,0 @@
-<action> a.
-<fluent> b.
-<fluent> possible(a).
-
-<nonexecutable> A <if> b <where> <action> A.

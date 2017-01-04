@@ -5,31 +5,38 @@ christian.schulz-hanke( at )cs.uni-potsdam.de
 
 http://www.cs.uni-potsdam.de/wv/coala2/
 
+This project can be used from directories or
+packed and be installed using python distutils.
 
+### Using without installing
+
+coala can be used without installation.<br>
+It can be run calling
+
+	python coala/coala examples/medical.bc
+
+### Packing and installing using python distutils
+
+The project can be packed calling
+
+    python setup.py sdist
+
+Which will produce a coala-Version.tar.gz in the dist directory.<br>
 If you unpack the tar file, there will be a "coala-Version" directory.
 
-From there you can either install it using the setup.py script as super user ( sudo python setup.py install )<br>
-Or you can run the tool directly from it's subfolder (python coala/coala examples/medical.bc)
+From there you can install it using the setup.py script as super user.
+
+####Installation:
+
+    sudo python setup.py install
 
 For the Input language, there is an "coala-Version/examples" folder with 3 small examples.<br>
 (additionally, there are more files in the "coala-Version/testcases" directory;<br>
 Note that the files role_X.bc must be run with:
 
-	python coala/coala examples/medical.bc
-	
-or after installing with
-
 	coala examples/medical.bc
 	
 )
-
-The implementation does also allow to use variables (bound in a <where> part).
-
-
-Installation:
-
-	sudo python setup.py install
-
 
 Note that coala does not include solving options if it cannot find the gringo python library.<br>
 If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.

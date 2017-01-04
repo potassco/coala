@@ -1,9 +1,0 @@
-<asp>agent(1,rob(1)).agent(2,rob(1)).agent(3,rob(1)).agent(4,rob(1)).</asp>
-<role rob(myparametername)>
-<fluent> param(1), param(2).
-<inertial> param(1), param(2).
-param(myparametername) <if> <true>.
-</role>
-
-% BCA 2 States, 2 Transitions
-% BCE 16 States, 16 Transitions
