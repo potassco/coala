@@ -1,0 +1,9 @@
+
+<fluent> a,b : 0 .. 10.
+
+<inertial> a,b.
+
+a/3+b=10.
+
+% 1 States
+% 1 Transitions

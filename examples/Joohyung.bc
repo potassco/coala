@@ -4,7 +4,13 @@
 % Since we allow direct asp inclusion for facts, we have different options of expressing sorts and objects without having to stick to this concept.
 % Currently we don't support global variables.
 %
-% Joohyung Lee's version:
+% Translate with:
+%   coala examples/Joohyung.bc
+% Call with:
+%   coala examples/Joohyung.bc | clingo - encodings/incremental_clingo.lp 2 | outputformatclingocoala
+%
+% Joohyung Lee's version: ( See http://reasoning.eas.asu.edu/cplus2asp/examples/bc.html )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %:- sorts
 %	loc >> block.
@@ -43,12 +49,10 @@
 %	0: loc(B)=table;
 %	maxstep: loc(b4)=b3, loc(b3)=b2, loc(b2)=b1.
 %
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Our translation:
-
-%%%%%%%%%%%%
 % Instead of using sorts, we allow direct usage of asp-code to create such behavior
+% We don't use global variables, each is declared in a where block.
 
 % Direct asp code is wrapped by <asp> </asp> tags. Note that the tanslater doesn't check anything inside it.
 <asp>
@@ -67,8 +71,7 @@ inertial loc(B) where block(B).
 % Declare actions
 action move(B,L) where block(B), location(L), L!=B.
 
-%%%%%%%%%%%%
-% We don't use global variables, each is declared in a where block.
+
 
 % location
 impossible loc(B1) = B, loc(B2) = B where B1!=B2, block(B1), block(B2), block(B).
@@ -85,6 +88,8 @@ move(B,L) causes loc(B)=L where location(L), block(B), B!=L.
 impossible -in_tower(B) where block(B).
 
 nonexecutable move(B,L) if loc(B1) = B where block(B), block(B1), location(L).
+
+
 
 % Definition an initial state and the definition of a goal state.
 initially loc(B)=table where block(B).

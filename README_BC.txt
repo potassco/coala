@@ -161,6 +161,7 @@ at(X,Y) after moveto(X,Y) where position(X,Y), X > Y + 1.
 *** using Arithmetics:
 
 Using clingcon, it is possible to add fluents with large domains.
+( Visit the clingcon page at https://potassco.org/clingcon/ )
 Otherwise if using writing
     at(X) <after> moveto(X) <where> position(X).
 would reproduce that law for every possible element of X.

@@ -4,3 +4,5 @@ location(floor).
 </asp>
 
 fluent loc(b1)=L where location(L).
+fluent loc(b1)=1.
+fluent loc=x.
