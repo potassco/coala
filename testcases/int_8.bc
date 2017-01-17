@@ -3,7 +3,7 @@
 
 <inertial> x.
 
-x:=X <where> X = 2**2.
+x:=X <where> X =2**2.
 %x:=X <where> X = 4.
 %x:=4.
 

@@ -61,6 +61,8 @@ after(id(nonexecutable,I),F) :- nonexecutable(I,F).
 %%% Set initial state
 holds(F,0) :- initially(F).
 
+:- holds(_false,0).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

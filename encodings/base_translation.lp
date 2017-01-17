@@ -14,9 +14,10 @@ static_law(id(default,F)) :- default(F).
 head(id(default,F),F) :- default(F).
 ifcons(id(default,F),F) :- default(F).
 
-static_law(id(default,law(L))) :- default(L,_).
-head(id(default,law(L)),F) :- default(L,F).
-ifcons(id(default,law(L)),F) :- default(L,F).
+static_law(L) :- default(L,_), not after(L,_).
+dynamic_law(L) :- default(L,_), after(L,_).
+head(L,F) :- default(L,F).
+ifcons(L,F) :- default(L,F).
 
 % Impossible laws
 static_law(id(impossible,I)) :- impossible(I,_). 

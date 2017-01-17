@@ -107,7 +107,7 @@ class AspCompiler(aspCom.AspCompiler):
 				for a in data[key]:
 					upd_result = a.update(actions=self.actions,fluents=self.fluents,integers=self.integers, \
 						integer_ids=self.integer_ids,idfunction=self.next_id,arith_idfunction=self.next_arith_id, \
-						arith_helper_idfunction=self.next_arith_helper_id)
+						arith_helper_idfunction=self.next_arith_helper_id,law_type=key)
 					update_results.append(upd_result)
 					res = a.simplify(negation=False)
 					if res is not None:

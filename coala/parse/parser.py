@@ -142,7 +142,7 @@ class Parser(object):
 		
 	def p_pred_fact(self,t): # <action> a_1,...,a_n <where> bla.
 #		''' pred_fact : formula where_part'''
-		''' pred_fact : fluent_formula where_part'''
+		''' pred_fact : formula where_part'''
 		line,filename=self.get_meta(t.lineno(1))
 		t[0] = ps.predicate_fact(t[1],t[2],line=line,filename=filename)
 		
@@ -161,9 +161,9 @@ class Parser(object):
 					| DFLU fluent_formula where_part
 					| FLU fluent_formula int_domain where_part
 					| DFLU fluent_formula int_domain where_part
-					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
-					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
 					| INT fluent_formula where_part '''		
+#					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
+#					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
 #					| FLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
 #					| DFLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
 #					| FLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
@@ -176,17 +176,49 @@ class Parser(object):
 				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 			else:
 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
-		elif len(t) == 8:
-			termlist = t[5]
-			if t[1] not in ['<fluent>','fluent']:
-				t[0] = ps.defined_fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
-			else:
-				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
+#		elif len(t) == 8:
+#			termlist = t[5]
+#			if t[1] not in ['<fluent>','fluent']:
+#				t[0] = ps.defined_fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
+#			else:
+#				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
 		else:
 			#if t[1] not in ['<fluent>','fluent']:
 			#	t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
 			#else:
 				t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
+				
+#	def p_flu_fact(self,t): # <fluent> f_1,...,f_n <where> bla.
+# 		''' flu_fact : FLU fluent_formula where_part
+# 					| DFLU fluent_formula where_part
+# 					| FLU fluent_formula int_domain where_part
+# 					| DFLU fluent_formula int_domain where_part
+# 					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
+# 					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
+# 					| INT fluent_formula where_part '''		
+# #					| FLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
+# #					| DFLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
+# #					| FLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
+# #					| DFLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
+# 		line,filename=self.get_meta(t.lineno(1))
+# 		if len(t) == 4:
+# 			if t[1] == '<int>':
+# 				t[0] = ps.integer_fact(t[2],None,t[4],line=line,filename=filename)
+# 			elif t[1] not in ['<fluent>','fluent']:
+# 				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
+# 			else:
+# 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
+# 		elif len(t) == 8:
+# 			termlist = t[5]
+# 			if t[1] not in ['<fluent>','fluent']:
+# 				t[0] = ps.defined_fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
+# 			else:
+# 				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
+# 		else:
+# 			#if t[1] not in ['<fluent>','fluent']:
+# 			#	t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
+# 			#else:
+# 				t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
 		
 	def p_static_law(self,t): # f_1,...,f_n <if> g_1,...,g_m <where> bla.
 		''' static_law : formula IF formula ifcons_part where_part
@@ -364,36 +396,43 @@ class Parser(object):
 			elif t[1].is_false(): t[0] = t[1]
 			else: t[0] = ps.atom_list(t[1])
 
-	def p_fluent_formula(self,t):
-		''' fluent_formula : term_boolean 
-					| term_boolean COMMA fluent_formula '''
-		if len(t) == 4:
-			if t[1] is None: t[0] = t[3]
-			elif t[1].is_false(): t[0] = t[1]
-			elif t[3].is_false(): t[0] = t[3]
-			else:
-				t[3].combine(t[1])
-				t[0] = t[3]
-		else:
-			if t[1] is None: t[0] = ps.atom_list()
-			elif t[1].is_false(): t[0] = t[1]
-			else: t[0] = ps.atom_list(t[1])
+# 	def p_fluent_formula(self,t):
+# 		''' fluent_formula : term_boolean 
+# 					| term_boolean COMMA fluent_formula '''
+# 		if len(t) == 4:
+# 			if t[1] is None: t[0] = t[3]
+# 			elif t[1].is_false(): t[0] = t[1]
+# 			elif t[3].is_false(): t[0] = t[3]
+# 			else:
+# 				t[3].combine(t[1])
+# 				t[0] = t[3]
+# 		else:
+# 			if t[1] is None: t[0] = ps.atom_list()
+# 			elif t[1].is_false(): t[0] = t[1]
+# 			else: t[0] = ps.atom_list(t[1])
 
-#	def p_fluent_formula(self,t): # f_1,...,f_n
-#		''' fluent_formula : term equalpart
-#					| term equalpart COMMA fluent_formula'''
-#		if len(t) == 5: 
-#			if t[2] == None: 
-#				t[4].append(t[1])
-#				t[0] = t[4]
-#			else: 
-#				t[4].append(ps.equation(t[1],t[2]))
-#				t[0] = t[4]
-#		else: 
-#			if t[2] == None: 
-#				t[0] = ps.atom_list(t[1])
-#			else: 
-#				t[0] = ps.atom_list(ps.equation(t[1],t[2]))
+	def p_fluent_formula(self,t): # f_1,...,f_n
+		''' fluent_formula : term equalpart
+					| term equalpart COMMA fluent_formula
+					| term EQ LBRAC term_number_list_two RBRAC 
+					| term EQ LBRAC term_number_list_two RBRAC COMMA fluent_formula'''
+		if len(t) == 5: 
+			if t[2] == None: 
+				t[4].append(t[1])
+				t[0] = t[4]
+			else: 
+				t[4].append(ps.equation(t[1],t[2]))
+				t[0] = t[4]
+		elif len(t) == 3: 
+			if t[2] == None: 
+				t[0] = ps.atom_list(t[1])
+			else: 
+				t[0] = ps.atom_list(ps.equation(t[1],t[2]))
+		elif len(t) == 6:
+			t[0] = ps.atom_list(ps.fluent_multival(t[1],t[4]))
+		else:
+			t[7].append(ps.fluent_multival(t[1],t[4]))
+			t[0] = t[7]
 
 	def p_term_number_list_two(self,t):
 		''' term_number_list_two : term_numeric COMMA term_number_list '''
@@ -410,29 +449,47 @@ class Parser(object):
 			t[0] = t[3]
 
 	def p_term_boolean(self,t):
-		''' term_boolean : term_negated
+		''' term_boolean : term 
+					| NOT term
+					| MINUS term
 					| asp_term
 					| TRUE 
 					| FALSE '''
-		if t[1] == "<true>": t[0] = None #ps.atom_list()
-		elif t[1] == "<false>": t[0] = ps.false_atom()
-		else: t[0] = t[1]
-
-	def p_term_negated(self,t):
-		''' term_negated : term equalpart
-					| NOT term equalpart
-					| MINUS term equalpart '''
 		if len(t) == 3:
-			if t[2] is not None: t[0] = ps.equation(t[1],t[2])
+			t[0] = ps.negation(t[2])
+		else:
+			if t[1] == "<true>": t[0] = None #ps.atom_list()
+			elif t[1] == "<false>": t[0] = ps.false_atom()
 			else: t[0] = t[1]
-		else: 
-			if t[3] is not None: t[0] = ps.negation(ps.equation(t[2],t[3]))
-			else: t[0] = ps.negation(t[2])
+
+# 	def p_term_boolean(self,t):
+# 		''' term_boolean : term_negated
+# 					| asp_term
+# 					| TRUE 
+# 					| FALSE '''
+# 		if t[1] == "<true>": t[0] = None #ps.atom_list()
+# 		elif t[1] == "<false>": t[0] = ps.false_atom()
+# 		else: t[0] = t[1]
+
+# 	def p_term_negated(self,t):
+# 		''' term_negated : term equalpart
+# 					| NOT term equalpart
+# 					| MINUS term equalpart '''
+# 		if len(t) == 3:
+# 			if t[2] is not None: t[0] = ps.equation(t[1],t[2])
+# 			else: t[0] = t[1]
+# 		else: 
+# 			if t[3] is not None: t[0] = ps.negation(ps.equation(t[2],t[3]))
+# 			else: t[0] = ps.negation(t[2])
 
 	def p_term_numeric(self,t):
 		''' term_numeric : term
+				| MINUS term
 				| number '''
-		t[0] = t[1]
+		if len(t) == 3:
+			t[0] = ps.negation(t[2])
+		else:
+			t[0] = t[1]
 			
 	def p_term(self,t): # X, a, 3, X;Y, 1..Z
 		''' term : variable 
@@ -593,7 +650,7 @@ class Parser(object):
 		#return
 		
 		if self.debug:
-			self.parser = yacc.yacc(module=self, debug=False, outputdir=mypath, **kwargs) # SILENT MODE!
+			self.parser = yacc.yacc(module=self, debug=True, outputdir=mypath, **kwargs) # SILENT MODE!
 		else:
 			self.parser = yacc.yacc(module=self, debug=False, optimize=False, outputdir=mypath, write_tables=False, **kwargs) # SILENT MODE!
 		#self.parser = yacc.yacc(module=self, **kwargs)

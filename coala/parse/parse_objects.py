@@ -129,12 +129,12 @@ class parse_object(object):
     
     # Top-level Update function.
     # Initiates the pass_down update.
-    def update(self,actions=None,fluents=None,integers=None,integer_ids=None,idfunction=None,arith_idfunction=None,check=True,others=None,arith_helper_idfunction=None):
+    def update(self,actions=None,fluents=None,integers=None,integer_ids=None,idfunction=None,arith_idfunction=None,check=True,others=None,arith_helper_idfunction=None,law_type=None):
         my_others = {"idfunction":idfunction,"arith_idfunction":arith_idfunction,"arith_helper_idfunction":arith_helper_idfunction,"check":check}
         if others is not None:
             for o in others:
                 my_others[o] = others[o]
-        update = update_passdown(fluents=fluents,actions=actions,integers=integers,integer_ids=integer_ids,others=my_others)
+        update = update_passdown(fluents=fluents,actions=actions,integers=integers,integer_ids=integer_ids,others=my_others,law_type=law_type)
         self.pass_down_update(update)
         return update
     
@@ -989,6 +989,17 @@ class fluent(parse_object):
     
     def get_bottom_elements(self):
         return [self,]
+
+class fluent_multival(fluent):
+    def __init__(self, content, multidomain=None):
+        fluent.__init__(self, content, None)
+        self.multidomain = multidomain
+
+    def get_fluents_domains(self):
+        result = []
+        for x in self.multidomain:
+            result.append(domain(self.content,x))
+        return result
 
 class predicate(parse_object):
     def __init__(self, name, parameters):
@@ -2004,6 +2015,9 @@ class negation(parse_object):
         if self.content is None:
             return ""
         return "not "+self.content.print_facts()
+    
+    def arith_flatten(self,negation,update):
+        return self.content.arith_flatten(not negation, update)
 
 # Some asp code.
 # We don't want to mess with that.
@@ -2059,11 +2073,12 @@ class domain(parse_object):
 
 # This object is only used during the pass_down update
 class update_passdown(object):
-    def __init__(self, fluents=[], actions=[], integers=[], integer_ids=[], others={}):
+    def __init__(self, fluents=[], actions=[], integers=[], integer_ids=[], others={}, law_type = None):
         self.fluents = fluents
         self.actions = actions
         self.integers = integers
         self.integer_ids = integer_ids
+        self.law_type = law_type
         self.arithmetic_laws = []
         self.pass_up = {}
         self.where = False
@@ -2129,6 +2144,7 @@ class update_passdown(object):
         self.path.pop()
         
     def is_in_head(self):
+        if self.law_type == "goals": return False
         for ob in self.path:
             caller = ob[0]; att = ob[1]
             if att == "head" and law in inspect.getmro(caller.__class__):
