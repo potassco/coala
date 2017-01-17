@@ -1,0 +1,82 @@
+
+fluent status=descending.
+fluent status=ascending.
+fluent status=stationary.
+fluent bounce, fall.
+
+fluent velocity : <int>. % : -1000 .. 1000. % last digit is a decimal position.
+fluent height : <int>. %-1000 .. 1000. % last digit is a decimal position.
+
+action drop.
+action catch.
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+default -bounce, -fall.
+inertial height, velocity, status.
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+drop causes status=descending. 
+%status=descending after drop.
+
+fall causes status=descending. 
+%status=descending after fall.
+
+%impossible drop if status!=stationary
+%%%nonexecutable drop if not status=stationary.
+nonexecutable drop if status=descending.
+nonexecutable drop if status=ascending.
+
+%fall causes velocity:=9.8 *delta
+% Need to remodel that... there are no processes in BC.
+%fall causes height:=height - 4.9 *delta^2
+% Need to remodel that... there are no processes in BC.
+%drop causes velocity:=9.8 *delta
+% Need to remodel that... there are no processes in BC.
+%drop causes height:=height - 4.9 *delta^2
+% Need to remodel that... there are no processes in BC.
+velocity:=velocity+98 after <true> ifcons status=descending. % Velocity increases while falling, assume delta==1
+height:=height-velocity after height-velocity > 0.
+height:=velocity-height after height-velocity <= 0.
+
+velocity:=velocity+98 after not bounce ifcons status=ascending.
+catch causes status=stationary. 
+%status=stationary, velocity:=0 after catch.
+
+%impossible catch if status=stationary.
+nonexecutable catch if status=stationary.
+
+%impossible catch if height=0.
+nonexecutable catch if height=0.
+
+%impossible drop if height=0.
+nonexecutable drop if height=0.
+
+catch causes velocity:=0. 
+%status=stationary, velocity:=0 after catch.
+
+%catch causes height:=X if height=X.
+%catch causes height:=height. % Left out.
+
+bounce causes status=ascending.
+%status=ascending after bounce.
+
+%bounce causes velocity:= max(0, velocity*0.8 - 9.8 *delta)
+% Need to remodel that... there are no processes in BC.
+%bounce causes height:= velocity*0.8 * delta - 4.9 * delta^2
+% Need to remodel that... there are no processes in BC.
+velocity:= -velocity after bounce.
+velocity:=velocity+98 after not bounce ifcons status=ascending.
+
+%status=descending, height=0, velocity > 0 triggers bounce
+bounce if velocity > 0, height < velocity, status=descending.
+
+%status=ascending, velocity=0, height > 0 triggers fall
+%fall if velocity <= 0, height > 0, status=ascending. % Remoddeled
+
+
+%%%impossible height < 0.
+
+% 10 States
+% 6 Transitions

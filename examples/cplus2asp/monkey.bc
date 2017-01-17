@@ -1,0 +1,148 @@
+% Our Translation for a cplus2asp example
+
+% File: 'monkey.bc+'.
+
+%:- sorts
+%  thing;
+%  location.
+
+%:- objects
+%  monkey,bananas,box     :: thing;
+%  l1,l2,l3               :: location.
+<asp>
+thing(monkey).thing(bananas).thing(box).
+location(l1).location(l2).location(l3).
+boolean(true).boolean(false).
+</asp>
+
+%:- variables
+%  B                      :: boolean;
+%  Th                     :: thing;
+%  L                      :: location.
+% We don't have variables
+
+%:- constants
+%  loc(thing)             :: simpleFluent(location);
+%  hasBananas,onBox       :: simpleFluent;
+fluent loc(LOC) where location(LOC).
+fluent hasBananas,onBox.
+
+%  walk(location),
+%  pushBox(location),
+%  climbOn,
+%  climbOff,
+%  graspBananas           :: action.
+action walk(LOC), pushBox(LOC), climbOn, climbOff, graspBananas where location(LOC).
+
+%{loc(Th)=L} after loc(Th)=L.
+%{hasBananas=B} after hasBananas=B.
+%{onBox=B} after onBox=B.
+%%easier:
+%%inertial loc(Thing) where thing(Thing).
+%%inertial hasBananas.
+%%inertial onBox.
+default loc(Thing)=Loc after loc(Thing)=Loc where thing(Thing), location(Loc).
+%%default hasBananas=false after hasBananas=false. % the strings "false" and "true" are the default values.
+%%default hasBananas=true after hasBananas=true.
+default hasBananas=B after hasBananas=B where boolean(B).
+default onBox=B after onBox=B where boolean(B).
+
+%{walk(L)=B}.
+%{pushBox(L)=B}.
+%{climbOn=B}.
+%{climbOff=B}.
+%{graspBananas=B}.
+%% We declared them actions, there is nothing to do here.
+%% since we are not using bc+, we are not allowed to set actions.
+
+%loc(bananas)=L if hasBananas & loc(monkey)=L.
+%loc(monkey)=L if onBox & loc(box)=L.
+loc(bananas)=L if hasBananas, loc(monkey)=L where location(L).
+loc(monkey)=L if onBox, loc(box)=L where location(L).
+
+%loc(monkey)=L after walk(L).
+%false after walk(L) & loc(monkey)=L.
+%false after walk(L) & onBox.
+loc(monkey)=L after walk(L) where location(L).
+<false> after walk(L), loc(monkey)=L  where location(L). % we need to use <false>, since false is not a reserved word for us
+<false> after walk(L), onBox where location(L).
+
+%loc(box)=L after pushBox(L).
+%loc(monkey)=L after pushBox(L).
+%false after pushBox(L) & loc(monkey)=L.
+%false after pushBox(L) & onBox.
+%false after pushBox(L) & loc(monkey)\=loc(box).
+loc(box)=L after pushBox(L) where location(L).
+loc(monkey)=L after pushBox(L) where location(L).
+<false> after pushBox(L), loc(monkey)=L where location(L).
+<false> after pushBox(L), onBox where location(L).
+<false> after pushBox(L), loc(monkey)=L1, loc(box)=L2 where location(L), location(L1), location(L2), L1 != L2.
+
+%onBox after climbOn.
+%false after climbOn & onBox.
+%false after climbOn & loc(monkey)\=loc(box).
+onBox after climbOn.
+<false> after climbOn, onBox.
+<false> after climbOn, loc(monkey)=L1, loc(box)=L2 where location(L1), location(L2), L1 != L2.
+
+%~onBox after climbOff.
+%false after climbOff & ~onBox.
+-onBox after climbOff.
+<false> after climbOff, -onBox.
+
+%hasBananas after graspBananas.
+%false after graspBananas & hasBananas.
+%false after graspBananas & ~onBox.
+%false after graspBananas & loc(monkey)\=loc(bananas).
+hasBananas after graspBananas.
+<false> after graspBananas, hasBananas.
+<false> after graspBananas, -onBox.
+<false> after graspBananas, loc(monkey)=L1, loc(bananas)=L2 where location(L1), location(L2), L1 != L2.
+
+%false after walk(L) & pushBox(L).
+%false after walk(L) & climbOn.
+%false after pushBox(L) & climbOn.
+%false after climbOff & graspBananas.
+<false> after walk(L), pushBox(L) where location(L).
+<false> after walk(L), climbOn where location(L).
+<false> after pushBox(L), climbOn where location(L).
+<false> after climbOff, graspBananas.
+
+
+%%% Our queries should be done one by one,
+%%% Therefore, additional files should be used to either be passed to coala
+%%% or to clingo / clingcon after translation in addition to the encoding.
+%%% For the base_translation.lp and base.lp encoding, maxsteps are set as a parameter -c k=2
+
+% Prediction
+%:- query
+%maxstep :: 2;
+%0: loc(monkey)=l1 &
+%   loc(bananas)=l2 &
+%   loc(box)=l3 &
+%   walk(l3);
+%1: pushBox(l2);
+%2: loc(monkey)\= loc(bananas) ++ loc(bananas)\=loc(box).
+initially loc(monkey)=l1.
+initially loc(bananas)=l2, loc(box)=l3.
+<asp>occurs(walk(l3),0).</asp> %% We currently don't have a way of doing this.. this may depend on your encoding.
+<asp>occurs(pushBox(l2),0).</asp>
+
+
+% Postdiction
+%:- query
+%label :: 1;
+%maxstep :: 2;
+%0: walk(l3);
+%1: [\/L | pushBox(L)];
+%0: loc(box)\=l3.
+
+% Planning
+%:- query
+%label :: 2;
+%maxstep :: 4;
+%0: loc(monkey)=l1 &
+%   loc(bananas)=l2 &
+%   loc(box)=l3;
+%maxstep: hasBananas.
+

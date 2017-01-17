@@ -1,0 +1,116 @@
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% File: 'hanoi.obc': Towers of Hanoi
+%% Author: Joseph Babb
+%% Date: 10/07/2012
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The agent is tasked with solving the Towers
+%% of Hanoi problem, where a series of graduated
+%% disks must be placed in the appropriate order
+%% on one of three pegs given some initial
+%% configuration. Meanwhile, an antagonistic
+%% entity is able to move pegs in order to
+%% attempt to thwart the agent's efforts.
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Based on the example provided in:
+%%      Nonmontonic Causal Theories (2004)
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%:- sorts
+%  location >> (disk, peg).
+%
+%:- objects
+%  1..4             :: disk;
+%  p1,p2,p3         :: peg.
+<asp>
+location(X) :- disk(X).
+location(X) :- peg(X).
+disk(1..4).
+peg(p1).peg(p2).peg(p3).
+</asp>
+
+%:- variables
+%  D,D1             :: disk;
+%  P,P1,P2,P3       :: peg;
+%  L                :: location.
+%
+%:- constants
+%  loc(disk)         :: simpleFluent(location);
+%  base(location)    :: sdFluent(peg);
+%  clear(location)   :: sdFluent;
+%  move(peg,peg)     :: exogenousAction;
+%  ext_move(peg,peg) :: externalAction;
+%  ab_ext(peg)	    :: sdFluent.
+fluent loc(Disk)=Loc where disk(Disk), location(Loc).
+fluent base(Loc)=Peg where peg(Peg), location(Loc).
+fluent clear(Loc) where location(Loc).
+action move(Peg,Peg2) where peg(Peg), peg(Peg2).
+action ext_move(Peg,Peg2) where peg(Peg), peg(Peg2).
+fluent ab_ext(Peg) where peg(Peg).
+
+%% Inertia / Defaults
+%inertial loc(D).
+%default ~ab_ext(P).
+%default clear(L).
+inertial loc(D) where disk(D).
+default -ab_ext(P) where peg(P).
+default clear(L) where location(L).
+
+%% different disks can't be in the same location
+%impossible loc(D)=L & loc(D1)=L where D<D1.
+impossible loc(D)=L, loc(D1)=L where D<D1, disk(D), disk(D1), location(L).
+
+%% a disk is smaller than the disk under it
+%impossible loc(D)=D1 where D1<D.
+impossible loc(D)=D1 where D1<D, disk(D), disk(D1).
+
+%%%%%%%NEW: disks can't be put on itself.
+impossible loc(D)=D where disk(D).
+
+%% Definition of a disk being clear
+%~clear(L) if loc(D)=L.
+-clear(L) if loc(D)=L where disk(D), location(L).
+
+%% definition of base
+%base(P)=P.
+%base(D)=P if loc(D)=L & base(L)=P.
+base(P)=P where peg(P).
+base(D)=P if loc(D)=L, base(L)=P where disk(D), location(L), peg(P).
+
+%% abnormality
+%ab_ext(P) after ext_move(P,P1)=true.
+%ab_ext(P1) after ext_move(P,P1)=true.
+ab_ext(P) after ext_move(P,P1) where peg(P), peg(P1).
+ab_ext(P1) after ext_move(P,P1) where peg(P), peg(P1).
+
+%% Don't move something that's not there
+%nonexecutable move(P,P1) if clear(P).
+nonexecutable move(P,P1) if clear(P) where peg(P), peg(P1).
+
+%% effect and precondition of move
+%loc(D)=L ifcons ~ab_ext(P) & ~ab_ext(P1) after move(P,P1) & base(D)=P & clear(D) & base(L)=P1 & clear(L).
+%ext_move(P,P1)=true causes loc(D)=L if base(D)=P & clear(D) & base(L)=P1 & clear(L).
+loc(D)=L after move(P,P1), base(D)=P, clear(D), base(L)=P1, clear(L) ifcons -ab_ext(P), -ab_ext(P1) where disk(D), location(L), peg(P), peg(P1).
+ext_move(P,P1) causes loc(D)=L if base(D)=P, clear(D), base(L)=P1, clear(L) where disk(D), peg(P), peg(P1), location(L).
+
+%% Move only a single disk at a time
+%nonexecutable move(P,P1) & move(P2,P3) where  P < P2.
+%nonexecutable move(P,P1) & move(P2,P3) where P1 < P3.
+nonexecutable move(P,P1), move(P2,P3) where  P < P2, peg(P), peg(P1), peg(P2), peg(P3).
+nonexecutable move(P,P1), move(P2,P3) where P1 < P3, peg(P), peg(P1), peg(P2), peg(P3).
+
+%:- hide all.
+%:- show move(P,P1)=true.
+%:- show ext_move(P,P1)=true.
+%:- show loc(D)=L.
+%
+%
+%:- query
+%  0: clear(p2) & clear(p3);
+%  maxstep: clear(p1) & clear(p2).
+initially clear(p2), clear(p3).
+goal clear(p2), clear(p1).
+
+%can be run from this directory using
+% coala hanoi.obcp | clingo - ../../encodings/incremental_clingo.lp | outputformatclingocoala
+

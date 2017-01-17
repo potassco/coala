@@ -2,7 +2,8 @@
 #include "csp.lp".
 
 % Domains of integers
-&dom {L..U} = val(V,T) :- integer(V), integer_domain(V,L,U), step(T).
+%&dom {L..U} = val(V,T) :- integer(V), integer_domain(V,L,U), step(T).
+&dom {L..U : integer_domain(V,L,U)} = val(V,T) :- step(T), integer_domain(V,_,_). % only for ints with domain!
 
 % Include integers in answer sets.
 &show {val(I,T) : integer(I), step(T)}.
@@ -16,7 +17,7 @@
 #include "base_translation.lp".
 
 % Handle inertial laws. (won't be handled in the base_translation.lp part as there is no domain/2 for integers)
-assigned(V,T) :- integer(V), inertial(V), step(T), step(T-1), &sum{val(V,T); -val(V,T-1)} = 0.
+assigned(V,T) :- integer(V), inertial(V), step(T), step(T-1), &sum{val(V,T)} = val(V,T-1).
 
 % Initial values are assumed to be assigned for the initial step
 %assigned(V,0) :- integer(V), initially(val(V,_)), step(0).
