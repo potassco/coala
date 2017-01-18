@@ -249,7 +249,7 @@ class Parser(object):
 		else:
 			head = t[1]; after = t[2]; ifcons = t[3]; where = t[4]
 		if head.is_false():
-			t[0] = ps.nonexecutable_law(after,ifcons,where,line,filename)
+			t[0] = ps.nonexecutable_law(after,None,ifcons,where,line,filename)
 		elif len(head) > 0:
 			t[0] = ps.dynamic_law(head,after,ifcons,where,line,filename)
 					

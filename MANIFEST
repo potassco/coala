@@ -73,15 +73,6 @@ examples/sumo.bc
 examples/sumo_instance.bc
 examples/walkbot.bc
 examples/walkbot_instance.bc
-examples/bouncing/bounce.bc
-examples/bouncing/plan1.lp
-examples/bouncing_2/bounce.bc
-examples/bouncing_2/plan1.lp
-examples/bouncing_2/plan2.lp
-examples/elevator/elevator.bc
-examples/elevator/plan1.lp
-examples/elevator_transfer/elevator.bc
-examples/elevator_transfer/plan1.lp
 examples/monkey/monkey.bc
 page/index.html
 ply/__init__.py

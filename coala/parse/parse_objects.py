@@ -87,7 +87,7 @@ class parse_object(object):
     # Extracts domains for fluents.
     # Is overwritten by classes: Fluent, Predicate
     def get_fluents_domains(self,simple=True):
-        #print  >> sys.stderr, "Warning!, not implemented get_fluents_domains for", self.__class__ 
+        #print  >> sys.stderr, "% Warning!, not implemented get_fluents_domains for", self.__class__ 
         result = []
         ch = self.get_children()
         wh = self.get_where()
@@ -814,13 +814,18 @@ class integer_fact(fact):
         domain = False
         if self.domain is not None and len(self.domain) == 2:
             lower = self.domain.get_children()[0]
+            if type(lower) != str:
+                lower = lower.print_facts()
             upper = self.domain.get_children()[1]
+            if type(upper) != str:
+                upper = upper.print_facts()
             domain = True
         for ac in self.head:
             st = ac.print_facts()
             result.append("integer("+st+")"+wherepart+".")
             if domain:
                 result.append("integer_domain("+st+","+lower+","+upper+")"+wherepart+".")
+        # TODO: else??
         return result
 
     def get_integers(self):
@@ -924,14 +929,14 @@ class action(parse_object):
     
     def compile_where_single(self):
         if self.negation: 
-            print >> sys.stderr, "Warning! Action "+str(self)+" is negated."
-            errout.error("Warning! Action "+str(self)+" is negated.")
+            print >> sys.stderr, "% Warning! Action "+str(self)+" is negated."
+            errout.error("% Warning! Action "+str(self)+" is negated.")
         return "action(act("+self.content.print_facts()+"))"
     
     def pass_down_update_overwrite(self,update):
         if not update.where:
-            print >> sys.stderr, "Action "+str(self)+" can only appear in where parts!"
-            errout.error("Action "+str(self)+" can only appear in where parts!")
+            print >> sys.stderr, "% Action "+str(self)+" can only appear in where parts!"
+            errout.error("% Action "+str(self)+" can only appear in where parts!")
         update.add_where_action(self.content)
     
     def get_bottom_elements(self):
@@ -983,8 +988,8 @@ class fluent(parse_object):
     
     def pass_down_update_overwrite(self,update):
         if not update.where:
-            print >> sys.stderr, "Fluent "+str(self)+" can only appear in where parts!"
-            errout.error("Fluent "+str(self)+" can only appear in where parts!")
+            print >> sys.stderr, "% Fluent "+str(self)+" can only appear in where parts!"
+            errout.error("% Fluent "+str(self)+" can only appear in where parts!")
         update.add_where_fluent(self.content)
     
     def get_bottom_elements(self):
@@ -1059,13 +1064,13 @@ class predicate(parse_object):
                 return "val("+text+","+str(not self.negation).lower()+")" #true)"
             elif self.type == "action":
                 if self.negation: 
-                    print >> sys.stderr, "Warning! Action "+str(self)+" is negated."
-                    errout.error("Warning! Action "+str(self)+" is negated.")
+                    print >> sys.stderr, "% Warning! Action "+str(self)+" is negated."
+                    errout.error("% Warning! Action "+str(self)+" is negated.")
                 return "act("+text+")"      
             elif self.type == "integer":
                 if self.negation: 
-                    print >> sys.stderr, "Warning! Fluent "+str(self)+" is negated."
-                    errout.error("Warning! Integer "+str(self)+" is negated.")#TODO!
+                    print >> sys.stderr, "% Warning! Fluent "+str(self)+" is negated."
+                    errout.error("% Warning! Integer "+str(self)+" is negated.")#TODO!
                 return "_arithmetic("+text+")"#TODO: return somethin if we are an integer      
         return text
     
@@ -1108,8 +1113,8 @@ class predicate(parse_object):
                         had_flu = True
                         break 
                 if had_act and had_flu:
-                    print >> sys.stderr, "Error! "+str(self)+" is Fluent and Action at the same time"
-                    errout.error("Error! "+str(self)+" is Fluent and Action at the same time")
+                    print >> sys.stderr, "% Error! "+str(self)+" is Fluent and Action at the same time"
+                    errout.error("% Error! "+str(self)+" is Fluent and Action at the same time")
             
             if not definite_type:
                 for act in update.actions:
@@ -1137,8 +1142,8 @@ class predicate(parse_object):
             if update.where:
                 self.type = "asp"
             elif not definite_type and self.type == "??": # Assume Fluent!
-                print >> sys.stderr, "Waring: Cannot find "+str(self)+" in fluents or actions!"
-                errout.error( "Waring: Cannot find "+str(self)+" in fluents or actions!")
+                print >> sys.stderr, "% Warning: Cannot find "+str(self)+" in fluents or actions!"
+                errout.error( "% Warning: Cannot find "+str(self)+" in fluents or actions!")
                 self.type = "fluent"
             
         for c in self.parameters:
@@ -1470,6 +1475,8 @@ class equation(parse_object):
             self.replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
             assignment = update.is_in_head()
             dynamic_law_part = update.is_in_dynamic_law()
+            # TODO: During Flattenning, we should identify INTEGERS that we know and others
+            # That we can handle them differently
             if type(self.left) == str: le = [arithmetic_atom(self.left,update.arith_helper_idfunction()),]
             else:
                 le = self.left.arith_flatten(negation=False,update=update)
@@ -1871,8 +1878,8 @@ class unknown(parse_object):
             self.type = "str"
         elif not definite_type and self.type == "??":
             # Assume Fluent!
-            print >> sys.stderr, "Waring: Cannot find "+str(self)+" in fluents or actions!"
-            errout.error("Waring: Cannot find "+str(self)+" in fluents or actions!")
+            print >> sys.stderr, "% Warning: Cannot find "+str(self)+" in fluents or actions!"
+            errout.error("% Warning: Cannot find "+str(self)+" in fluents or actions!")
             self.type = "fluent"
             
         return variables
@@ -1883,8 +1890,8 @@ class unknown(parse_object):
         if not prime: return st
         if self.type == "action":
             if self.negation: 
-                print >> sys.stderr, "Warning! Action "+str(self)+" is negated."
-                errout.error("Warning! Action "+str(self)+" is negated.")
+                print >> sys.stderr, "% Warning! Action "+str(self)+" is negated."
+                errout.error("% Warning! Action "+str(self)+" is negated.")
             return "act("+st+")"
         elif self.type == "fluent":
             return "val("+st+","+str(not self.negation).lower()+")"
@@ -1945,7 +1952,7 @@ class variable(parse_object):
             for x in acs:
                 if str(self) == str(x):
                     if assigned_fluent:
-                        print "Warning! Variable "+str(self)+" could be a fluent or action!"
+                        print "% Warning! Variable "+str(self)+" could be a fluent or action!"
                     self.type = "action"
                     break
         return [str(self),]
@@ -1964,8 +1971,8 @@ class variable(parse_object):
                 elif self.type == "fluent":
                     return "val("+my_str+",true)"
                 else:
-                    print >> sys.stderr, "Warning!!! "+my_str+" could also be an action!"
-                    errout.error("Warning!!! "+my_str+" could also be an action!")
+                    print >> sys.stderr, "% Warning!!! "+my_str+" could also be an action!"
+                    errout.error("% Warning!!! "+my_str+" could also be an action!")
                     return "val("+my_str+",true)"
         return my_str
     

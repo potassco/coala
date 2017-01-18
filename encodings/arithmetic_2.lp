@@ -3,7 +3,8 @@
 
 % Domains of integers
 %&dom {L..U} = val(V,T) :- integer(V), integer_domain(V,L,U), step(T).
-&dom {L..U : integer_domain(V,L,U)} = val(V,T) :- integer(V), step(T).
+%&dom {L..U : integer_domain(V,L,U)} = val(V,T) :- integer(V), step(T).
+&dom {L..U : integer_domain(V,L,U)} = val(V,T) :- step(T), integer_domain(V,_,_).
 
 % Include integers in answer sets.
 &show {val(I,T) : integer(I), step(T)}.
