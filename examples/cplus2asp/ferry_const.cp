@@ -90,7 +90,7 @@ cross(SS, SW) causes here(sheep):=here(sheep) + SS, here(wolf):=here(wolf) + SW 
 %caused false if here(wolf)=N & here(sheep)=N1 where 0 < N1 & N1 < N. 
 %% don't allow less wolves than sheeps when less then n sheeps here
 %caused false if here(wolf)=N & here(sheep)=N1 where N1 < NUM & N < N1.
-false if here(wolf) > here(sheep).
+<false> if here(wolf) > here(sheep).
 
 %:- query
 %	label::0;
@@ -103,5 +103,5 @@ initially here(sheep)=numb.
 goal here(wolf)=0.
 goal here(sheep)=0.
 
-%coala ferryman-120-4-benchmark.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_goal.lp -c k=201 | outputformatclingocoala
+%coala ferry_const.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_goal.lp -c k=201 | outputformatclingocoala
 % Note that the number of steps must be odd (-c k=200 won't work)

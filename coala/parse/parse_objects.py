@@ -134,7 +134,7 @@ class parse_object(object):
         if others is not None:
             for o in others:
                 my_others[o] = others[o]
-        update = update_passdown(fluents=fluents,actions=actions,integers=integers,integer_ids=integer_ids,others=my_others,law_type=law_type)
+        update = update_passdown(law=self,fluents=fluents,actions=actions,integers=integers,integer_ids=integer_ids,others=my_others,law_type=law_type)
         self.pass_down_update(update)
         return update
     
@@ -151,7 +151,7 @@ class parse_object(object):
         if wh is not None:
             #prev = update.where #There may only be one update...
             update.where_start(wh)
-            wh.pass_down_update(update)
+            update.where_variables = wh.pass_down_update(update)
             update.where_end() #prev
             #variables = wh.pass_down_update(actions,fluents,idfunction,arith_idfunction,check=False)
             #for v in variables:
@@ -948,7 +948,7 @@ class fluent(parse_object):
         parse_object.__init__(self)
         self.content = content
         self.domainelement = domainelement
-        self.child_attributes = ["content"]
+        self.child_attributes = ["content","domainelement"]
         
     def __str__(self):
         return str(self.content)
@@ -1214,6 +1214,12 @@ class arithmatic_law(law): # Will be generated out of equations!
         
         #TODO: extract stuff from body... it needs to be a list of int_variables with factors
             
+    def __str__(self):
+        if type(self.head) == list:
+            return "["+"+".join(str(x) for x in self.head) + str(self.operator)+ \
+            ("+".join(str(x) for x in self.body))+  "]"
+        return "["+str(self.head) + str(self.operator)+ \
+            ("+".join(str(x) for x in self.body))+  "]"
     
     def print_facts(self, prime=False):
         wherepart = self.compile_where()
@@ -1237,9 +1243,9 @@ class arithmatic_law(law): # Will be generated out of equations!
         return result
 
 class arithmetic_atom(parse_object):
-    def __init__(self,value,helper_id,negation=False):
+    def __init__(self,value,helper_id,negation=False,unknown=False):
         parse_object.__init__(self)
-        self.unknown = False
+        self.unknown = unknown
         self.value = None
         self.unknown_is = None
         self.helper_id = helper_id
@@ -1374,11 +1380,14 @@ class arithmetic_atom(parse_object):
         
     def is_zero(self):
         return int(self.factor) == 0
+            
+    def __str__(self):
+        return "("+str(self.variable)+"*"+("-" if self.negation else "")+(str(self.value) if self.value is not None else "1")+")"
     
     def print_facts(self, prime=False):
         if self.unknown:
             if self.variable is not None:
-                return "_unknown,"+self.variable+","+self.value+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
+                return "_unknown,"+self.variable+","+((self.value+",") if self.value is not None else "")+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
             else:
                 return "_unknown,"+self.value+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
         elif self.variable is not None:
@@ -1878,8 +1887,12 @@ class unknown(parse_object):
             self.type = "str"
         elif not definite_type and self.type == "??":
             # Assume Fluent!
-            print >> sys.stderr, "% Warning: Cannot find "+str(self)+" in fluents or actions!"
-            errout.error("% Warning: Cannot find "+str(self)+" in fluents or actions!")
+            if update.is_action_allowed():
+                print >> sys.stderr, "% Warning: Cannot find "+str(self)+" in fluents or actions!"
+                errout.error("% Warning: Cannot find "+str(self)+" in fluents or actions!")
+            else:
+                print >> sys.stderr, "% Warning: Cannot find "+str(self)+" in fluents!"
+                errout.error("% Warning: Cannot find "+str(self)+" in fluents!")
             self.type = "fluent"
             
         return variables
@@ -1912,7 +1925,7 @@ class unknown(parse_object):
         #return result
     
     def arith_flatten(self,negation,update):
-        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation)
+        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation=negation,unknown=self.type!="integer")
     
     def compile_where_single(self):
         return self.print_facts()
@@ -1940,6 +1953,7 @@ class variable(parse_object):
     def pass_down_update(self,update):
         #TODO: Get a way of knowing if this here is an action/fluent or integer!!...
         #where_binding = update.get("where_binding")
+        found = False
         if update.had_where: #where_binding is not None:
             fls = update.where_fluents #where_binding["fluents"]
             acs = update.where_actions #where_binding["actions"]
@@ -1947,6 +1961,7 @@ class variable(parse_object):
             for x in fls:
                 if str(self) == str(x):
                     self.type = "fluent"
+                    found = True
                     assigned_fluent = True
                     break
             for x in acs:
@@ -1954,7 +1969,11 @@ class variable(parse_object):
                     if assigned_fluent:
                         print "% Warning! Variable "+str(self)+" could be a fluent or action!"
                     self.type = "action"
+                    found = True
                     break
+        if not found and not update.where and not str(self) in update.where_variables:
+            print >> sys.stderr, "% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!"
+            errout.error("% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!")
         return [str(self),]
     
     def print_facts(self,prime=False):
@@ -2080,11 +2099,12 @@ class domain(parse_object):
 
 # This object is only used during the pass_down update
 class update_passdown(object):
-    def __init__(self, fluents=[], actions=[], integers=[], integer_ids=[], others={}, law_type = None):
+    def __init__(self, law=None, fluents=[], actions=[], integers=[], integer_ids=[], others={}, law_type = None):
         self.fluents = fluents
         self.actions = actions
         self.integers = integers
         self.integer_ids = integer_ids
+        self.law = law
         self.law_type = law_type
         self.arithmetic_laws = []
         self.pass_up = {}
@@ -2093,6 +2113,7 @@ class update_passdown(object):
         self.where_part = None
         self.where_actions = []
         self.where_fluents = []
+        self.where_variables = []
         self.path = []
         if type(others) == dict:
             self.others = others

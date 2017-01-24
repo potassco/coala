@@ -1,0 +1,11 @@
+<asp>
+x(1..10).
+</asp>
+<fluent> a,b : 1 .. 10.
+
+<inertial> a,b.
+
+a := X if b == X where x(X).
+
+% 10 States
+% 10 Transitions
