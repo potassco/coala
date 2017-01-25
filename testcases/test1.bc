@@ -36,6 +36,6 @@ z <after> -z.
 
 <initially> z.
 
-<goal> z.
+<finally> z.
 
 % 1 state, 0 transitions

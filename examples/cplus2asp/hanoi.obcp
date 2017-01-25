@@ -109,7 +109,7 @@ nonexecutable move(P,P1), move(P2,P3) where P1 < P3, peg(P), peg(P1), peg(P2), p
 %  0: clear(p2) & clear(p3);
 %  maxstep: clear(p1) & clear(p2).
 initially clear(p2), clear(p3).
-goal clear(p2), clear(p1).
+finally clear(p2), clear(p1).
 
 %can be run from this directory using
 % coala hanoi.obcp | clingo - ../../encodings/incremental_clingo.lp | outputformatclingocoala

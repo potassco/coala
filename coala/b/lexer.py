@@ -72,7 +72,7 @@ class Lexer(object):
     t_NONEXE = r'<nonexecutable>'
     t_IMPOSSIBLE = r'<impossible>'
     t_INIT = r'<initially>'
-    t_GOAL = r'<goal>'
+    t_GOAL = r'<finally>'
     t_WHERE = r'<where>'
     t_TRUE = r'<true>'
     t_FALSE = r'<false>'

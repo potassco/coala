@@ -850,7 +850,7 @@ class initial_law(query):
         return str(self.head)
     
     def typestr(self):
-        return "initial("+self.head.typestr()+")"
+        return "initially("+self.head.typestr()+")"
     
     def print_facts(self,prime=False):
         result = []
@@ -875,14 +875,14 @@ class goal_law(query):
         return str(self.head)
     
     def typestr(self):
-        return "goal("+self.head.typestr()+")"
+        return "finally("+self.head.typestr()+")"
     
     def print_facts(self,prime=False):
         result = []
         wherepart = self.compile_where()
         for ac in self.head:
             st = ac.print_facts(prime=True)
-            result.append("goal("+st+")"+wherepart+".")
+            result.append("finally("+st+")"+wherepart+".")
         return result
 
 

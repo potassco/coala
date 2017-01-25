@@ -30,6 +30,6 @@ a <causes> z,y(1,2,x(33)) <if> z,y(1,2,x(33)).
 
 <initially> z,y(1,2,x(33)).
 
-<goal> z,y(1,2,x(33)).
+<finally> z,y(1,2,x(33)).
 
 % 3 States, 10 Transitions

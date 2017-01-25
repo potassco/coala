@@ -31,4 +31,4 @@ a <causes> -z,-x(v(w)) <if> -z,-x(v(w)).
 
 <initially> -z,-x(v(w)).
 
-<goal> -z,-x(v(w)).
+<finally> -z,-x(v(w)).

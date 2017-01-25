@@ -23,4 +23,4 @@ medicate <causes> dead <if> -hydrated, infected.
 <initially> infected.
 <initially> -hydrated, -dead.
 
-<goal> -infected, -dead.
+<finally> -infected, -dead.

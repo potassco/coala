@@ -39,6 +39,6 @@ win <after> bomb(0,X,Y) <ifcons> alive, someoneat(X2,Y) <where> map(X,Y), map(X2
 <initially> -win.
 <initially> -bomb(B,X,Y) <where> bombcounter(B), map(X,Y).
 
-<goal> win.
+<finally> win.
 
 </role>

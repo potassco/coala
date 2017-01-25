@@ -12,4 +12,4 @@ a <causes> z <if> z.
 
 <initially> z.
 
-<goal> z.
+<finally> z.

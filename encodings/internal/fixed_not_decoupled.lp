@@ -79,8 +79,8 @@ holds(F,T) :- dynamic_law(I,F), occurs(A,T-1) : after(I,A),action(A);
 :- fluent(X), holds(val(X,Y),T), holds(neg_val(X,Y),T), step(T).
 
 #program query.
-:- not holds(val(G,GV),k), goal(val(G,GV)).
-:- holds(val(G,GV),k), goal(neg_val(G,GV)).
+:- not holds(val(G,GV),k), finally(val(G,GV)).
+:- holds(val(G,GV),k), finally(neg_val(G,GV)).
 
 #program utility.
-#maximize {1,G : holds(G,k), goal(G); -1,G : holds(val(G,X),k), goal(neg_val(G,X))}.
+#maximize {1,G : holds(G,k), finally(G); -1,G : holds(val(G,X),k), finally(neg_val(G,X))}.

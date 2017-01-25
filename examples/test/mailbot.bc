@@ -86,7 +86,7 @@ pickup(From, To)     <causes> -fullbags(F)        <if> fullbags(F)       <where>
 tasksremaining <if> request(X,Y) <where> office(X), office(Y).
 tasksremaining <if> holding(X,Y) <where> office(X), office(Y).
 
-<goal> -tasksremaining.
+<finally> -tasksremaining.
 
 
 

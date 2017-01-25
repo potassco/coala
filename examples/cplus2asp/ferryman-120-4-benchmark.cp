@@ -99,8 +99,8 @@ false if here(wolf) > here(sheep).
 %	maxstep: here(wolf)=0 & here(sheep)=0.
 initially here(wolf)=120.
 initially here(sheep)=120.
-goal here(wolf)=0.
-goal here(sheep)=0.
+finally here(wolf)=0.
+finally here(sheep)=0.
 
-%coala ferryman-120-4-benchmark.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_goal.lp -c k=201 | outputformatclingocoala
+%coala ferryman-120-4-benchmark.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_finally.lp -c k=201 | outputformatclingocoala
 % Note that the number of steps must be odd (-c k=200 won't work)

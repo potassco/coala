@@ -58,7 +58,7 @@ include encodings/arithmetic_initial.lp
 include encodings/base.lp
 include encodings/base_translation.lp
 include encodings/base_initial.lp
-include encodings/base_goal.lp
+include encodings/base_finally.lp
 include encodings/csp.lp
 include encodings/incremental.lp
 include encodings/solve_incremental.lp

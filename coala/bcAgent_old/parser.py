@@ -339,7 +339,7 @@ class Parser(object):
 			#self.data['initially_laws'].append((t[2],t[3],var3,var2))
 			t[0] = ('initially_laws',self.add_meta((t[2],t[3],var3,var2),t.lineno(1)))
 		
-	def p_goal_query(self,t): # <goal> f_1,...,f_n <where> bla.
+	def p_goal_query(self,t): # <finally> f_1,...,f_n <where> bla.
 		''' goal_query : GOAL formula where_part'''
 		if len(t[2]) > 0:
 			t[2], var2 = unpack(t[2])

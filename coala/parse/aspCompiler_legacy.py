@@ -809,8 +809,8 @@ class AspCompiler(aspCom.AspCompiler):
 			self.current_vars = ac[-1]
 			if type(ac[0]) == list:
 				for p in ac[0]:
-					self.write('goal('+self.to_string(p,role=role)+')'+wherepart+'.')
-			else:self.write('goal('+self.to_string(ac[0],role=role)+')'+wherepart+'.')
+					self.write('finally('+self.to_string(p,role=role)+')'+wherepart+'.')
+			else:self.write('finally('+self.to_string(ac[0],role=role)+')'+wherepart+'.')
 		self.current_meta_info = None
 		
 	def compile_kill(self,a,b,role):

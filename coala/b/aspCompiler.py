@@ -550,8 +550,8 @@ class AspCompiler(object):
             self.current_vars = ac[-1]
             if type(ac[0]) == list:
                 for p in ac[0]:
-                    self.write('goal('+self.to_string(p)+')'+self.return_compiled_where(ac[-3],ac[-2],ac[-1])+'.')
-            else:self.write('goal('+self.to_string(ac[0])+')'+self.return_compiled_where(ac[-3],ac[-2],ac[-1])+'.')
+                    self.write('finally('+self.to_string(p)+')'+self.return_compiled_where(ac[-3],ac[-2],ac[-1])+'.')
+            else:self.write('finally('+self.to_string(ac[0])+')'+self.return_compiled_where(ac[-3],ac[-2],ac[-1])+'.')
         self.current_meta_info = None
         
     def compile_kill(self,a,b):

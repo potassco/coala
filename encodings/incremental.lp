@@ -90,12 +90,12 @@ holds(H,t) :- dynamic_law(I), head(I,H),
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% Query: Check goals
+%%% Query: Check finallys
 #program query(t).
 
 #external query(t).
 
 % Goals for planning
-:- not holds(val(G,GV),t), goal(val(G,GV)), query(t).
+:- not holds(val(G,GV),t), finally(val(G,GV)), query(t).
 
 

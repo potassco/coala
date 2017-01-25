@@ -157,6 +157,6 @@ initially(val(fullbags(0),true)).
 initially(val(fullbags(X),false)) :- capacityminusone(X).
 initially(val(request(X,Y),true)) :- initialrequest(X,Y).
 initially(val(request(X,Y),false)) :- office(X),office(Y),notinitialrequest(X,Y).
-goal(val(tasksremaining,false)).
+finally(val(tasksremaining,false)).
 
 %#show initially/1.

@@ -91,7 +91,7 @@ nonexecutable move(B,L) if loc(B1) = B where block(B), block(B1), location(L).
 
 
 
-% Definition an initial state and the definition of a goal state.
+% Definition an initial state and the definition of a finally state.
 initially loc(B)=table where block(B).
-goal loc(b2)=b1, loc(b3)=b2, loc(b4)=b3. % These rules can also be separated, as all goals have to be fullfilled.
+finally loc(b2)=b1, loc(b3)=b2, loc(b4)=b3. % These rules can also be separated, as all finallys have to be fullfilled.
 

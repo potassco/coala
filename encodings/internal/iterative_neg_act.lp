@@ -93,9 +93,9 @@ holds(F,t) :- dynamic_law(I), head(I,F),
 
 #program query(t).
 #external query(t).
-:- not holds(val(G,GV),t), goal(val(G,GV)), query(t).
-:- holds(val(G,GV),t), goal(neg_val(G,GV)), query(t).
+:- not holds(val(G,GV),t), finally(val(G,GV)), query(t).
+:- holds(val(G,GV),t), finally(neg_val(G,GV)), query(t).
 
 #program utility(t).
 #external utility(t).
-#maximize {1,G : holds(G,t), goal(G), utility(t); -1,G : holds(val(G,X),t), goal(neg_val(G,X)), utility(t)}.
+#maximize {1,G : holds(G,t), finally(G), utility(t); -1,G : holds(val(G,X),t), finally(neg_val(G,X)), utility(t)}.

@@ -30,6 +30,6 @@ a <causes> -z <if> -z.
 
 <initially> -z.
 
-<goal> -z.
+<finally> -z.
 
 % States 2, Transitions 2

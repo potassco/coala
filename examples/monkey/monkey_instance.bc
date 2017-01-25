@@ -2,6 +2,6 @@
 initially not has(banana).
 initially monkey=onground, position(monkey)=left.
 initially position(chair)=right.
-goal has(banana).
+finally has(banana).
 
 % plan: move(right)*2, push(left), move(left), climb, grasp.

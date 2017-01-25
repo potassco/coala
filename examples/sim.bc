@@ -72,7 +72,7 @@ notcapacityplusone(X) :- capacity(X), not capacity(X+1).
 <initially> -fullbags(X) <where> capacityplusone(Y,X).
 
 % GOAL
-%<goal> holding(1,4).
-%<goal> at(4).
-<goal> -holding(X,Y) <where> office(X), office(Y).
-<goal> -request(X,Y) <where> office(X), office(Y).
+%<finally> holding(1,4).
+%<finally> at(4).
+<finally> -holding(X,Y) <where> office(X), office(Y).
+<finally> -request(X,Y) <where> office(X), office(Y).

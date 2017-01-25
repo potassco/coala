@@ -252,7 +252,7 @@ with variables.
 
 Bug Reports and Patches
 =======================
-My goal with PLY is to simply have a decent lex/yacc implementation
+My finally with PLY is to simply have a decent lex/yacc implementation
 for Python.  As a general rule, I don't spend huge amounts of time
 working on it unless I receive very specific bug reports and/or
 patches to fix problems. I also try to incorporate submitted feature

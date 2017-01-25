@@ -19,11 +19,6 @@
 %	NUM-CAPACITY..NUM :: big_int;
 %	sheep, wolf :: type.
 
-
-%%% Note that we don't have NUM anymore.
-%%%
-%%% We instead will use something huge ( 10000000 )
-
 <asp>
 #const numb=120.
 type(sheep).type(wolf).
@@ -57,11 +52,11 @@ nonexecutable cross(SS, SW) if boat_here, here(wolf) < SW where small_int(SS), s
 
 %% don't cross when boat not here and more than n sheep
 %nonexecutable cross(SS, SW) if -boat_here & here(sheep)=BS where SS + BS > NUM.
-%%% We don't have such a maximal number anymore.
+%%% We don't have such a maximal number anymore. This handled by the domain instead.
 
 %% don't cross when boat not here and more than n wolves
 %nonexecutable cross(SS, SW) if -boat_here & here(wolf)=BW where  SW + BW > NUM.  
-%%% We don't have such a maximal number anymore.
+%%% We don't have such a maximal number anymore. This handled by the domain instead.
 
 %% don't cross with an empty boat
 %nonexecutable cross(0, 0). 
@@ -88,9 +83,11 @@ cross(SS, SW) causes here(sheep):=here(sheep) + SS, here(wolf):=here(wolf) + SW 
 
 %% don't allow less sheep than wolves when still sheeps here
 %caused false if here(wolf)=N & here(sheep)=N1 where 0 < N1 & N1 < N. 
+<false> if here(wolf) > here(sheep), here(sheep) > 0.
+
 %% don't allow less wolves than sheeps when less then n sheeps here
 %caused false if here(wolf)=N & here(sheep)=N1 where N1 < NUM & N < N1.
-<false> if here(wolf) > here(sheep).
+<false> if here(wolf) < here(sheep), here(sheep) < numb.
 
 %:- query
 %	label::0;
@@ -100,8 +97,8 @@ cross(SS, SW) causes here(sheep):=here(sheep) + SS, here(wolf):=here(wolf) + SW 
 %	maxstep: here(wolf)=0 & here(sheep)=0.
 initially here(wolf)=numb.
 initially here(sheep)=numb.
-goal here(wolf)=0.
-goal here(sheep)=0.
+finally here(wolf)=0.
+finally here(sheep)=0.
 
-%coala ferry_const.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_goal.lp -c k=201 | outputformatclingocoala
+%coala ferry_const.cp | clingcon - ../../encodings/arithmetic.lp ../../encodings/arithmetic_initial.lp ../../encodings/arithmetic_finally.lp -c k=201 | outputformatclingocoala
 % Note that the number of steps must be odd (-c k=200 won't work)

@@ -25,7 +25,7 @@ out(A) <after> right(A), at(A,l) <where> sumo(A), slot(L).
 
 <initially> at(A,1) <where> sumo(A), slot(1).
 <initially> -at(A,L) <where> sumo(A), slot(L), L != 1.
-<goal> at(A,4) <where> sumo(A), slot(4).
+<finally> at(A,4) <where> sumo(A), slot(4).
 
 
 %ASP

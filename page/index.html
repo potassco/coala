@@ -46,8 +46,8 @@ Coala features the following options:
     <ul>
     <li>Printing States of the BC Program</li>
     <li>Printing possible Transitions of the BC Program</li>
-    <li>Generating Plans given an initial State, goal fluent-assignments and a number of steps</li>
-    <li>Incrementally generating Plans given an initial State, goal fluent-assignments</li>
+    <li>Generating Plans given an initial State, finally fluent-assignments and a number of steps</li>
+    <li>Incrementally generating Plans given an initial State, finally fluent-assignments</li>
     <li>Printing States and Transitions of BC Progams with integers (using clingcon)</li>
     </ul>
 </li>
@@ -252,14 +252,14 @@ at(Y) <after> goto(X) <where> pos(X), Y = X / 2.</xmp>
 Note that each variable still needs to be bound somewhere.<br>
 
 <br><br>
-For finding plans, we added initial values and goals.<br>
+For finding plans, we added initial values and finallys.<br>
 They are not part of BC and will have no effect unless modified encodings are used.<br>
 Initial values can be set using a simple rule like shown in the file "encodings/base_initial.lp" : "holds(F,0) :- initially(F)."
 <br>
 Initial values of fluents can be set using
 <xmp style="margin-left: 20px;"><initially> -dead.</xmp>
-And goals can be defined using
-<xmp style="margin-left: 20px;"><goal> winning.</xmp>
+And finallys can be defined using
+<xmp style="margin-left: 20px;"><finally> winning.</xmp>
 
 
 
@@ -306,7 +306,7 @@ after(law(1),act(drink(cup(water)))) dynamic_law(law(2)) head(law(2),val(dead,tr
 after(law(2),val(infected,true)) dynamic_law(law(3)) head(law(3),val(infected,false)) after(law(3),act(medicate)) ifcons(law(3),val(hydrated,true))
 nonexecutable(law(4),act(drink(cup(water)))) nonexecutable(law(4),val(dead,true)) nonexecutable(law(5),act(medicate)) nonexecutable(law(5),val(dead,true))
 inertial(dead) inertial(hydrated) inertial(infected) initially(val(infected,true)) initially(val(hydrated,false)) initially(val(dead,false))
-goal(val(infected,false)) goal(val(dead,false)) step(0) step(1) atom(val(hydrated,true)) atom(val(hydrated,false)) atom(val(infected,true))
+finally(val(infected,false)) finally(val(dead,false)) step(0) step(1) atom(val(hydrated,true)) atom(val(hydrated,false)) atom(val(infected,true))
 atom(val(infected,false)) atom(val(dead,true)) atom(val(dead,false)) head(id(inertial,dead,true),val(dead,true))
 head(id(inertial,dead,false),val(dead,false)) head(id(inertial,hydrated,true),val(hydrated,true)) head(id(inertial,hydrated,false),val(hydrated,false))
 head(id(inertial,infected,true),val(infected,true)) head(id(inertial,infected,false),val(infected,false)) head(id(nonexecutable,law(4)),_false)
@@ -365,7 +365,7 @@ SATISFIABLE
 <br>
 
 If you have the gringo library installed and in your python path (old library, the clingo library might get supported later)<br>
-Given a <b>goal</b> and an <b>initial</b> state, you can call
+Given a <b>finally</b> and an <b>initial</b> state, you can call
 <div style="padding:0em 2em;">
     <div style="text-indent=20em; padding-left=-20em; background: #f0f0f0; overflow:hidden;width:45em;border:solid gray;border-width:.1em .1em .1em .1em;padding:.6em .6em;">
     <span style="color: #000000">
@@ -374,7 +374,7 @@ Given a <b>goal</b> and an <b>initial</b> state, you can call
     </div>
 </div>
 <br>
-This generates a plan for the given transition system from the/an initial state to a state satisfying the goal.
+This generates a plan for the given transition system from the/an initial state to a state satisfying the finally.
 <xmp style="margin-left: 20px;">
 Plan:
 

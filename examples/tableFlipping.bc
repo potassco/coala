@@ -50,7 +50,7 @@ at(P),-at(Q) <after> goto(P),at(Q) <where> place(P), place(Q).
 <initially> -holds(C) <where> cup(C).
 <initially> -clean(C) <where> cup(C).
 
-<goal> -at(C,table) <where> cup(C).
+<finally> -at(C,table) <where> cup(C).
 
 %%<nonexecutable> A, B <where> <action> A, <action> B, A!=B.
 %%

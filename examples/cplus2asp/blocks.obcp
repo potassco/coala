@@ -110,7 +110,7 @@ initially loc(1)=2, loc(2)=table, loc(3)=4,
     loc(4)=table, loc(5)=6, loc(6)=table.
 initially -rained(A) where rblock(A).
 
-goal loc(B)=table where nblock(B).
+finally loc(B)=table where nblock(B).
 
 %can be run from this directory using
 % coala blocks.obcp | clingo - ../../encodings/incremental_clingo.lp | outputformatclingocoala

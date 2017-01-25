@@ -308,7 +308,7 @@ class Parser(object):
 		t[0] = ps.initial_law(t[2],t[3],line,filename)
 		#TODO: Ignore if empty.
 		
-	def p_goal_query(self,t): # <goal> f_1,...,f_n <where> bla.
+	def p_goal_query(self,t): # <finally> f_1,...,f_n <where> bla.
 		''' goal_query : GOAL formula where_part'''
 		line,filename=self.get_meta(t.lineno(1))
 		t[0] = ps.goal_law(t[2],t[3],line,filename)

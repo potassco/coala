@@ -31,7 +31,7 @@ a <causes> -z=5,-x(v(w)) <if> -z=5,-x(v(w)).
 
 <initially> -z=5,-x(v(w)).
 
-<goal> -z=5,-x(v(w)).
+<finally> -z=5,-x(v(w)).
 
 % 2 States
 % 3 Transitions

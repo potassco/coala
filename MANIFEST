@@ -50,7 +50,7 @@ coala/parse/parsetab.py
 encodings/arithmetic.lp
 encodings/arithmetic_initial.lp
 encodings/base.lp
-encodings/base_goal.lp
+encodings/base_finally.lp
 encodings/base_initial.lp
 encodings/base_translation.lp
 encodings/csp.lp

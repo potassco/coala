@@ -52,5 +52,5 @@
 <initially> -fullbags(X) <where> capacityplusone(Y,X).
 
 % GOAL
-<goal> -holding(X,Y) <where> office(X), office(Y).
-<goal> -request(X,Y) <where> office(X), office(Y).
+<finally> -holding(X,Y) <where> office(X), office(Y).
+<finally> -request(X,Y) <where> office(X), office(Y).
