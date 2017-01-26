@@ -1,0 +1,6 @@
+<action> a,b,c,e,f,g.
+
+nonexecutable A, B where action A, action B, A != B.
+
+% 1 State
+% 7 Transitions

@@ -24,7 +24,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.433"
+version = "2.434"
 
 
 try:
@@ -464,6 +464,7 @@ def main(argv):
 				(mypath+"testcases/test7.bc",2,1),
 				(mypath+"testcases/test8.bc",2,2),
 				(mypath+"testcases/test9.bc",2,3),
+				(mypath+"testcases/test10.bc",1,7),
 				(mypath+"testcases/test_false.bc",4,0),
 				(mypath+"testcases/test_true.bc",3,0),
 				(mypath+"testcases/test_where.bc",12,0),
