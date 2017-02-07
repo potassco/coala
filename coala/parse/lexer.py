@@ -41,7 +41,9 @@ class Lexer(object):
 		'COLON',
 #		'MOD',
 #		'SEMIC',
-		'NEQ','EQQ','GT','LT','LE','GE','PLUS','POWER','TIMES','DIV',
+		'NEQ','EQQ','GT','LT','LE','GE',
+		'PLUSEQ','MINUSEQ',
+		'PLUS','POWER','TIMES','DIV',
 		'ASSIGN',
 		'EQ',
 #		'AND','OR','XOR','LTLNOT','LTLOR','IMPL','EQUIV',
@@ -125,6 +127,8 @@ class Lexer(object):
 	#t_NUMBER = r'[0-9]+'
 	t_EQQ = r'=='
 	t_ASSIGN = r':='
+	t_PLUSEQ = r'\+='
+	t_MINUSEQ = r'-='
 	t_EQ = r'=' 
 	t_NEQ = r'!='
 	t_LT = r'<'

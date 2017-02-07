@@ -1,0 +1,7 @@
+<fluent> a : 1 .. 5.
+
+%a:=2 ifcons a==2.
+default a=2.
+
+% 5 States
+% 5 Transitions

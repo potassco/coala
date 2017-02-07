@@ -1,0 +1,19 @@
+fluent x : 0..20. %<int>
+action a,b,c.
+
+inertial x.
+%default x=1.
+
+x += 2 after a.
+x += 3 after b.
+x += 5 after c.
+
+initially x=2.
+impossible x==12.
+<asp>
+:- initially(val(V,X)), integer(V), not &sum{val(V,0)} = X.
+holds(F,0) :- initially(F).
+</asp>
+
+% 1 States
+% 7 Transitions

@@ -43,6 +43,7 @@ class Parser(object):
 	# will be filled with the lines to parse
 	my_lines = []
 	meta_info = None
+	
 	debug = False
 	
 	start = 'program'
@@ -543,12 +544,18 @@ class Parser(object):
 	def p_asp_term(self,t):
 		#''' asp_term : asp_operation
 		''' asp_term : term ASSIGN asp_operation
+					| term PLUSEQ asp_operation
+					| term MINUSEQ asp_operation
 					| asp_operation asp_eqoperator asp_operation'''
 #					| MINUS term
 #					| NOT term
 #	if len(t) == 4:
 		if t[2] == ":=":
 			t[0] = ps.assignment(t[1],t[3])
+		elif t[2] == "+=":
+			t[0] = ps.incremental_assignment(t[1],t[3])
+		elif t[2] == "-=":
+			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
 		else:
 			t[0] = ps.equation(t[1],t[3],operator=t[2])
 #	else:

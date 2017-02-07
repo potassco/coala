@@ -1178,7 +1178,7 @@ class predicate(parse_object):
     def arith_flatten(self,negation,update):
         return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation)
 
-class arithmatic_law(law): # Will be generated out of equations!
+class arithmetic_law(law): # Will be generated out of equations!
     def __init__(self,head,body,operator,my_id,assignment,dynamic_law_part,variables,where=None):
         law.__init__(self)
         self.head = head
@@ -1242,6 +1242,37 @@ class arithmatic_law(law): # Will be generated out of equations!
             result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
         return result
 
+class arithmetic_additive_law(arithmetic_law): # Will be generated out of equations!
+    def __init__(self,head,body,my_id,dynamic_law_part,variables,where=None):
+        arithmetic_law.__init__(self,head,body,"=",my_id,True,dynamic_law_part,variables,where)
+        #print >> sys.stderr, "Warning! Incremental statements using += will result in inertial behavior for the fluent." 
+        print >> sys.stderr, "Warning! Incremental statements using += may result in different behavior!"
+    
+    def print_facts(self, prime=False):
+        wherepart = self.compile_where()
+        result = []
+        stid = "law("+','.join([str(self.my_id)]+self.variables)+")"
+
+        result.append("arithmetic_additive_law("+stid+")"+wherepart+".")
+
+        for e in self.head:
+            result.append("arithmetic_additive_fluent("+stid+","+e.variable+")"+wherepart+".")
+            
+        if self.is_dynamic_law_part:
+            result.append("arithmetic_assignment_dynamic("+stid+")"+wherepart+".")
+        else:
+            result.append("arithmetic_assignment("+stid+")"+wherepart+".")
+        #result.append("arithmetic_additive_law("+stid+","+self.operator_type+")"+wherepart+".")
+        
+        for e in self.head:
+            e.encapsulate("additive_helper("+stid+",",")")
+            result.append("arithmetic_head("+stid+","+e.print_facts()+")"+wherepart+".")
+            
+
+        for e in self.body:
+            result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+        return result
+
 class arithmetic_atom(parse_object):
     def __init__(self,value,helper_id,negation=False,unknown=False):
         parse_object.__init__(self)
@@ -1264,6 +1295,10 @@ class arithmetic_atom(parse_object):
     
     #def negate(self):
     #    self.negation = not self.negation
+    
+    def encapsulate(self,pre,post):
+        if self.variable is not None:
+            self.variable = pre+self.variable+post
         
     def has_no_variable(self):
         return not self.unknown and self.variable is None
@@ -1520,7 +1555,7 @@ class equation(parse_object):
             #print " ".join(x.print_facts() for x in head)
             #print " ".join(x.print_facts() for x in body)
             
-            law = arithmatic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+            law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
             update.add_arithmetic_law(law)
             
         
@@ -1666,6 +1701,7 @@ class assignment(parse_object):
         self.negated = negated
         self.child_attributes = ["head","body"]
         self.replacement = None
+        self.replacement_name = "_arithmetic"
         
     def __str__(self):
         return ("not " if self.negated else "")+str(self.head)+"="+str(self.body)
@@ -1719,7 +1755,7 @@ class assignment(parse_object):
         if is_arithmetic_assignment:
             self.has_integer = True
             self.my_id = update.arith_idfunction()
-            self.replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
+            self.replacement = predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
             assignment = update.is_in_head()
             if not assignment:
                 print >> sys.stderr, "Error: Assignment in Body!"
@@ -1755,11 +1791,15 @@ class assignment(parse_object):
             #print " ".join(x.print_facts() for x in head)
             #print " ".join(x.print_facts() for x in body)
             
-            law = arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+            law = self.create_law(head,body,dynamic_law_part,update)
+            #arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
             update.add_arithmetic_law(law)
             
         
         return self.variables
+    
+    def create_law(self,head,body,dynamic_law_part,update):
+        return arithmetic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
     
     def simplify(self, negation=False):
         if self.replacement is not None:
@@ -1768,6 +1808,20 @@ class assignment(parse_object):
             self.negation = not self.negation
         return self
 
+class incremental_assignment(assignment):
+    
+    def __init__(self, head, body, negated = False):
+        assignment.__init__(self, head, body, negated)
+        self.replacement_name = "_arithmetic" #"_additive_arithmetic"
+
+    def typestr(self):
+        head = self.head.typestr() if type(self.head) != str else "str"
+        body = self.body.typestr() if type(self.body) != str else "str"
+        return ("increment" if not self.negated else "decrement")+"("+head+","+body+")"
+    
+    def create_law(self,head,body,dynamic_law_part,update):
+        return arithmetic_additive_law(head,body,self.my_id,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+    
 # unknown may sound weird, but while parsing it, we don't know what this is.
 # It may be a Fluent, Actions
 class unknown(parse_object):
