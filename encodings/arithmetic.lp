@@ -1,5 +1,7 @@
 % Theory
 #include "csp.lp".
+% Transitions
+#include "base_translation.lp".
 
 % Domains of integers
 &dom {L..U : integer_domain(V,L,U)} = val(V,T) :- step(T), integer_domain(V,_,_).
@@ -8,41 +10,37 @@
 &show {val(I,T) : integer(I), step(T)}.
 
 %---------------------------------------------------------
-% Transitions
-#include "base_translation.lp".
 
 % arithmetic_laws are atoms, therefore they can hold at time steps.
 atom(_arithmetic(L)) :- arithmetic_law(L,_).
 
-% Dynamic Assignments
-:- holds(_arithmetic(L),T), allassigned(L,T-1), 
-    arithmetic_assignment_dynamic(L), not arithmetic_fulfilled(L,T), 
-    step(T), step(T-1).
-
-% Static Assignments
-:- holds(_arithmetic(L),T), allassigned(L,T), 
-    arithmetic_assignment(L), not arithmetic_fulfilled(L,T), 
-    step(T).
+% Enforces arithmetics to hold when laws do.
+:- holds(_arithmetic(L),T), allassigned(L,T), not arithmetic_fulfilled(L,T).
+%:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
 
 % Non-Assignments which appear in bodys:
-holds(_arithmetic(L),T) :- allassigned(L,T), 
-    allassigned_head(L,T), not arithmetic_assignment(L), 
-    not arithmetic_assignment_dynamic(L), arithmetic_fulfilled(L,T), 
+holds(_arithmetic(L),T) :- allassigned(L,T), not ifcons(_,_arithmetic(L)),
+    allassigned_head(L,T), arithmetic_fulfilled(L,T), 
+    not arithmetic_assignment(L),
+    not arithmetic_assignment_dynamic(L), 
     step(T).
 
-%------------------------------------------------
+% Handling ifcons parts
+holds(_arithmetic(L),T) :- arithmetic_fulfilled(L,T), ifcons(_,_arithmetic(L)), step(T).
 
+%------------------------------------------------
 % Handle equations
+
 arithmetic_fulfilled(L,T) :- arithmetic_law(L,eq),
-    &sum {K*X,I:arith_law_atom(K,X,I,L,T)} = C, 
+    &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);K*X,I:arith_law_atom(K,X,I,L)} = C, 
     arithmetic(L,C), step(T).
 
 arithmetic_fulfilled(L,T) :- arithmetic_law(L,ne),
-    &sum {K*X,I:arith_law_atom(K,X,I,L,T)} != C,
+    &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);K*X,I:arith_law_atom(K,X,I,L)} != C,
     arithmetic(L,C), step(T).
 
 arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,F),
-    &sum {F*K*X,I:arith_law_atom(K,X,I,L,T)} < C,
+    &sum {F*K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);F*K*X,I:arith_law_atom(K,X,I,L)} < C,
     step(T).
 
 %---------------------------------------------------------
@@ -53,9 +51,9 @@ arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,F),
 assigned(V,0) :- integer(V), step(0).
 
 % Handle inertial laws (domain/2 doesn't exist integers)
-assigned(V,T) :- integer(V), inertial(V), 
-    &sum{val(V,T)} = val(V,T-1), 
-    step(T), step(T-1).
+assigned(V,T) :- integer(V), inertial(V),
+    &sum{val(V,T); -K*val(C,T):arithmetic_head(I,C,K,_),arithmetic_additive_fluent(I,V)} = val(V,T-1), 
+    step(T), step(T-1). % Includes increment helpers!
 
 % An integer is assigned if there is a dynamic law assigning it.
 assigned(V,T) :- integer(V), arithmetic_head(L,V,_,_), 
@@ -85,6 +83,14 @@ allassigned_head(L,T) :- arithmetic_law(L,_),
     assigned(V,T) : arithmetic_head(L,V,_,_), integer(V);
     step(T).
 
+allassigned(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)), 
+    not not assigned(V,T) : arithmetic(L,V,_,_), integer(V);  
+    step(T).
+
+allassigned_head(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)), 
+    not not assigned(V,T) : allassigned_head(L,V,_,_), integer(V);  
+    step(T).
+
 % Handle Atoms that are unknown during the translation process
 arithmetic(L,V,K,I):-       arithmetic(L,_unknown,V,K,I),   integer(V).
 arithmetic(L,K,V,I):-       arithmetic(L,_unknown,V,K,I),   not integer(V), integer(K).
@@ -94,21 +100,18 @@ arithmetic(L,V,K*U,I):-     arithmetic(L,_unknown,V,U,K,I), integer(V),     not 
 arithmetic(L,U,K*V,I):-     arithmetic(L,_unknown,V,U,K,I), not integer(V), integer(U).
 
 % Collect atoms for the sum construct
-arith_law_atom(K,val(X,T-1),I,L,T) :- arithmetic(L,X,K,I), 
+arith_law_atom(K,X,I,L,-1) :- arithmetic(L,X,K,I), 
     arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C), 
-    step(T), step(T-1).
+    arithmetic(L,C).
 
-arith_law_atom(K,val(X,T),I,L,T) :- arithmetic(L,X,K,I), 
+arith_law_atom(K,X,I,L,0) :- arithmetic(L,X,K,I), 
     not arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C), 
-    step(T).
+    arithmetic(L,C).
 
-arith_law_atom(K,val(X,T),I,L,T) :- arithmetic_head(L,X,K,I), 
-    arithmetic(L,C), 
-    step(T).
+arith_law_atom(K,X,I,L,0) :- arithmetic_head(L,X,K,I), 
+    arithmetic(L,C).
 
-arith_law_atom(K,X,I,L,T) :- arithmetic(L,_sum,X,K,I), 
+arith_law_atom(K,X,I,L) :- arithmetic(L,_sum,X,K,I), 
     arithmetic(L,C),
     step(T).
 

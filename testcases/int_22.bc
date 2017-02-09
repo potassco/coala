@@ -1,0 +1,7 @@
+<fluent> a,b : 1 .. 5.
+
+a:=b if <true>.
+b:=a if <true>.
+
+% 5 States
+% 0 Transitions

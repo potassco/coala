@@ -1,5 +1,7 @@
 % Theory
 #include "csp.lp".
+% Transitions
+#include "base_translation.lp". 
 
 % Domains of integers
 &dom {L..U : integer_domain(V,L,U)} = val(V,T) :- step(T), integer_domain(V,_,_).
@@ -8,15 +10,13 @@
 &show {val(I,T) : integer(I), step(T)}.
 
 %---------------------------------------------------------
-% Transitions
-#include "base_translation.lp". 
-%---------------------------------------------------------
 
 % arithmetic_laws are atoms, therefore they can hold at time steps.
 atom(_arithmetic(L)) :- arithmetic_law(L,_).
 
 % Enforces arithmetics to hold when laws do.
-:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
+:- holds(_arithmetic(L),T), allassigned(L,T), not arithmetic_fulfilled(L,T).
+%:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
 
 % Non-Assignments which appear in bodys:
 holds(_arithmetic(L),T) :- allassigned(L,T), not ifcons(_,_arithmetic(L)),
@@ -32,15 +32,15 @@ holds(_arithmetic(L),T) :- arithmetic_fulfilled(L,T), ifcons(_,_arithmetic(L)), 
 % Handle equations
 
 arithmetic_fulfilled(L,T) :- arithmetic_law(L,eq),
-    &sum {K*X,I:arith_law_atom(K,X,I,L,T)} = C, 
+    &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);K*X,I:arith_law_atom(K,X,I,L)} = C, 
     arithmetic(L,C), step(T).
 
 arithmetic_fulfilled(L,T) :- arithmetic_law(L,ne),
-    &sum {K*X,I:arith_law_atom(K,X,I,L,T)} != C,
+    &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);K*X,I:arith_law_atom(K,X,I,L)} != C,
     arithmetic(L,C), step(T).
 
 arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,F),
-    &sum {F*K*X,I:arith_law_atom(K,X,I,L,T)} < C,
+    &sum {F*K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);F*K*X,I:arith_law_atom(K,X,I,L)} < C,
     step(T).
 
 %---------------------------------------------------------
@@ -100,21 +100,18 @@ arithmetic(L,V,K*U,I):-     arithmetic(L,_unknown,V,U,K,I), integer(V),     not 
 arithmetic(L,U,K*V,I):-     arithmetic(L,_unknown,V,U,K,I), not integer(V), integer(U).
 
 % Collect atoms for the sum construct
-arith_law_atom(K,val(X,T-1),I,L,T) :- arithmetic(L,X,K,I), 
+arith_law_atom(K,X,I,L,-1) :- arithmetic(L,X,K,I), 
     arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C), 
-    step(T), step(T-1).
+    arithmetic(L,C).
 
-arith_law_atom(K,val(X,T),I,L,T) :- arithmetic(L,X,K,I), 
+arith_law_atom(K,X,I,L,0) :- arithmetic(L,X,K,I), 
     not arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C), 
-    step(T).
+    arithmetic(L,C).
 
-arith_law_atom(K,val(X,T),I,L,T) :- arithmetic_head(L,X,K,I), 
-    arithmetic(L,C), 
-    step(T).
+arith_law_atom(K,X,I,L,0) :- arithmetic_head(L,X,K,I), 
+    arithmetic(L,C).
 
-arith_law_atom(K,X,I,L,T) :- arithmetic(L,_sum,X,K,I), 
+arith_law_atom(K,X,I,L) :- arithmetic(L,_sum,X,K,I), 
     arithmetic(L,C),
     step(T).
 
@@ -159,15 +156,17 @@ arithmetic_division(V,L,F*R,X) :- arithmetic_helper_division(V,L,F,R,X).
 
 % Notes if the helper is set to the result of the additive statement
 arithmetic_fulfilled(L,T) :- arithmetic_additive_law(L),
-    &sum {K*X,I:arith_law_atom(K,X,I,L,T)} = C, 
+    &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);K*X,I:arith_law_atom(K,X,I,L)} = C, 
     arithmetic(L,C), step(T).
-
 
 % Requires the additive helper to be 0 otherwise
 :- not holds(_arithmetic(L),T), arithmetic_additive_law(L),
     arithmetic_head(L,C,K,_),
     not &sum {val(C,T)} = 0, 
     step(T).
+
+% There is no allassigned for additive laws.
+:- arithmetic_additive_law(L), holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
 
 %---------------------------------------------------------
 % What do additive statements mean?
@@ -182,11 +181,11 @@ arithmetic_fulfilled(L,T) :- arithmetic_additive_law(L),
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Option B:
 % 
 % The following two laws modify each (!) assignment of to-be-increased fluent by adding the additive helpers! 
-arith_law_atom(-1,val(additive_helper(L,X),T),additive_helper(L,X),L2,T) :- 
+arith_law_atom(-1,additive_helper(L,X),additive_helper(L,X),L2,0) :- 
     step(T), arithmetic_additive_fluent(L,X),
     arithmetic_assignment(L2), arithmetic_head(L2,X,_,_).
 
-arith_law_atom(-1,val(additive_helper(L,X),T),additive_helper(L,X),L2,T) :- 
+arith_law_atom(-1,additive_helper(L,X),additive_helper(L,X),L2,0) :- 
     step(T), arithmetic_additive_fluent(L,X),
     arithmetic_assignment_dynamic(L2), arithmetic_head(L2,X,_,_).
 %
