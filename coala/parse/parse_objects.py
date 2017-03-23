@@ -995,17 +995,21 @@ class fluent(parse_object):
     def get_bottom_elements(self):
         return [self,]
 
-class fluent_multival(fluent):
+class fluent_multival(fluent): #TODO: Clean this one up; It should have another parent class
     def __init__(self, content, multidomain=None):
         fluent.__init__(self, content, None)
         self.multidomain = multidomain
-
+ 
     def get_fluents_domains(self):
         result = []
         for x in self.multidomain:
             result.append(domain(self.content,x))
         return result
+    
+    def pass_down_update_overwrite(self,update):
+        pass
 
+    
 class predicate(parse_object):
     def __init__(self, name, parameters):
         parse_object.__init__(self)
@@ -1702,6 +1706,7 @@ class assignment(parse_object):
         self.child_attributes = ["head","body"]
         self.replacement = None
         self.replacement_name = "_arithmetic"
+        self.where_variables = []
         
     def __str__(self):
         return ("not " if self.negated else "")+str(self.head)+"="+str(self.body)
@@ -1736,6 +1741,9 @@ class assignment(parse_object):
             return "val("+head+","+body+")"
 
     def pass_down_update(self,update):
+        if update.had_where:
+            self.where_variables = update.where_variables # Required for additive fluents (incremental assignments)
+        
         update.set("has_integer",False)
         if type(self.head) != str:
             variables = self.head.pass_down_update(update)
@@ -1755,7 +1763,7 @@ class assignment(parse_object):
         if is_arithmetic_assignment:
             self.has_integer = True
             self.my_id = update.arith_idfunction()
-            self.replacement = predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
+            self.replacement = self.create_replacement()
             assignment = update.is_in_head()
             if not assignment:
                 print >> sys.stderr, "Error: Assignment in Body!"
@@ -1801,6 +1809,9 @@ class assignment(parse_object):
     def create_law(self,head,body,dynamic_law_part,update):
         return arithmetic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
     
+    def create_replacement(self):
+        return predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
+    
     def simplify(self, negation=False):
         if self.replacement is not None:
             return self.replacement.simplify(negation)
@@ -1820,7 +1831,18 @@ class incremental_assignment(assignment):
         return ("increment" if not self.negated else "decrement")+"("+head+","+body+")"
     
     def create_law(self,head,body,dynamic_law_part,update):
-        return arithmetic_additive_law(head,body,self.my_id,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+        var = self.variables
+        for wv in self.where_variables:
+            if not wv in var:
+                var.append(wv)
+        return arithmetic_additive_law(head,body,self.my_id,dynamic_law_part,var,update.get_where())#self.get_where())
+    
+    def create_replacement(self):
+        var = self.variables
+        for wv in self.where_variables:
+            if not wv in var:
+                var.append(wv)
+        return predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),var))))
     
 # unknown may sound weird, but while parsing it, we don't know what this is.
 # It may be a Fluent, Actions

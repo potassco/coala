@@ -1,0 +1,10 @@
+fluent pos:0..10000.
+fluent velocity:0..10.
+
+action speedup.
+action slowdown.
+
+velocity:=velocity+1 after speedup.
+velocity:=velocity-1 after slowdown.
+
+pos:=pos+velocity after <true>.

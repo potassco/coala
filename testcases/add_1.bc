@@ -1,0 +1,28 @@
+fluent sick.
+fluent offer = (apple,cake,fish,deer).
+fluent orders : 0..100.
+
+action reset.
+action buy(X) where object(X).
+
+inertial offer, orders.
+default not sick.
+
+offer=fish if sick ifcons orders>5.
+sick after buy(fish) ifcons offer=fish.
+
+nonexecutable buy(deer).
+impossible offer=deer.
+
+orders+=1 after buy(X) where object(X).
+
+orders:=0 after reset.
+nonexecutable buy(X),reset where object(X).
+
+<asp>
+object(apple;cake;fish;deer).
+</asp>
+
+
+% 416 States
+% 4472 Transitions

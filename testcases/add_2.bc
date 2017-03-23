@@ -1,0 +1,20 @@
+fluent police.
+fluent noise:0..20.
+fluent pain:0..10.
+
+action call.
+
+inertial noise. % your neighbors
+noise:=noise+2 after noise<20 ifcons -police.
+noise:=0 if police.
+
+pain:=0 if noise<10. % yourself
+pain:=noise-10 if noise>9.
+
+default -police.
+police after call.
+nonexecutable call, pain<3.
+
+
+% 22 States
+% 29 Transitions
