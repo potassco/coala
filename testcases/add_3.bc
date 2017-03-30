@@ -9,10 +9,11 @@ x += 3 after b.
 x += 5 after c.
 
 initially x=0.
+impossible x=1.
 <asp>
 :- initially(val(V,X)), integer(V), not &sum{val(V,0)} = X.
 holds(F,0) :- initially(F).
 </asp>
 
 % 1 States
-% 8 Transitions
+% 7 Transitions

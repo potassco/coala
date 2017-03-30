@@ -552,7 +552,7 @@ class inertial_law(law): #inertial
         return result
 
 class default_law(law): #default
-    def __init__(self, head, if_part, after_part, where,line=None,filename=None):
+    def __init__(self, head, if_part, after_part, where, dynamic=None,line=None,filename=None):
         law.__init__(self)
         self.law_type = "default_laws"
         self.head = head
@@ -562,6 +562,10 @@ class default_law(law): #default
         self.line_number = line
         self.filename = filename
         self.law_id = None
+        if dynamic is not None:
+            self.dynamic = dynamic
+        else:
+            self.dynamic = after_part == None
         self.child_attributes = ["head","if_part","after_part"]
         
     def __str__(self):
@@ -582,7 +586,7 @@ class default_law(law): #default
         #Law
         result = []
         
-        if self.if_part is None and self.after_part is None and self.head is not None:
+        if not self.dynamic and self.if_part is None and self.after_part is None and self.head is not None:
             for ch in self.head:
                 result += [ "default("+ch.print_facts(prime=True)+")"+wherepart+"." ]
             return result
@@ -595,6 +599,8 @@ class default_law(law): #default
                 continue
             cname = st[1]
             children = current.get_children()
+            if self.dynamic:
+                result += [ "dynamic_law("+myid+")"+wherepart+"." ]
             for ch in children:
                 result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
@@ -1768,7 +1774,7 @@ class assignment(parse_object):
             if not assignment:
                 print >> sys.stderr, "Error: Assignment in Body!"
                 errout.error("Error: Assignment in Body!")
-            dynamic_law_part = update.is_in_dynamic_law()
+            dynamic_law_part = update.is_in_dynamic_law(check_default_laws=True)
             if type(self.head) == str: le = [arithmetic_atom(self.head,update.arith_helper_idfunction()),]
             else:
                 le = self.head.arith_flatten(negation=False,update=update)
@@ -2255,13 +2261,16 @@ class update_passdown(object):
                 return True
         return False
     
-    def is_in_dynamic_law(self):
+    def is_in_dynamic_law(self,check_default_laws=False):
         for ob in self.path:
             caller = ob[0];
             if dynamic_law == caller.__class__:
                 return True
             if dynamic_law in inspect.getmro(caller.__class__):
                 return True
+            if check_default_laws:
+                if default_law == caller.__class__ or default_law in inspect.getmro(caller.__class__):
+                    return caller.dynamic
         return False
 
     def is_action_allowed(self):

@@ -265,13 +265,16 @@ class Parser(object):
 					| DEFAULT formula IF formula where_part
 					| DEFAULT formula AFTER formula where_part''' #TODO: default ifcons??
 		line,filename=self.get_meta(t.lineno(1))
+		dynamic = None
 		if len(t) == 4: 
 			head = t[2]; ifpart = None; after = None; where = t[3]
 		elif t[3] in ['<if>','if']:
 			head = t[2]; ifpart = t[4]; after = None; where = t[5]
+			dynamic = False
 		else:	
 			head = t[2]; ifpart = None; after = t[4]; where = t[5]
-		t[0] = ps.default_law(head,ifpart,after,where,line,filename)
+			dynamic = True
+		t[0] = ps.default_law(head,ifpart,after,where,dynamic,line,filename)
 		
 	def p_imposs_law(self,t):
 		''' imposs_law : IMPOSSIBLE formula ifcons_part where_part'''
