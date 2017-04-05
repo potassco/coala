@@ -1186,7 +1186,7 @@ class predicate(parse_object):
         return False
     
     def arith_flatten(self,negation,update):
-        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation)
+        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation,variables=self.variables)
 
 class arithmetic_law(law): # Will be generated out of equations!
     def __init__(self,head,body,operator,my_id,assignment,dynamic_law_part,variables,where=None):
@@ -1256,7 +1256,7 @@ class arithmetic_additive_law(arithmetic_law): # Will be generated out of equati
     def __init__(self,head,body,my_id,dynamic_law_part,variables,where=None):
         arithmetic_law.__init__(self,head,body,"=",my_id,True,dynamic_law_part,variables,where)
         #print >> sys.stderr, "Warning! Incremental statements using += will result in inertial behavior for the fluent." 
-        print >> sys.stderr, "Warning! Incremental statements using += may result in different behavior!"
+        #print >> sys.stderr, "Warning! Incremental statements using += may result in different behavior!"
     
     def print_facts(self, prime=False):
         wherepart = self.compile_where()
@@ -1284,11 +1284,12 @@ class arithmetic_additive_law(arithmetic_law): # Will be generated out of equati
         return result
 
 class arithmetic_atom(parse_object):
-    def __init__(self,value,helper_id,negation=False,unknown=False):
+    def __init__(self,value,helper_id,negation=False,unknown=False,variables=[]):
         parse_object.__init__(self)
         self.unknown = unknown
         self.value = None
         self.unknown_is = None
+        self.variables=variables
         self.helper_id = helper_id
         if type(value) == str and value.isdigit() or value[0] == "-" and value[1:].isdigit():
             self.factor = float(value)
@@ -1676,7 +1677,7 @@ class operation(parse_object):
             # Not asking for r.variable, since that won't be possible.
             factor = r.factor
             runknown = r.value
-            unkn = l.unknown or r.unknown
+            unkn = l.unknown or r.unknown or len(l.variables) > 0 or len(r.variables) > 0
             
             helper_elements = [variable]
             if l.unknown: helper_elements += [lunknown]

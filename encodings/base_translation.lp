@@ -14,7 +14,7 @@ static_law(id(default,F)) :- default(F).
 head(id(default,F),F) :- default(F).
 ifcons(id(default,F),F) :- default(F).
 
-static_law(L) :- default(L,_), not after(L,_), not dynamic_law(L).
+static_law(L) :- default(L,_), not after(L,_).
 dynamic_law(L) :- default(L,_), after(L,_).
 head(L,F) :- default(L,F).
 ifcons(L,F) :- default(L,F).
