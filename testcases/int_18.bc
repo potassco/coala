@@ -3,7 +3,7 @@
 
 <inertial> a,b.
 
-a/3+b=10.
+<impossible> a/3+b!=10.
 
 % 11 States
 % 11 Transitions

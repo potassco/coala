@@ -76,7 +76,7 @@ assigned(V,T) :- integer(V), arithmetic_head(L,V,_,_),
 
 % Collect assigned atoms
 allassigned(L,T) :- arithmetic_law(L,_),
-    assigned(V,T) : arithmetic(L,V,_,_), integer(V);  
+    assigned(V,T) : arithmetic(L,V,_,_,_), integer(V);  
     step(T).
 
 allassigned_head(L,T) :- arithmetic_law(L,_),
@@ -84,7 +84,7 @@ allassigned_head(L,T) :- arithmetic_law(L,_),
     step(T).
 
 allassigned(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)), 
-    not not assigned(V,T) : arithmetic(L,V,_,_), integer(V);  
+    not not assigned(V,T) : arithmetic(L,V,_,_,_), integer(V);  
     step(T).
 
 allassigned_head(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)), 
@@ -92,28 +92,28 @@ allassigned_head(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)),
     step(T).
 
 % Handle Atoms that are unknown during the translation process
-arithmetic(L,V,K,I):-       arithmetic(L,_unknown,V,K,I),   integer(V).
-arithmetic(L,K,V,I):-       arithmetic(L,_unknown,V,K,I),   not integer(V), integer(K).
-arithmetic(L,_sum,V,K,I):-  arithmetic(L,_unknown,V,K,I),   not integer(V), not integer(K).
+arithmetic(L,V,K,I,M):-       arithmetic(L,_unknown,V,K,I,M),   integer(V).
+arithmetic(L,K,V,I,M):-       arithmetic(L,_unknown,V,K,I,M),   not integer(V), integer(K).
+arithmetic(L,_sum,V,K,I,M):-  arithmetic(L,_unknown,V,K,I,M),   not integer(V), not integer(K).
 
-arithmetic(L,V,K*U,I):-     arithmetic(L,_unknown,V,U,K,I), integer(V),     not integer(U).
-arithmetic(L,U,K*V,I):-     arithmetic(L,_unknown,V,U,K,I), not integer(V), integer(U).
+arithmetic(L,V,K*U,I,M):-     arithmetic(L,_unknown,V,U,K,I,M), integer(V),     not integer(U).
+arithmetic(L,U,K*V,I,M):-     arithmetic(L,_unknown,V,U,K,I,M), not integer(V), integer(U).
 
 % Collect atoms for the sum construct
-arith_law_atom(K,X,I,L,-1) :- arithmetic(L,X,K,I), 
-    arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C).
-
-arith_law_atom(K,X,I,L,0) :- arithmetic(L,X,K,I), 
-    not arithmetic_assignment_dynamic(L), 
-    arithmetic(L,C).
+%arith_law_atom(K,X,I,L,-1) :- arithmetic(L,X,K,I), 
+%    arithmetic_assignment_dynamic(L), 
+%    arithmetic(L,C).
+%
+%arith_law_atom(K,X,I,L,0) :- arithmetic(L,X,K,I), 
+%    not arithmetic_assignment_dynamic(L), 
+%    arithmetic(L,C).
+arith_law_atom(K,X,I,L,M) :- arithmetic(L,X,K,I,M).
 
 arith_law_atom(K,X,I,L,0) :- arithmetic_head(L,X,K,I), 
     arithmetic(L,C).
 
-arith_law_atom(K,X,I,L) :- arithmetic(L,_sum,X,K,I), 
-    arithmetic(L,C),
-    step(T).
+arith_law_atom(K,X,I,L) :- arithmetic(L,_sum,X,K,I,_), 
+    arithmetic(L,C).
 
 % Convert laws to "lower than"
 arith_law_simp(L,C,1) :-     arithmetic_law(L,lt), arithmetic(L,C). 

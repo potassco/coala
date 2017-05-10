@@ -46,6 +46,7 @@ class Lexer(object):
 		'PLUS','POWER','TIMES','DIV',
 		'ASSIGN',
 		'EQ',
+		'APOS',
 #		'AND','OR','XOR','LTLNOT','LTLOR','IMPL','EQUIV',
 #		'LTL','X','G','F','U','R',
 		'ROLE_BEGIN','ROLE_END',
@@ -139,6 +140,8 @@ class Lexer(object):
 	t_POWER = r'\*\*'
 	t_TIMES = r'\*'
 	t_DIV = r'/'
+	
+	t_APOS = r'\''
 	
 	t_COLON = r':'
 #		t_AND = r'&'

@@ -6,7 +6,7 @@
 <inertial> X <where> letter(X).
 
 
-1000*s+100*e+10*n+d+1000*m+100*o+10*r+e-10000*m-1000*o-100*n-10*e-y == 0.
+<impossible> 1000*s+100*e+10*n+d+1000*m+100*o+10*r+e-10000*m-1000*o-100*n-10*e-y != 0.
 <impossible> m == 0.
 <impossible> X == Y <where> letter(X), letter(Y), X != Y.
 

@@ -1,7 +1,7 @@
 
-<asp>cup(1..7).</asp>
+<asp>cup(1..7).
 %cup(cup1).cup(cup2).
-place(table),place(dishwasher).place(counter).
+place(table).place(dishwasher).place(counter).</asp>
 
 <action> pickup(C),iscupclean(C),cleanupcup(C),putindishwasher(C),putdown(C,counter) <where> cup(C).
 <action> goto(P) <where> place(P).

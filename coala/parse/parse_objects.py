@@ -5,6 +5,9 @@ from __builtin__ import str
 import sys
 import inspect
 
+old_arithmetics = False
+additional_ifcons_facts = False
+
 #
 # The following classes are used to represent the parse tree.
 # parse_object is the parent class of all objects except for strings.
@@ -1017,13 +1020,14 @@ class fluent_multival(fluent): #TODO: Clean this one up; It should have another 
 
     
 class predicate(parse_object):
-    def __init__(self, name, parameters):
+    def __init__(self, name, parameters, apostroph=False):
         parse_object.__init__(self)
         self.name = name
         self.parameters = parameters
         self.compile_where_single = self.print_facts
         self.type = "??"
         self.child_attributes = ["parameters"]
+        self.apostroph = apostroph
         
     def __str__(self):
         if self.parameters is None: 
@@ -1242,14 +1246,41 @@ class arithmetic_law(law): # Will be generated out of equations!
                 result.append("arithmetic_assignment("+stid+")"+wherepart+".")
         result.append("arithmetic_law("+stid+","+self.operator_type+")"+wherepart+".")
         
+        if additional_ifcons_facts:
+            inverse_apostroph = True
+        else:
+            inverse_apostroph = False 
+            # This was used to express that ' is t-1 and ' in the head inverses the meaning of ' to t
         if self.is_assignment:
             for e in self.head:
+                #try:
+                #    if e.apostroph: inverse_apostroph = True
+                #except:
+                #    pass
                 result.append("arithmetic_head("+stid+","+e.print_facts()+")"+wherepart+".")
         else:
             for e in self.head:
-                result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+                result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+        
+        if old_arithmetics: inverse_apostroph = not inverse_apostroph 
+        # In old arithmetics, it was the other way...
+        # But there were also no apostroph's
+        
         for e in self.body:
-            result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+            try:
+                if e.variable is None and not e.unknown:
+                    result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+                elif e.apostroph != inverse_apostroph:
+                    if self.is_dynamic_law_part:
+                        result.append("arithmetic("+stid+","+e.print_facts()+",-1)"+wherepart+".")
+                    else:
+                        result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+                else: 
+                    result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+                    if additional_ifcons_facts: result.append("arithmetic_ifcons("+stid+","+e.print_facts()+")"+wherepart+".") #new for ifcons!
+            except:
+                result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+            
         return result
 
 class arithmetic_additive_law(arithmetic_law): # Will be generated out of equations!
@@ -1265,7 +1296,17 @@ class arithmetic_additive_law(arithmetic_law): # Will be generated out of equati
 
         result.append("arithmetic_additive_law("+stid+")"+wherepart+".")
 
+        if additional_ifcons_facts:
+            inverse_apostroph = True
+        else:
+            inverse_apostroph = False 
+            # This was used to express that ' is t-1 and ' in the head inverses the meaning of ' to t
+        
         for e in self.head:
+            try:
+                if e.apostroph: inverse_apostroph = True
+            except:
+                pass
             result.append("arithmetic_additive_fluent("+stid+","+e.variable+")"+wherepart+".")
             
         if self.is_dynamic_law_part:
@@ -1278,19 +1319,33 @@ class arithmetic_additive_law(arithmetic_law): # Will be generated out of equati
             e.encapsulate("additive_helper("+stid+",",")")
             result.append("arithmetic_head("+stid+","+e.print_facts()+")"+wherepart+".")
             
-
+        
         for e in self.body:
-            result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+            try:
+                if e.variable is None and not e.unknown:
+                    result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+                elif e.apostroph != inverse_apostroph:
+                    if self.is_dynamic_law_part:
+                        result.append("arithmetic("+stid+","+e.print_facts()+",-1)"+wherepart+".")
+                    else:
+                        result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+                else:
+                    result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+                    if additional_ifcons_facts: result.append("arithmetic_ifcons("+stid+","+e.print_facts()+")"+wherepart+".") #new for ifcons!
+            except:
+                result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")    
+            
         return result
 
 class arithmetic_atom(parse_object):
-    def __init__(self,value,helper_id,negation=False,unknown=False,variables=[]):
+    def __init__(self,value,helper_id,negation=False,unknown=False,variables=[],apostroph=False):
         parse_object.__init__(self)
         self.unknown = unknown
         self.value = None
         self.unknown_is = None
         self.variables=variables
         self.helper_id = helper_id
+        self.apostroph=apostroph
         if type(value) == str and value.isdigit() or value[0] == "-" and value[1:].isdigit():
             self.factor = float(value)
             self.variable = None
@@ -1428,7 +1483,7 @@ class arithmetic_atom(parse_object):
         return int(self.factor) == 0
             
     def __str__(self):
-        return "("+str(self.variable)+"*"+("-" if self.negation else "")+(str(self.value) if self.value is not None else "1")+")"
+        return "("+str(self.variable)+("'" if self.apostroph else "")+"*"+("-" if self.negation else "")+(str(self.value) if self.value is not None else "1")+")"
     
     def print_facts(self, prime=False):
         if self.unknown:
@@ -1854,11 +1909,12 @@ class incremental_assignment(assignment):
 # unknown may sound weird, but while parsing it, we don't know what this is.
 # It may be a Fluent, Actions
 class unknown(parse_object):
-    def __init__(self, content):
+    def __init__(self, content, apostroph=False):
         parse_object.__init__(self)
         self.content = content
         self.type = "??"
         self.child_attributes = []#"content"
+        self.apostroph = apostroph
         
     def __str__(self):
         return str(self.content)
@@ -2008,7 +2064,7 @@ class unknown(parse_object):
         #return result
     
     def arith_flatten(self,negation,update):
-        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation=negation,unknown=self.type!="integer")
+        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation=negation,unknown=self.type!="integer",apostroph=self.apostroph)
     
     def compile_where_single(self):
         return self.print_facts()

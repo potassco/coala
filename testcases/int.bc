@@ -4,7 +4,7 @@
 
 <inertial> x.
 
-x:=x+1 <after> increase.
+x:=x'+1 <after> increase.
 
 % 96 States
 % 191 Transitions (2*states -1)

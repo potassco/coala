@@ -498,9 +498,12 @@ class Parser(object):
 	def p_term(self,t): # X, a, 3, X;Y, 1..Z
 		''' term : variable 
 				| identifier 
-				| IDENTIFIER LBRAC term_number_list RBRAC '''
+				| IDENTIFIER LBRAC term_number_list RBRAC
+				| IDENTIFIER LBRAC term_number_list RBRAC APOS '''
 		if len(t) == 2: 
 			t[0] = t[1]
+		elif len(t) == 6:
+			t[0] = ps.predicate(t[1],t[3],apostroph=True) 
 		else:
 			t[0] = ps.predicate(t[1],t[3]) 
 		
@@ -516,8 +519,12 @@ class Parser(object):
 		
 		
 	def p_identifier(self,t):
-		''' identifier : IDENTIFIER '''
-		t[0] = ps.unknown(t[1])
+		''' identifier : IDENTIFIER 
+					| IDENTIFIER APOS '''
+		if len(t) == 2:
+			t[0] = ps.unknown(t[1])
+		else:
+			t[0] = ps.unknown(t[1],apostroph=True)
 		
 	def p_int_domain(self,t):
 		''' int_domain : COLON term_numeric DDOT term_numeric 

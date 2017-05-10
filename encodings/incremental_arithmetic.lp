@@ -83,22 +83,22 @@ arithmetic_division(V,L,F*R,X) :- arithmetic_helper_division(V,L,F,R,X).
 
 assigned(V,0) :- integer(V).
 
-arithmetic(L,V,K,I):- arithmetic(L,_unknown,V,K,I), integer(V).
-arithmetic(L,K,V,I):- arithmetic(L,_unknown,V,K,I), not integer(V), integer(K).
-arithmetic(L,V,K*U,I):- arithmetic(L,_unknown,V,U,K,I), integer(V), not integer(U).
-arithmetic(L,U,K*V,I):- arithmetic(L,_unknown,V,U,K,I), not integer(V), integer(U).
-arithmetic(L,_sum,V,K,I):- arithmetic(L,_unknown,V,K,I), not integer(V), not integer(K).
+arithmetic(L,V,K,I,M):- arithmetic(L,_unknown,V,K,I,M), integer(V).
+arithmetic(L,K,V,I,M):- arithmetic(L,_unknown,V,K,I,M), not integer(V), integer(K).
+arithmetic(L,V,K*U,I,M):- arithmetic(L,_unknown,V,U,K,I,M), integer(V), not integer(U).
+arithmetic(L,U,K*V,I,M):- arithmetic(L,_unknown,V,U,K,I,M), not integer(V), integer(U).
+arithmetic(L,_sum,V,K,I,M):- arithmetic(L,_unknown,V,K,I,M), not integer(V), not integer(K).
 
 :- initially(val(V,X)), integer(V), not &sum{val(V,0)} = X.
 
 allassigned(L,0) :- arithmetic_law(L,_).
 allassigned_head(L,0) :- arithmetic_law(L,_).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} = C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,eq), arithmetic(L,C).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} < C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,lt), arithmetic(L,C).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} <= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,le), arithmetic(L,C).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} > C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,gt), arithmetic(L,C).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} >= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ge), arithmetic(L,C).
-arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} != C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ne), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} = C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,eq), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} < C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,lt), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} <= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,le), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} > C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,gt), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} >= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ge), arithmetic(L,C).
+arithmetic_fulfilled(L,0) :- &sum {K*val(X,0),I:arithmetic(L,X,K,I,0);K*val(X,0),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} != C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ne), arithmetic(L,C).
 
 % Handle arithmetics!
 % Assignments
@@ -167,22 +167,16 @@ assigned(V,t) :- integer(V), arithmetic_head(L,V,_,_),
 %:- arithmetic_helper_division(V,L,R,X), not &sum {2*R*val(X,t); -2*L*val(V,t)} >= -R.
 
 % Workaround concerning a bug; Arithmetic laws are only used if all integers in it are assigned!
-allassigned(L,t) :- assigned(V,t) : arithmetic(L,V,_,_), integer(V); arithmetic_law(L,_).
+allassigned(L,t) :- assigned(V,t) : arithmetic(L,V,_,_,_), integer(V); arithmetic_law(L,_).
 allassigned_head(L,t) :- assigned(V,t) : arithmetic_head(L,V,_,_), integer(V); arithmetic_law(L,_).
 
 
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} = C, arithmetic_assignment_dynamic(L), arithmetic_law(L,eq), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} < C, arithmetic_assignment_dynamic(L), arithmetic_law(L,lt), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} <= C, arithmetic_assignment_dynamic(L), arithmetic_law(L,le), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} > C, arithmetic_assignment_dynamic(L), arithmetic_law(L,gt), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} >= C, arithmetic_assignment_dynamic(L), arithmetic_law(L,ge), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-1),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} != C, arithmetic_assignment_dynamic(L), arithmetic_law(L,ne), arithmetic(L,C), t>0.
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} = C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,eq), arithmetic(L,C).
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} < C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,lt), arithmetic(L,C).
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} <= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,le), arithmetic(L,C).
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} > C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,gt), arithmetic(L,C).
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} >= C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ge), arithmetic(L,C).
-arithmetic_fulfilled(L,t) :- &sum {K*val(X,t),I:arithmetic(L,X,K,I);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I)} != C, not arithmetic_assignment_dynamic(L), arithmetic_law(L,ne), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} = C, arithmetic_assignment_dynamic(L), arithmetic_law(L,eq), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} < C, arithmetic_assignment_dynamic(L), arithmetic_law(L,lt), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} <= C, arithmetic_assignment_dynamic(L), arithmetic_law(L,le), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} > C, arithmetic_assignment_dynamic(L), arithmetic_law(L,gt), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} >= C, arithmetic_assignment_dynamic(L), arithmetic_law(L,ge), arithmetic(L,C).
+arithmetic_fulfilled(L,t) :- &sum {K*val(X,t-M),I:arithmetic(L,X,K,I,M);K*val(X,t),I:arithmetic_head(L,X,K,I);K*X,I:arithmetic(L,_sum,X,K,I,_)} != C, arithmetic_assignment_dynamic(L), arithmetic_law(L,ne), arithmetic(L,C).
 
 % Handle arithmetics!
 % Assignments

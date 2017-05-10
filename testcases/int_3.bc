@@ -6,7 +6,7 @@
 %<inertial> x.
 <inertial> y.
 
-x:=x*2 <after> increase, y = 2.
+x:=x'*2 <after> increase, y = 2.
 <nonexecutable> increase, y <= 1.
 
 % 200 States

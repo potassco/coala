@@ -2,5 +2,5 @@
 &show {x;y}.
 &sum {x*1; -5*y} = 5.</asp>
 
-% 2 States
-% 2 Transitions (Empty)
+% 2 States - clingcon only
+% 2 Transitions (Empty) - clingcon only
