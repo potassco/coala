@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
-import gringo
+import clingo
 import os
 
 class StateBuilder(object):
@@ -51,27 +51,27 @@ class StateBuilder(object):
         act = []
         atoms.sort()
         for a in atoms:
-            if a.name() == 'holds':
-                st = a.args()
-                if st[1] == stid:
-                    if st[0].name() == 'val':
-                        content = st[0].args()
-                        if type(content[1]) is gringo.Fun:
-                            if content[1].name() == 'false':
+            if a.name == 'holds':
+                st = a.arguments
+                if st[1].number == stid:
+                    if st[0].name == 'val':
+                        content = st[0].arguments
+                        if content[1].type is clingo.SymbolType.Function:
+                            if content[1].name == 'false':
                                 if not self.only_positive:
                                     result.append('-'+str(content[0]))
-                            elif content[1].name() == 'true':
+                            elif content[1].name == 'true':
                                 result.append(str(content[0]))
                             else:
                                 result.append(str(content[0])+"="+str(content[1]))
                         else:
                             result.append(str(content[0])+"="+str(content[1]))
-                    elif st[0].name() == 'neg_val':
-                        content = st[0].args()
-                        if type(content[1]) is gringo.Fun:
-                            if content[1].name() == 'false':
+                    elif st[0].name == 'neg_val':
+                        content = st[0].arguments
+                        if content[1].type is clingo.SymbolType.Function:
+                            if content[1].name == 'false':
                                 result.append(str(content[0]))
-                            elif content[1].name() == 'true':
+                            elif content[1].name == 'true':
                                 if not self.only_positive:
                                     result.append('-'+str(content[0]))
                             else:
@@ -81,28 +81,28 @@ class StateBuilder(object):
                             if not self.only_positive:
                                 result.append('-'+str(content[0])+"="+str(content[1]))
                     else:
-                        if st[0].name() == 'act': 
-                            st = st[0].args()
+                        if st[0].name == 'act': 
+                            st = st[0].arguments
                         act.append(str(st[0]))
-                elif transitions and st[1] == stid+1:
-                    if st[0].name() == 'val':
-                        content = st[0].args()
-                        if type(content[1]) is gringo.Fun:
-                            if content[1].name() == 'false':
+                elif transitions and st[1].number == stid+1:
+                    if st[0].name == 'val':
+                        content = st[0].arguments
+                        if content[1].type is clingo.SymbolType.Function:
+                            if content[1].name == 'false':
                                 if not self.only_positive:
                                     rest.append('-'+str(content[0]))
-                            elif content[1].name() == 'true':
+                            elif content[1].name == 'true':
                                 rest.append(str(content[0]))
                             else:
                                 rest.append(str(content[0])+"="+str(content[1]))
                         else:
                             rest.append(str(content[0])+"="+str(content[1]))
-                    elif st[0].name() == 'neg_val':
-                        content = st[0].args()
-                        if type(content[1]) is gringo.Fun:
-                            if content[1].name() == 'false':
+                    elif st[0].name == 'neg_val':
+                        content = st[0].arguments
+                        if content[1].type is clingo.SymbolType.Function:
+                            if content[1].name == 'false':
                                 rest.append(str(content[0]))
-                            elif content[1].name() == 'true':
+                            elif content[1].name == 'true':
                                 if not self.only_positive:
                                     rest.append('-'+str(content[0]))
                             else:
@@ -116,7 +116,7 @@ class StateBuilder(object):
         return result    
         
     def onmodel(self,model):
-        atoms = model.atoms(gringo.Model.ATOMS)
+        atoms = model.symbols(atoms=True) #.atoms(clingo.Model.ATOMS)
         #optim = model.optimization()
         if self.debug:
             print atoms
@@ -135,7 +135,7 @@ class StateBuilder(object):
                 print "State: " + str(state) + "\r\n"
                 
     def onmodel_conflict(self,model):
-        atoms = model.atoms(gringo.Model.ATOMS)
+        atoms = model.symbols(atoms=True) #.atoms(clingo.Model.ATOMS)
         state = self.clean(atoms,transitions=self.transitions)
         #state = self.clean(atoms,stid=1,transitions=False)
         self.states.append(state)
@@ -151,8 +151,8 @@ class StateBuilder(object):
         result = ""
         self.states = []
         self.transitions = False
-        co = gringo.Control(['-W','no-atom-undefined'])
-        co.conf.solve.models = 0
+        co = clingo.Control(['-W','no-atom-undefined'])
+        co.configuration.solve.models = 0
         co.load(self.encoding_s)
         co.add("base", [], inputText)
         co.ground([("base",[])])
@@ -160,7 +160,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
         
-        co.solve([],self.onmodel)
+        co.solve(self.onmodel,[])
         
         if self.silent:
             result += "\r\n"
@@ -180,8 +180,8 @@ class StateBuilder(object):
         result = ""
         self.states = []
         self.transitions = True
-        co = gringo.Control(['-W','no-atom-undefined'])
-        co.conf.solve.models = 0
+        co = clingo.Control(['-W','no-atom-undefined'])
+        co.configuration.solve.models = 0
         co.load(self.encoding_s)
         co.load(self.encoding_t)
         co.add("base", [], inputText)
@@ -190,7 +190,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
             
-        co.solve([],self.onmodel)
+        co.solve(self.onmodel,[])
         
         if self.silent:
             result += "\r\n"
@@ -218,7 +218,7 @@ class StateBuilder(object):
         result = ""
         self.states = []
         self.transitions = False
-        co = gringo.Control(['-W','no-atom-undefined'])
+        co = clingo.Control(['-W','no-atom-undefined'])
         co.conf.solve.models = 0
         if reduced:
             encs = self.encoding_non_internal
@@ -231,7 +231,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
         
-        co.solve([],self.onmodel)
+        co.solve(self.onmodel,[])
         
         if self.silent:
             result += "\r\n"
@@ -261,21 +261,21 @@ class StateBuilder(object):
     def has_states(self,inputText):
         self.states = []
         self.transitions = False
-        co = gringo.Control(['-W','no-atom-undefined'])
+        co = clingo.Control(['-W','no-atom-undefined'])
         co.load(self.encoding_s)
         co.add("base", [], inputText)
         co.ground([("base",[])])
         result = co.solve()
-        return result == gringo.SolveResult.SAT
+        return result.satisfiable
         
     def has_conflict(self,inputText):
         self.states = []
         self.transitions = True
-        co = gringo.Control(['-W','no-atom-undefined'])
+        co = clingo.Control(['-W','no-atom-undefined'])
         co.conf.solve.models = 0
         co.load(self.encoding_s)
         co.load(self.encoding_c)
         co.add("base", [], inputText)
         co.ground([("base",[])])
         result = co.solve([],self.onmodel_conflict)
-        return result == gringo.SolveResult.UNSAT, self.states
+        return result.unsatisfiable, self.states

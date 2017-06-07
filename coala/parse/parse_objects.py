@@ -1578,6 +1578,12 @@ class equation(parse_object):
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
+        
+        #if type(self.left) == unknown and type(self.right) == variable and self.right.unbound == True:
+            #print str(self.left) + str(self.operator) + str(self.right)
+            #update.set()
+        #    update.
+
 
         if update.get("has_integer") or (not simple and not update.where): #rewrite to arithmetic(X)
             self.has_integer = True
@@ -2075,6 +2081,7 @@ class variable(parse_object):
         self.content = content
         self.type = "??" #This is an assumption!
         self.child_attributes = []#"content"
+        self.unbound = None
         
     def __str__(self):
         return str(self.content)
@@ -2102,6 +2109,7 @@ class variable(parse_object):
                     self.type = "fluent"
                     found = True
                     assigned_fluent = True
+                    self.unbound = False
                     break
             for x in acs:
                 if str(self) == str(x):
@@ -2109,8 +2117,10 @@ class variable(parse_object):
                         print "% Warning! Variable "+str(self)+" could be a fluent or action!"
                     self.type = "action"
                     found = True
+                    self.unbound = False
                     break
         if not found and not update.where and not str(self) in update.where_variables:
+            self.unbound = True
             print >> sys.stderr, "% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!"
             errout.error("% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!")
         return [str(self),]

@@ -97,7 +97,7 @@ the facts given by coala can be run the "encodings/base_translation.lp" using cl
     </div>
 </div>
 <br>
-Or when using the gringo python library
+Or when using the clingo python library
 <div style="padding:0em 2em;">
     <div style="text-indent=20em; padding-left=-20em; background: #f0f0f0; overflow:hidden;width:45em;border:solid gray;border-width:.1em .1em .1em .1em;padding:.6em .6em;">
     <span style="color: #000000">
@@ -364,7 +364,7 @@ SATISFIABLE
 </xmp>
 <br>
 
-If you have the gringo library installed and in your python path (old library, the clingo library might get supported later)<br>
+If you have the clingo library installed and in your python path<br>
 Given a <b>finally</b> and an <b>initial</b> state, you can call
 <div style="padding:0em 2em;">
     <div style="text-indent=20em; padding-left=-20em; background: #f0f0f0; overflow:hidden;width:45em;border:solid gray;border-width:.1em .1em .1em .1em;padding:.6em .6em;">
@@ -430,7 +430,7 @@ Also, you can restrict the actions to maximal one per step by:
 In BC, you normally get no answer set when something went wrong.<br>
 One thing to check then is whether each fluent has either an inertial or default law.<br>
 Additionally, removing impossible and nonexecutable laws might help to track down the problem.<br>
-You can use the print states mode of coala with the (currently gringo) python library in order to list all possible states:
+You can use the print states mode of coala with the clingo python library in order to list all possible states:
 <div style="padding:0em 2em;">
     <div style="text-indent=20em; padding-left=-20em; background: #f0f0f0; overflow:hidden;width:45em;border:solid gray;border-width:.1em .1em .1em .1em;padding:.6em .6em;">
     <span style="color: #000000">

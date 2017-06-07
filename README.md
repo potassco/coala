@@ -38,7 +38,7 @@ Note that the files role_X.bc must be run with:
 	
 )
 
-Note that coala does not include solving options if it cannot find the gringo python library.<br>
+Note that coala does not include solving options if it cannot find the clingo python library.<br>
 If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.
 
 

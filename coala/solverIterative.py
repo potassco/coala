@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
-import gringo
+import clingo
 import os
 
 
@@ -28,42 +28,44 @@ class SolverIterative(object):
 		self.holds = []
 		result = []
 		for a in atoms:
-			if a.name() == 'holds':
-				st = a.args()
-				while st[-1] >= len(self.holds):
+			if a.name == 'holds':
+				st = a.arguments
+				while st[-1].number >= len(self.holds):
 					self.holds.append([])
-				if st[0].name() == 'val':
-					content = st[0].args()
-					if type(content[1]) is gringo.Fun:
-						if content[1].name() == 'false':
+				if st[0].name == 'val':
+					content = st[0].arguments
+					if content[1].type is clingo.SymbolType.Function:
+						if content[1].name == 'false':
 							if self.print_negative:
-								self.holds[st[-1]].append('-'+str(content[0]))
-						elif content[1].name() == 'true':
-							self.holds[st[-1]].append(str(content[0]))
+								self.holds[st[-1].number].append('-'+str(content[0]))
+						elif content[1].name == 'true':
+							self.holds[st[-1].number].append(str(content[0]))
 						else:
-							self.holds[st[-1]].append(str(content[0])+"="+str(content[1]))
+							self.holds[st[-1].number].append(str(content[0])+"="+str(content[1]))
 					else:
-						self.holds[st[-1]].append(str(content[0])+"="+str(content[1]))
-				elif st[0].name() == 'neg_val':
-					content = st[0].args()
-					if type(content[1]) is gringo.Fun:
-						if content[1].name() == 'false':
-							self.holds[st[-1]].append(str(content[0]))
-						elif content[1].name() == 'true':
+						self.holds[st[-1].number].append(str(content[0])+"="+str(content[1]))
+				elif st[0].name == 'neg_val':
+					content = st[0].arguments
+					print type(content[1])
+					print dir(content[1])
+					if content[1].type is clingo.SymbolType.Function:
+						if content[1].name == 'false':
+							self.holds[st[-1].number].append(str(content[0]))
+						elif content[1].name == 'true':
 							if self.print_negative:
-								self.holds[st[-1]].append('-'+str(content[0]))
+								self.holds[st[-1].number].append('-'+str(content[0]))
 						else:
-							self.holds[st[-1]].append("-"+str(content[0])+"="+str(content[1]))
+							self.holds[st[-1].number].append("-"+str(content[0])+"="+str(content[1]))
 					else:
-						self.holds[st[-1]].append("-"+str(content[0])+"="+str(content[1]))
+						self.holds[st[-1].number].append("-"+str(content[0])+"="+str(content[1]))
 				#self.holds[st[-1]].append(str(st[0]))
-			elif a.name() == 'occurs':
-				st = a.args()
-				if len(st) > 0 and st[0].name() == 'act': 
-					actt = st[0].args()
-				while st[-1] >= len(result):
+			elif a.name == 'occurs':
+				st = a.arguments
+				if len(st) > 0 and st[0].name == 'act': 
+					actt = st[0].arguments
+				while st[-1].number >= len(result):
 					result.append([])
-				result[st[-1]].append(str(actt[0]))
+				result[st[-1].number].append(str(actt[0]))
 		return result	
 	
 	def setStep(self,index):
@@ -73,32 +75,32 @@ class SolverIterative(object):
 		oldqu = self.horizon
 		
 		if self.optimize:
-			self.control.assign_external(gringo.Fun("utility",[oldqu]),False)
+			self.control.assign_external(clingo.Function("utility",[oldqu]),False)
 			if not index in self.transitions:
 				if self.debug:
 					print "Grounding transition and utility ",index
 				self.control.ground([("transition",[index]),("utility",[index])])
 				self.transitions.append(index)
-			self.control.assign_external(gringo.Fun("utility",[index]),True)
+			self.control.assign_external(clingo.Function("utility",[index]),True)
 		else:
-			self.control.assign_external(gringo.Fun("query",[oldqu]),False)
+			self.control.assign_external(clingo.Function("query",[oldqu]),False)
 			if not index in self.transitions:
 				if self.debug:
 					print "Grounding transition and query ",index
 				self.control.ground([("transition",[index]),("query",[index])])
 				self.transitions.append(index)
-			self.control.assign_external(gringo.Fun("query",[index]),True)
+			self.control.assign_external(clingo.Function("query",[index]),True)
 			
 		self.horizon = index
 		
 	def onmodel(self,model):
-		atoms = model.atoms(gringo.Model.ATOMS)
+		atoms = model.symbols(atoms=True) #atoms(clingo.Model.ATOMS)
 		self.solution = atoms
 	
 	def solve(self,inputText):
 		self.solution = []
-		self.control = gringo.Control(['-W','no-atom-undefined'])
-		self.control.conf.solve.models = 0
+		self.control = clingo.Control(['-W','no-atom-undefined'])
+		self.control.configuration.solve.models = 0
 		self.control.load(self.encoding)
 		self.control.add("base", [], inputText)
 		if self.optimize:
@@ -106,8 +108,8 @@ class SolverIterative(object):
 		else:
 			self.control.ground([("base",[]),("initialbase",[]),("query",[0])])
 		
-		state = self.control.solve([],self.onmodel)
-		if state == gringo.SolveResult.UNSAT:
+		state = self.control.solve(self.onmodel,[])
+		if state.unsatisfiable:
 			if self.debug:
 				print "Base is ",state
 			return [], [], False
@@ -116,19 +118,19 @@ class SolverIterative(object):
 			print "Base is ",state," : ",self.holds
 		
 		if self.optimize:
-			self.control.assign_external(gringo.Fun("utility",[0]),True)
+			self.control.assign_external(clingo.Function("utility",[0]),True)
 		else:
-			self.control.assign_external(gringo.Fun("query",[0]),True)
+			self.control.assign_external(clingo.Function("query",[0]),True)
 		self.transitions = [0]
 		self.horizon = 0
 		
-		state = self.control.solve([],self.onmodel)
+		state = self.control.solve(self.onmodel,[])
 		if self.debug:
 			print "Solving result: ",state
-		while (state == gringo.SolveResult.UNSAT or (self.optimize and self.horizon < 5)):
+		while (state.unsatisfiable or (self.optimize and self.horizon < 5)):
 			self.setStep(self.horizon+1)
 			if self.debug: print "solving"
-			state = self.control.solve([],self.onmodel)
+			state = self.control.solve(self.onmodel,[])
 			if self.max_horizon>0 and self.max_horizon <= self.horizon:
 				break
 			if self.debug:
@@ -138,4 +140,4 @@ class SolverIterative(object):
 		if self.debug:
 			print "Holds: ",self.holds
 	
-		return result, self.holds, state == gringo.SolveResult.SAT
+		return result, self.holds, state.satisfiable

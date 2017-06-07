@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
-import gringo
+import clingo
 import os
 
 
@@ -27,51 +27,51 @@ class SolverFixed(object):
         self.holds = []
         result = []
         for a in atoms:
-            if a.name() == 'holds':
-                st = a.args()
-                while st[-1] >= len(self.holds):
+            if a.name == 'holds':
+                st = a.arguments
+                while st[-1].number >= len(self.holds):
                     self.holds.append([])
-                if st[0].name() == 'val':
-                    content = st[0].args()
-                    if type(content[1]) is gringo.Fun:
-                        if content[1].name() == 'false':
+                if st[0].name == 'val':
+                    content = st[0].arguments
+                    if content[1].type is clingo.SymbolType.Function:
+                        if content[1].name == 'false':
                             if self.print_negative:
-                                self.holds[st[-1]].append('-'+str(content[0]))
-                        elif content[1].name() == 'true':
-                            self.holds[st[-1]].append(str(content[0]))
+                                self.holds[st[-1].number].append('-'+str(content[0]))
+                        elif content[1].name == 'true':
+                            self.holds[st[-1].number].append(str(content[0]))
                         else:
-                            self.holds[st[-1]].append(str(content[0])+"="+str(content[1]))
+                            self.holds[st[-1].number].append(str(content[0])+"="+str(content[1]))
                     else:
-                        self.holds[st[-1]].append(str(content[0])+"="+str(content[1]))
-                elif st[0].name() == 'neg_val':
-                    content = st[0].args()
-                    if type(content[1]) is gringo.Fun:
-                        if content[1].name() == 'false':
-                            self.holds[st[-1]].append(str(content[0]))
-                        elif content[1].name() == 'true':
+                        self.holds[st[-1].number].append(str(content[0])+"="+str(content[1]))
+                elif st[0].name == 'neg_val':
+                    content = st[0].arguments
+                    if content[1].type is clingo.SymbolType.Function:
+                        if content[1].name == 'false':
+                            self.holds[st[-1].number].append(str(content[0]))
+                        elif content[1].name == 'true':
                             if self.print_negative:
-                                self.holds[st[-1]].append('-'+str(content[0]))
+                                self.holds[st[-1].number].append('-'+str(content[0]))
                         else:
-                            self.holds[st[-1]].append("-"+str(content[0])+"="+str(content[1]))
+                            self.holds[st[-1].number].append("-"+str(content[0])+"="+str(content[1]))
                     else:
-                        self.holds[st[-1]].append("-"+str(content[0])+"="+str(content[1]))
+                        self.holds[st[-1].number].append("-"+str(content[0])+"="+str(content[1]))
                 #self.holds[st[-1]].append(str(st[0]))
-            elif a.name() == 'occurs':
-                st = a.args()
-                if st[0].name() == 'act': st = st[0].args()
-                while st[-1] >= len(result):
+            elif a.name == 'occurs':
+                st = a.arguments
+                if st[0].name == 'act': sta = st[0].arguments
+                while st[-1].number >= len(result):
                     result.append([])
-                result[st[-1]].append(str(st[0]))
+                result[st[-1].number].append(str(sta[0]))
         return result
         
     def onmodel(self,model):
-        atoms = model.atoms(gringo.Model.ATOMS)
+        atoms = model.symbols(atoms=True) #.atoms(clingo.Model.ATOMS)
         self.solution = atoms
     
     def solve(self,inputText):
         self.solution = []
-        self.control = gringo.Control(['-W','no-atom-undefined',"-c","k="+str(self.max_horizon)])
-        self.control.conf.solve.models = 0
+        self.control = clingo.Control(['-W','no-atom-undefined',"-c","k="+str(self.max_horizon)])
+        self.control.configuration.solve.models = 0
         self.control.load(self.encoding)
         self.control.add("base", [], inputText)
         if self.debug:
@@ -83,7 +83,7 @@ class SolverFixed(object):
         
         if self.debug:
             print "Solving.."
-        state = self.control.solve([],self.onmodel)
+        state = self.control.solve(self.onmodel,[])
         if self.debug:
             print "Solving result: ",state
         
@@ -92,4 +92,4 @@ class SolverFixed(object):
             print "Holds: ",self.holds
     
     
-        return result, self.holds, state == gringo.SolveResult.SAT
+        return result, self.holds, state.satisfiable
