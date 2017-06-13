@@ -1,6 +1,6 @@
 include README_BC.txt
 include README_ply.md
-include outputformatclingobc2aso
+include outputformatclingocoala
 include page/index.html
 include testcases/bug2.b
 include testcases/bug.b

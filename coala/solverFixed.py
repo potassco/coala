@@ -10,7 +10,7 @@ class SolverFixed(object):
     def __init__(self,encoding = None,debug=False,silent=False,max_horizon=0,only_positive=False):
         mypath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/"  
         if encoding == None:
-            self.encoding = mypath+"encodings/internal/fixed.lp"
+            self.encoding = mypath+"coala/internal/fixed.lp"
         else:
             self.encoding = encoding
         self.silent = silent

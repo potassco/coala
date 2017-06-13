@@ -1,0 +1,16 @@
+<fluent> a : 1 .. 5.
+
+default a:=a'-1 after <true>.
+
+% 5 States
+% 4 Transitions
+
+%integer(a).
+%integer_domain(a,1,5).
+%
+%default(_arithmetic(law(1))).
+%
+%arithmetic_assignment(law(1)).
+%arithmetic_law(law(1),eq).
+%arithmetic_head(law(1),a,1,2).
+%arithmetic(law(1),5).

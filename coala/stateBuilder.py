@@ -9,15 +9,15 @@ class StateBuilder(object):
     def __init__(self,encoding_s = None,encoding_t = None,encoding_c = None,silent=False,only_positive=False,debug=False, encoding_non_internal=None, encoding_non_internal_transl=None):
         mypath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/"     
         if encoding_s == None:
-            self.encoding_s = mypath+"encodings/internal/states.lp"
+            self.encoding_s = mypath+"coala/internal/states.lp"
         else:
             self.encoding_s = encoding_s
         if encoding_t == None:
-            self.encoding_t = mypath+"encodings/internal/transitions.lp"
+            self.encoding_t = mypath+"coala/internal/transitions.lp"
         else:
             self.encoding_t = encoding_t
         if encoding_c == None:
-            self.encoding_c = mypath+"encodings/internal/conflicts.lp"
+            self.encoding_c = mypath+"coala/internal/conflicts.lp"
         else:
             self.encoding_c = encoding_c
         if encoding_non_internal == None:

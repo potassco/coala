@@ -3,7 +3,7 @@
 Copyright (c) 2016, Christian Schulz-Hanke<br>
 christian.schulz-hanke( at )cs.uni-potsdam.de
 
-http://www.cs.uni-potsdam.de/wv/coala2/
+https://github.com/potassco/coala
 
 This project can be used from directories or
 packed and be installed using python distutils.
@@ -42,7 +42,7 @@ Note that coala does not include solving options if it cannot find the clingo py
 If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.
 
 
-PLEASE refer to page/index.html for further details, examples and more!!!
+PLEASE refer to page/index.html for further details, examples and more.
 
 
 ```

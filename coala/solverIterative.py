@@ -10,7 +10,7 @@ class SolverIterative(object):
 	def __init__(self,encoding = None,debug=False,silent=False,max_horizon=0,only_positive=False):
 		mypath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/"
 		if encoding == None:
-			encoding = mypath+"encodings/internal/iterative.lp"
+			encoding = mypath+"coala/internal/iterative.lp"
 		else:
 			self.encoding = encoding
 		self.silent = silent

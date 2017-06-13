@@ -25,7 +25,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.442"
+version = "2.443"
 
 
 try:
@@ -80,13 +80,13 @@ def setDefaults():
 	debug = False
 	readmefile = mypath+"README_BC.txt"
 	exampledirectory = mypath+"examples/"
-	encoding_s = mypath+"encodings/internal/states.lp"
-	encoding_t = mypath+"encodings/internal/transitions.lp"
-	encoding_c = mypath+"encodings/internal/conflicts.lp"
-	encoding_i = mypath+"encodings/internal/iterative.lp"
-	encoding_f = mypath+"encodings/internal/fixed.lp"
-	encoding_non_internal=mypath+"encodings/base.lp"
-	encoding_non_internal_transl=mypath+"encodings/base_translation.lp"
+	encoding_s = mypath+"coala/internal/states.lp"
+	encoding_t = mypath+"coala/internal/transitions.lp"
+	encoding_c = mypath+"coala/internal/conflicts.lp"
+	encoding_i = mypath+"coala/internal/iterative.lp"
+	encoding_f = mypath+"coala/internal/fixed.lp"
+	encoding_non_internal=mypath+"coala/base.lp"
+	encoding_non_internal_transl=mypath+"coala/base_translation.lp"
 	mode = "translate"
 	language = "bc"
 	max_horizon = 10
@@ -461,54 +461,54 @@ def main(argv):
 		usage()
 		exit(2)
 	
-	testcases = [ (mypath+"testcases/test1.bc",1,0),
-				(mypath+"testcases/test2.bc",5,6),
-				(mypath+"testcases/test3.bc",8,64),
-				(mypath+"testcases/test4.bc",2,0),
-				(mypath+"testcases/test5.bc",4,10),
-				(mypath+"testcases/test6.bc",2,1),
-				(mypath+"testcases/test7.bc",2,1),
-				(mypath+"testcases/test8.bc",2,2),
-				(mypath+"testcases/test9.bc",2,3),
-				(mypath+"testcases/test10.bc",1,7),
-				(mypath+"testcases/test_false.bc",4,0),
-				(mypath+"testcases/test_true.bc",3,0),
-				(mypath+"testcases/test_where.bc",12,0),
-				(mypath+"testcases/test_evil.bc",31,47),
-				(mypath+"testcases/test_nex.bc",4,0),
-				(mypath+"testcases/test_benjamin.bc",1,2),
-				(mypath+"testcases/test_benjamin2.bc",0,0),
-				(mypath+"testcases/test_benjamin3.bc",1,1),
-				(mypath+"testcases/greedy.bc",2,0),
-				(mypath+"testcases/flu.bc",4,0),
-				(mypath+"testcases/neg.bc",512,0),
-				(mypath+"testcases/dom_1.bc",25,0),
-				(mypath+"testcases/dom_2.bc",15,27),
-				(mypath+"testcases/dom_3.bc",120,0),
-				(mypath+"testcases/dom_4.bc",3,0)]
+	testcases = [ (mypath+"coala/testcases/test1.bc",1,0),
+				(mypath+"coala/testcases/test2.bc",5,6),
+				(mypath+"coala/testcases/test3.bc",8,64),
+				(mypath+"coala/testcases/test4.bc",2,0),
+				(mypath+"coala/testcases/test5.bc",4,10),
+				(mypath+"coala/testcases/test6.bc",2,1),
+				(mypath+"coala/testcases/test7.bc",2,1),
+				(mypath+"coala/testcases/test8.bc",2,2),
+				(mypath+"coala/testcases/test9.bc",2,3),
+				(mypath+"coala/testcases/test10.bc",1,7),
+				(mypath+"coala/testcases/test_false.bc",4,0),
+				(mypath+"coala/testcases/test_true.bc",3,0),
+				(mypath+"coala/testcases/test_where.bc",12,0),
+				(mypath+"coala/testcases/test_evil.bc",31,47),
+				(mypath+"coala/testcases/test_nex.bc",4,0),
+				(mypath+"coala/testcases/test_benjamin.bc",1,2),
+				(mypath+"coala/testcases/test_benjamin2.bc",0,0),
+				(mypath+"coala/testcases/test_benjamin3.bc",1,1),
+				(mypath+"coala/testcases/greedy.bc",2,0),
+				(mypath+"coala/testcases/flu.bc",4,0),
+				(mypath+"coala/testcases/neg.bc",512,0),
+				(mypath+"coala/testcases/dom_1.bc",25,0),
+				(mypath+"coala/testcases/dom_2.bc",15,27),
+				(mypath+"coala/testcases/dom_3.bc",120,0),
+				(mypath+"coala/testcases/dom_4.bc",3,0)]
 	
 	if negated_actions:
-		testcases.append((mypath+"testcases/test_neg_act.bc",1,4))
+		testcases.append((mypath+"coala/testcases/test_neg_act.bc",1,4))
 	
-	testcasesB = [ (mypath+"testcases/test1.b",1,0),
-				(mypath+"testcases/test_where.b",12,0),
-				(mypath+"testcases/bug.b",30,0),
-				(mypath+"testcases/bug2.b",30,0)]
+	testcasesB = [ (mypath+"coala/testcases/test1.b",1,0),
+				(mypath+"coala/testcases/test_where.b",12,0),
+				(mypath+"coala/testcases/bug.b",30,0),
+				(mypath+"coala/testcases/bug2.b",30,0)]
 				
-	testcases_bc_multi = [(mypath+"testcases/role_1.bc",6,12),
-						(mypath+"testcases/role_2.bc",36,144),#18,72), # visible is replicated for each agent
-						(mypath+"testcases/role_3.bc",256,64),#128,32),
-						(mypath+"testcases/role_4.bc",1024,0),
-						(mypath+"testcases/role_5.bc",56,112),
-						(mypath+"testcases/role_5b.bc",2688,10752),
-						(mypath+"testcases/role_6.bc",16,16)]
+	testcases_bc_multi = [(mypath+"coala/testcases/role_1.bc",6,12),
+						(mypath+"coala/testcases/role_2.bc",36,144),#18,72), # visible is replicated for each agent
+						(mypath+"coala/testcases/role_3.bc",256,64),#128,32),
+						(mypath+"coala/testcases/role_4.bc",1024,0),
+						(mypath+"coala/testcases/role_5.bc",56,112),
+						(mypath+"coala/testcases/role_5b.bc",2688,10752),
+						(mypath+"coala/testcases/role_6.bc",16,16)]
 	
-	testcases_bc_multi_single = [(mypath+"testcases/role_1.bc",6,12),
-						(mypath+"testcases/role_2.bc",6,12),
-						(mypath+"testcases/role_3.bc",16,8),
-						(mypath+"testcases/role_4.bc",2,0),
-						(mypath+"testcases/role_5.bc",56,112),
-						(mypath+"testcases/role_6.bc",2,2)]
+	testcases_bc_multi_single = [(mypath+"coala/testcases/role_1.bc",6,12),
+						(mypath+"coala/testcases/role_2.bc",6,12),
+						(mypath+"coala/testcases/role_3.bc",16,8),
+						(mypath+"coala/testcases/role_4.bc",2,0),
+						(mypath+"coala/testcases/role_5.bc",56,112),
+						(mypath+"coala/testcases/role_6.bc",2,2)]
 				
 	global translator
 	translator = None
