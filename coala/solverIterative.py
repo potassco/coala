@@ -108,7 +108,7 @@ class SolverIterative(object):
 		else:
 			self.control.ground([("base",[]),("initialbase",[]),("query",[0])])
 		
-		state = self.control.solve(self.onmodel,[])
+		state = self.control.solve(on_model=self.onmodel,assumptions=[])
 		if state.unsatisfiable:
 			if self.debug:
 				print "Base is ",state
@@ -124,13 +124,13 @@ class SolverIterative(object):
 		self.transitions = [0]
 		self.horizon = 0
 		
-		state = self.control.solve(self.onmodel,[])
+		state = self.control.solve(on_model=self.onmodel,assumptions=[])
 		if self.debug:
 			print "Solving result: ",state
 		while (state.unsatisfiable or (self.optimize and self.horizon < 5)):
 			self.setStep(self.horizon+1)
 			if self.debug: print "solving"
-			state = self.control.solve(self.onmodel,[])
+			state = self.control.solve(on_model=self.onmodel,assumptions=[])
 			if self.max_horizon>0 and self.max_horizon <= self.horizon:
 				break
 			if self.debug:

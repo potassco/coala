@@ -99,7 +99,7 @@ def main(prg):
                 parts.append(("initially", []))
         prg.ground(parts)
         prg.assign_external(clingo.Function("query", [step]), True)
-        ret = prg.solve(onmodel)
+        ret = prg.solve(on_model=onmodel)
         step += 1
         prg.configuration.solve.models = modelcount - currentmodels
 #end.

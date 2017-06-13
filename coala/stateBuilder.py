@@ -160,7 +160,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
         
-        co.solve(self.onmodel,[])
+        co.solve(on_model=self.onmodel,assumptions=[])
         
         if self.silent:
             result += "\r\n"
@@ -190,7 +190,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
             
-        co.solve(self.onmodel,[])
+        co.solve(on_model=self.onmodel,assumptions=[])
         
         if self.silent:
             result += "\r\n"
@@ -231,7 +231,7 @@ class StateBuilder(object):
         if not self.silent:
             print "Solving.."
         
-        co.solve(self.onmodel,[])
+        co.solve(on_model=self.onmodel,assumptions=[])
         
         if self.silent:
             result += "\r\n"
@@ -277,5 +277,5 @@ class StateBuilder(object):
         co.load(self.encoding_c)
         co.add("base", [], inputText)
         co.ground([("base",[])])
-        result = co.solve([],self.onmodel_conflict)
+        result = co.solve(on_model=self.onmodel_conflict,assumptions=[])
         return result.unsatisfiable, self.states

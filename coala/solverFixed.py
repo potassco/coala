@@ -83,7 +83,7 @@ class SolverFixed(object):
         
         if self.debug:
             print "Solving.."
-        state = self.control.solve(self.onmodel,[])
+        state = self.control.solve(on_model=self.onmodel,assumptions=[])
         if self.debug:
             print "Solving result: ",state
         
