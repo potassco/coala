@@ -2,8 +2,10 @@
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
 from __builtin__ import str
-import sys
+import copy
 import inspect
+import sys
+
 
 old_arithmetics = False
 additional_ifcons_facts = False
@@ -140,7 +142,7 @@ class parse_object(object):
         update = update_passdown(law=self,fluents=fluents,actions=actions,integers=integers,integer_ids=integer_ids,others=my_others,law_type=law_type)
         self.pass_down_update(update)
         if len(update.unbound_assignment) > 0:
-            print update.unbound_assignment
+            #print update.unbound_assignment
             self.replace_unbound_variables(update.unbound_assignment)
         return update
     
@@ -208,12 +210,19 @@ class parse_object(object):
                         setattr(self,att,nval)
         return self
     
-    def replace_unbound_variables(self,assignm):
+    def replace_unbound_variables(self,assignm,negate=False):
         for att in self.child_attributes:
+            #neg = negate
+            #if att == "after": neg = not neg
             if hasattr(self,att):
                 val = getattr(self,att)
-                if val is not None and type(val) != str:
-                    setattr(self, att, val.replace_unbound_variables(assignm))
+                if type(val) == list:
+                    li = []
+                    for x in val:
+                        li.append(x.replace_unbound_variables(assignm,negate))#neg))
+                    setattr(self, att, li)
+                elif val is not None and type(val) != str:
+                    setattr(self, att, val.replace_unbound_variables(assignm,negate))#neg))
         return self
         
     
@@ -345,9 +354,9 @@ class atom_list(parse_object):
                 comb.append(c.compile_where_single())
         return ",".join(comb)
     
-    def replace_unbound_variables(self,assignm):
+    def replace_unbound_variables(self,assignm,negate=False):
         for i in range(len(self.content)):
-            self.content[i] = self.content[i].replace_unbound_variables(assignm)
+            self.content[i] = self.content[i].replace_unbound_variables(assignm,negate)
         return self
 
 class rule(parse_object):
@@ -365,6 +374,32 @@ class law(rule):
     def get_law_type(self):
         return self.law_type
 
+    def replace_unbound_variables(self,assignm,negate=False):
+        if len(self.variables) > 0:
+            nva = []
+            for va in self.variables:
+                found = False
+                for (x,y,after) in assignm:
+                    if str(va) == str(y):
+                        found = True
+                        break
+                if not found:
+                    nva.append(va)
+            self.variables = nva
+        for att in self.child_attributes:
+            neg = negate
+            if att == "after_part": 
+                neg = not neg
+            if hasattr(self,att):
+                val = getattr(self,att)
+                if type(val) == list:
+                    li = []
+                    for x in val:
+                        li.append(x.replace_unbound_variables(assignm,neg))
+                    setattr(self, att, li)
+                elif val is not None and type(val) != str:
+                    setattr(self, att, val.replace_unbound_variables(assignm,neg))
+        return self
 
 class static_law(law): #static
     def __init__(self, head, if_part, ifcons_part, where,line=None,filename=None):
@@ -451,7 +486,6 @@ class dynamic_law(law): #dynamic
             for ch in children:
                 result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
-
 
 class nonexecutable_law(law): #nonexecutable
     def __init__(self, body, if_part, ifcons_part, where,line=None,filename=None):
@@ -1087,7 +1121,7 @@ class predicate(parse_object):
         elif type(self.name) == str:
             text= self.name
         else:
-            print "This should not happen!"
+            print >> sys.stderr, "This should not happen!"
             #print self.name.typestr()
             text = self.name.print_facts()
         if prime:
@@ -1500,6 +1534,8 @@ class arithmetic_atom(parse_object):
         return int(self.factor) == 0
             
     def __str__(self):
+        if self.value is None and self.variable is None:
+            return "("+str(self.factor)+")"
         return "("+str(self.variable)+("'" if self.apostroph else "")+"*"+("-" if self.negation else "")+(str(self.value) if self.value is not None else "1")+")"
     
     def print_facts(self, prime=False):
@@ -1514,6 +1550,16 @@ class arithmetic_atom(parse_object):
             # Invert negation here: A single number will be written on the other side of the equation
             #return ("-" if not self.negation else "")+str(int(self.factor))
             return ("-" if self.negation else "")+str(int(self.factor)) ###+","+str(self.helper_id)
+        
+    def replace_unbound_variables(self,assignm,negate=False):
+        if self.value is not None:
+            for (x,y,after) in assignm:
+                if str(self.value) == str(y):
+                    self.value = None
+                    self.variable = x.content
+                    if after != negate: self.apostroph = not self.apostroph
+                    break
+        return self
         
 class arithmetic_helper_division(parse_object):
     def __init__(self,variable,lunknown,factor,runknown,iseq,where):
@@ -1543,6 +1589,7 @@ class equation(parse_object):
         self.child_attributes = ["left","right"]
         self.has_integer = False
         self.replacement = None
+        self.replaced_law = None
         
     def __str__(self):
         return str(self.left)+str(self.operator)+str(self.right)
@@ -1599,23 +1646,23 @@ class equation(parse_object):
         
         if len(update.unbound_variables)>0:
             if update.is_in_head():
-                print "head"
+                #print "head"
                 #self.replace_unbound_variables(update.unbound_assignment)
-                            
+                pass           
             else:
                 if self.operator in ["="]:
                     if self.left.__class__ in [unknown, predicate] \
                     and self.right.__class__ == variable:
-                        print "p/u = v"
+                        #print "p/u = v"
                         update.add_unbound_assignment((self.left,self.right))
                     if self.left.__class__ == variable \
                     and self.right.__class__ in [unknown,predicate]:
-                        print "v = p/u"
+                        #print "v = p/u"
                         update.add_unbound_assignment((self.right,self.left))
                 # is equation? |bound| > 1 # TODO: asdasdsad
                 # ignore for now
                 # is assignment? |bound| == 1
-            print update.unbound_variables
+            #print update.unbound_variables
         if type(self.left) == unknown and type(self.right) == variable and self.right.unbound == True:
             #print str(self.left) + str(self.operator) + str(self.right)
             #update.set()
@@ -1665,8 +1712,8 @@ class equation(parse_object):
             #print " ".join(x.print_facts() for x in head)
             #print " ".join(x.print_facts() for x in body)
             
-            law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
-            update.add_arithmetic_law(law)
+            self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+            update.add_arithmetic_law(self.replaced_law)
             
         
         return self.variables
@@ -1695,12 +1742,27 @@ class equation(parse_object):
             elif self.operator == "!=": self.operator = "="
             else:
                 raise NameError("Unknown Equation Symbol "+self.operator)
-        print "rep:",self
+        #print "rep:",self
         return self
     
-    def replace_unbound_variables(self,assignment):
-        self.left = self.left.replace_unbound_variables(assignment)
-        self.right = self.right.replace_unbound_variables(assignment)
+    def replace_unbound_variables(self,assignment,negate=False):
+        #self.left = self.left.replace_unbound_variables(assignment,negate)
+        #self.right = self.right.replace_unbound_variables(assignment,negate)
+        if self.replacement is not None:
+            for co in self.replacement.parameters.content:
+                con = co.parameters.content
+                repl = []
+                for c in con:
+                    found = False
+                    for (x,y,after) in assignment:
+                        if str(c) == str(y):
+                            found = True
+                            break
+                    if not found: repl.append(c)
+                co.parameters.content=repl
+        if self.replaced_law is not None:
+            #print type(self.replaced_law)
+            self.replaced_law.replace_unbound_variables(assignment,negate)
         #print "repl:",self
         return self
         
@@ -2201,9 +2263,13 @@ class variable(parse_object):
     def arith_flatten(self,negation,update):
         return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation)
 
-    def replace_unbound_variables(self,assignm):
-        for (x,y) in assignm:
+    def replace_unbound_variables(self,assignm,negate=False):
+        for (x,y,after) in assignm:
             if str(self.content) == str(y):
+                if after: 
+                    z = copy.deepcopy(x)
+                    z.apostroph = not z.apostroph
+                    return z
                 return x
         return self
         
@@ -2438,8 +2504,9 @@ class update_passdown(object):
         self.unbound_variables = []
     
     def add_unbound_assignment(self,elem):
-        if not elem in self.unbound_assignment:
-            self.unbound_assignment.append(elem)
+        x = (elem[0],elem[1],self.is_action_allowed())
+        if not x in self.unbound_assignment:
+            self.unbound_assignment.append(x)
         
 
 class errout(object):

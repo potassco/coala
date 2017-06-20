@@ -25,7 +25,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.443"
+version = "2.444"
 
 
 try:
@@ -78,7 +78,7 @@ def setDefaults():
 	ignore_undefined = False
 	write_file = False
 	debug = False
-	readmefile = mypath+"README_BC.txt"
+	readmefile = mypath+"coala/README_BC.txt"
 	exampledirectory = mypath+"examples/"
 	encoding_s = mypath+"coala/internal/states.lp"
 	encoding_t = mypath+"coala/internal/transitions.lp"

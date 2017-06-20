@@ -9,7 +9,7 @@ setup(
     name="coala",
 
     # Version number (initial):
-    version="2.443",
+    version="2.444",
 
     # Application author details:
     author="Christian Schulz-Hanke",
@@ -40,6 +40,7 @@ setup(
     #],
 
     data_files=[
+            ("coala",["coala/README_BC.txt"]),
             ("coala/internal", ["coala/internal/arithmetic.lp", \
                 "coala/internal/csp.lp", \
                 "coala/internal/fixed.lp", \
