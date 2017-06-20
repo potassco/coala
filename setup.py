@@ -16,7 +16,7 @@ setup(
     author_email="Christian.Schulz-Hanke@cs.uni-potsdam.de",
 
     # Packages
-    packages=["coala","coala.parse","coala.bc","coala.bc_legacy","coala.bcLc","coala.b","coala.bcAgent","coala.bcAgent_legacy","ply"],
+    packages=["coala","coala.parse","coala.bc","coala.bc_legacy","coala.bcLc","coala.b","coala.bcAgent","coala.bcAgent_legacy"],
 
     #
     scripts=["coala/coala","outputformatclingocoala"],
@@ -35,9 +35,9 @@ setup(
     long_description=open("README.txt").read(),
 
     # Dependent packages (distributions)
-    #install_requires=[
-    #    "flask",
-    #],
+    install_requires=[
+        "ply>=3.8",
+    ],
 
     data_files=[
             ("coala",["coala/README_BC.txt"]),
