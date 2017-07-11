@@ -1,0 +1,11 @@
+<asp>
+myaction(t3).
+myaction(t4).
+
+myflu(v1).
+myflu(v2).
+</asp>
+
+<fluent> V <where> myflu(V).
+
+<action> T <where> myaction(T).

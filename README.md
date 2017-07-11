@@ -5,42 +5,62 @@ christian.schulz-hanke( at )cs.uni-potsdam.de
 
 https://github.com/potassco/coala
 
+Coala is a translator from BC to an ASP fact format.
+In combination with clingo or the clingo python library,
+it can be used to generate states and transitions
+or calculate plans given an initial state and a goal.
+
 This project can be used from directories or
 packed and be installed using python distutils.
 
+Credit goes to Sergio Tessaris for his valuable feedback on installation and compatibility.
+
 ### Using without installing
 
-coala can be used without installation.<br>
+Coala can be used without installation.<br>
 It can be run calling
 
 	python coala/coala examples/medical.bc
 
-### Packing and installing using python distutils
+### Installing using pip
 
-The project can be packed calling
+Coala can be installed using pip without downloading (examples will not be available)
 
-    python setup.py sdist
+    pip install https://github.com/potassco/coala/archive/master.zip
 
-Which will produce a coala-Version.tar.gz in the dist directory.<br>
-If you unpack the tar file, there will be a "coala-Version" directory.
+Note that installing coala as a command line tool may require
 
-From there you can install it using the setup.py script as super user.
+    sudo pip install https://github.com/potassco/coala/archive/master.zip
 
-####Installation:
+### Installing using python distutils
+
+After downloading and unpacking coala,
+an installation can be done calling
 
     sudo python setup.py install
 
+
+### Example and Usage:
+
 For the Input language, there is an "coala-Version/examples" folder with 3 small examples.<br>
-(additionally, there are more files in the "coala-Version/testcases" directory;<br>
-Note that the files role_X.bc must be run with:
+(additionally, there are more files in the "coala-Version/testcases" directory)<br>
+A translation from BC to ASP facts can be done using:
 
 	coala examples/medical.bc
-	
-)
+
+Generating plans can be done using:
+
+    coala --mode solveIterative examples/medical.bc examples/medical_instance.bc
+
+or short:
+
+    coala -m s examples/medical*
 
 Note that coala does not include solving options if it cannot find the clingo python library.<br>
-If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.
+If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.<br>
+Using clingo may look as follows
 
+    coala examples/medical* | clingo - encodings/incremental_clingo.lp | outputformatclingocoala
 
 PLEASE refer to page/index.html for further details, examples and more.
 

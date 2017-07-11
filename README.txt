@@ -7,29 +7,40 @@ christian.schulz-hanke( at )cs.uni-potsdam.de
 
 https://github.com/potassco/coala
 
+Coala is a translator from BC to an ASP fact format.
+In combination with clingo or the clingo python library,
+it can be used to generate states and transitions
+or calculate plans given an initial state and a goal.
 
-If you unpack the tar file, there will be a "coala-Version" directory.
+This project can be used from directories or
+packed and be installed using python distutils.
 
-From there you can either install it using the setup.py script as super user ( sudo python setup.py install )
-Or you can run the tool directly from it's subfolder (python coala/coala examples/medical.bc)
-
-For the Input language, there is an "coala-Version/examples" folder with a few small examples.
-(additionally, there are more files in the "coala-Version/testcases" directory;
-Note that the files role_X.bc must be run with:
-    python coala/coala examples/medical.bc
-or after installing with
-    coala examples/medical.bc
-)
-
-The implementation does also allow to use variables (bound in a <where> part).
-
+Credit goes to Sergio Tessaris for his valuable feedback on installation and compatibility.
 
 Installation:
     sudo python setup.py install
+or
+    sudo pip install https://github.com/potassco/coala/archive/master.zip
 
+
+
+A translation from BC to ASP facts can be done using:
+
+	coala examples/medical.bc
+
+Generating plans can be done using:
+
+    coala --mode solveIterative examples/medical.bc examples/medical_instance.bc
+
+or short:
+
+    coala -m s examples/medical*
 
 Note that coala does not include solving options if it cannot find the clingo python library.
 If you want to use clingo instead, you will have to run a translated instance together with an encoding instead.
+Using clingo may look as follows
+
+    coala examples/medical* | clingo - encodings/incremental_clingo.lp | outputformatclingocoala
 
 
 PLEASE refer to page/index.html for further details, examples and more.

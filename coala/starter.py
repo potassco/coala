@@ -25,7 +25,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.444"
+version = "2.445"
 
 
 try:
@@ -485,7 +485,9 @@ def main(argv):
 				(mypath+"coala/testcases/dom_1.bc",25,0),
 				(mypath+"coala/testcases/dom_2.bc",15,27),
 				(mypath+"coala/testcases/dom_3.bc",120,0),
-				(mypath+"coala/testcases/dom_4.bc",3,0)]
+				(mypath+"coala/testcases/dom_4.bc",3,0),
+				(mypath+"coala/testcases/var_bug_1.bc",4,0),
+				(mypath+"coala/testcases/var_bug_2.bc",16,0)]
 	
 	if negated_actions:
 		testcases.append((mypath+"coala/testcases/test_neg_act.bc",1,4))

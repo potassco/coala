@@ -1,0 +1,24 @@
+<asp>
+myaction(t3).
+myaction(t4).
+
+myflu(v1).
+myflu(v2).
+myflu(v3).
+
+mydom(v1,1).
+mydom(v1,2).
+mydom(v1,3).
+mydom(v1,41).
+mydom(v2,1).
+mydom(v2,2).
+
+has_dom(V) :- myflu(V), mydom(V,X).
+</asp>
+
+<fluent> V <where> myflu(V), not has_dom(V).
+<fluent> V = X <where> myflu(V), mydom(V,X).
+
+% <action> T <where> myaction(T).
+<action> myact(T) <where> myaction(T).
+<action> t1.

@@ -106,6 +106,9 @@ class parse_object(object):
                 result += do 
         return result
     
+    def get_actions(self):
+        return []
+    
     # Prints the tree as ASP text.
     # This is used as the final translation.
     # Every class should overwrite this.
@@ -1725,7 +1728,7 @@ class equation(parse_object):
         if self.replacement is not None:
             #print "rep:",self.replacement
             return self.replacement.simplify(negation)
-        if type(self.left) in [unknown,predicate,str] and self.operator in ["=","=="]:
+        if type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
             if self.right == "<true>": #in ["<true>","true"] : 
                 return fluent(self.left,not negation)
             if self.right == "<false>": #in ["<false>","false"] : 
@@ -2208,6 +2211,11 @@ class variable(parse_object):
     def pass_down_update(self,update):
         #TODO: Get a way of knowing if this here is an action/fluent or integer!!...
         #where_binding = update.get("where_binding")
+        if update.is_in_action_fact():
+            self.type = "action"
+            self.unbound = False
+            return [str(self),]
+        
         found = False
         if update.had_where: #where_binding is not None:
             fls = update.where_fluents #where_binding["fluents"]
@@ -2460,6 +2468,15 @@ class update_passdown(object):
             if check_default_laws:
                 if default_law == caller.__class__ or default_law in inspect.getmro(caller.__class__):
                     return caller.dynamic
+        return False
+    
+    def is_in_action_fact(self):
+        for ob in self.path:
+            caller = ob[0];
+            if action_fact == caller.__class__:
+                return True
+            if action_fact in inspect.getmro(caller.__class__):
+                return True
         return False
 
     def is_action_allowed(self):
