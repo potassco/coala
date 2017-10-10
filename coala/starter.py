@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
@@ -6,13 +6,12 @@ import getopt
 import os
 import sys
 import traceback
-from coala.parse import parse_objects
 
 global mypath
 mypath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/"
 sys.path.append(mypath)
 
-
+import coala.parse.parse_objects
 import coala.b.translator
 import coala.bc.translator
 import coala.bcAgent.translator
@@ -451,9 +450,9 @@ def main(argv):
 		elif opt in ("-c"):
 			description_detect = arg
 		elif opt == "old_arithmetics":
-			parse_objects.old_arithmetics = True
+			coala.parse.parse_objects.old_arithmetics = True
 		elif opt == "-x":
-			parse_objects.additional_ifcons_facts = True
+			coala.parse.parse_objects.additional_ifcons_facts = True
 	
 	if len(args) > 0:
 		input_fi = args
