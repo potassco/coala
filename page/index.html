@@ -174,8 +174,7 @@ These words may not be used for and inside fluent and action names.<br>
 In the following, we will be using "<" and ">" to make it easier to distinguish between<br>
 fluents, actions and reserved words.<br>
 <br>
-Note that we accept both expressions with and without "<" and ">".<br>
-The only exception is the asp part, which must be contained in asp-html tags.
+Note that we accept both with and without "<" and ">".<br>
 <br>
 The BC syntax of coala requires the users to define actions and fluents used in the laws.
 <xmp style="margin-left: 20px;"><action> jump.
@@ -187,16 +186,10 @@ Multivalued fluents can be used by explicitly stating their domain.
 <xmp style="margin-left: 20px;"><fluent> position=inair.
 <fluent> position=onground.
 <fluent> position=underwater.
-<fluent> position=gone.
-<fluent> multivalue=(a,b,c,d).
-<fluent> numeric=5..100.</xmp>
+<fluent> position=gone.</xmp>
 If the domain is defined in asp code, a more comact form can be used:
 <xmp style="margin-left: 20px;"><asp> domain(1..1000). domain(6789).</asp>
 <fluent> position=X <where> domain(X).</xmp>
-Boolean domains may also be used explicitly
-<xmp style="margin-left: 20px;"><fluent> activated.
-<fluent> inverse.
-inverse=false <after> activated=true.</xmp>
 
 
 The static laws of BC are written as
@@ -204,7 +197,6 @@ The static laws of BC are written as
 at(1,2) <ifcons> at(1,2).
 position(onground) <if> -position(inair) <ifcons> -flying.</xmp>
 Only fluents can be used in static laws.<br>
-The <if> part can be omitted or followed by <true> for omitting.<br>
 <br>
 
 The dynamic laws of BC are written as

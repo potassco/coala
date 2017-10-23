@@ -5,7 +5,6 @@ import parse_objects as ps
 import ply.yacc as yacc
 import lexer
 import os
-from samba.ms_schema import multivalued_attrs
 		
 # Parsing rules
 
