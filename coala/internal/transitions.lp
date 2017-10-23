@@ -28,5 +28,6 @@ holds(F,1) :- dynamic_law(I), head(I,F),
     holds(P,0) : nonexecutable(I,P); 
     not not holds(P,1) : ifcons(I,P).
 
-:- fluent(X), not 1{ holds(val(X,A),1) }1. 
+:- fluent(X), not 1{ holds(val(X,A),1):domain(X,A) }1. 
 :- holds(_false,1).
+

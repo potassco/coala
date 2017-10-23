@@ -29,7 +29,7 @@ holds(H,0) :- static_law(I), head(I,H),
         not not holds(F,0) : ifcons(I,F).
 
 % Fluent domain restriction
-:- { holds(val(X,_),0) } != 1, fluent(X).
+:- { holds(val(X,A),0):domain(X,A) } != 1, fluent(X).
 %:- { holds(val(X,D),0):domain(X,D) } != 1, fluent(X).
 
 % Set initial state
@@ -194,7 +194,7 @@ holds(H,t) :- dynamic_law(I), head(I,H),
         not not holds(F,t) : ifcons(I,F).
 
 % Fluent domain restriction
-:- { holds(val(X,_),t) } != 1, fluent(X).
+:- { holds(val(X,A),t):domain(X,A) } != 1, fluent(X).
 %:- { holds(val(X,D),t):domain(X,D) } != 1, fluent(X).  
 
 % Simplification for impossible and nonexecutable laws

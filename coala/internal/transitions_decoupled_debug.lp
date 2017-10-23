@@ -35,7 +35,7 @@ error(n,I,1) :- nonexecutable(I,_), holds(A,0) : nonexecutable(I,A),action(A);
     not not holds(val(P,PV),1) : ifcons(I,val(P,PV)); 
     not holds(val(P,PV),1) : ifcons(I,neg_val(P,PV)).
 
-error(f,X,1) :- fluent(X), not 1{ holds(val(X,A),1) }1. 
+error(f,X,1) :- fluent(X), not 1{ holds(val(X,A),1):domain(X,A) }1. 
 
 error(fn,X,1) :- fluent(X), holds(val(X,Y),1), holds(neg_val(X,Y),1).
 

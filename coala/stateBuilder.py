@@ -28,6 +28,9 @@ class StateBuilder(object):
             self.encoding_non_internal_transl = mypath+"encodings/base_translation.lp"
         else:
             self.encoding_non_internal_transl = encoding_non_internal_transl
+        
+        self.encoding_only_in_domains = mypath+"coala/internal/only_in_domains.lp"
+            
         self.states = []
         self.silent = silent
         self.transitions = False
@@ -154,6 +157,7 @@ class StateBuilder(object):
         co = clingo.Control(['-W','no-atom-undefined'])
         co.configuration.solve.models = 0
         co.load(self.encoding_s)
+        co.load(self.encoding_only_in_domains)
         co.add("base", [], inputText)
         co.ground([("base",[])])
         
@@ -184,6 +188,7 @@ class StateBuilder(object):
         co.configuration.solve.models = 0
         co.load(self.encoding_s)
         co.load(self.encoding_t)
+        co.load(self.encoding_only_in_domains)
         co.add("base", [], inputText)
         co.ground([("base",[])])
         

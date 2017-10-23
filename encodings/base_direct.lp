@@ -59,7 +59,7 @@ holds(H,T) :- dynamic_law(I), head(I,H),
 
 
 % Fluent domain restriction
-:- { holds(val(X,_),T) } != 1, fluent(X), step(T). 
+:- { holds(val(X,A),T):domain(X,A) } != 1, fluent(X), step(T). 
 
 % Simplification for impossible and nonexecutable laws
 :- holds(_false,T), step(T).

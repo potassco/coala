@@ -35,7 +35,7 @@ holds(F,1) :- dynamic_law(I,F), holds(A,0) : after(I,A),action(A);
     not not holds(val(P,PV),1) : nonexecutable_ifcons(I,val(P,PV)); 
     not holds(val(P,PV),1) : nonexecutable_ifcons(I,neg_val(P,PV)).
 
-:- fluent(X), not 1{ holds(val(X,A),1) }1. 
+:- fluent(X), not 1{ holds(val(X,A),1):domain(X,A) }1. 
 
 :- fluent(X), holds(val(X,Y),1), holds(neg_val(X,Y),1).
 

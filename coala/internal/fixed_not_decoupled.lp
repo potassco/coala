@@ -17,7 +17,7 @@ holds(F,0) :- static_law(I,F), holds(val(P,PV),0) : if(I,val(P,PV));
     not holds(val(P,PV),0) : impossible(I,neg_val(P,PV)); 
     not not holds(val(P,PV),0) : impossible_ifcons(I,val(P,PV)); 
     not holds(val(P,PV),0) : impossible_ifcons(I,neg_val(P,PV)).
-:- fluent(X), not 1{ holds(val(X,A),0) }1. 
+:- fluent(X), not 1{ holds(val(X,A),0):domain(X,A) }1. 
 :- fluent(X), holds(val(X,Y),0), holds(neg_val(X,Y),0).
 
 #program initialbase.
@@ -39,7 +39,7 @@ holds(F,0) :- static_law(I,F), holds(val(P,PV),0) : if(I,val(P,PV));
     not not holds(val(P,PV),0) : ifcons(I,val(P,PV)); 
     not holds(val(P,PV),0) : ifcons(I,neg_val(P,PV)).
 
-:- fluent(X), not 1{ holds(val(X,A),0) }1. 
+:- fluent(X), not 1{ holds(val(X,A),0):domain(X,A) }1. 
 :- fluent(X), holds(val(X,Y),0), holds(neg_val(X,Y),0).
 
 #program base.
@@ -75,7 +75,7 @@ holds(F,T) :- dynamic_law(I,F), occurs(A,T-1) : after(I,A),action(A);
     not not holds(val(P,PV),T) : ifcons(I,val(P,PV)); 
     not holds(val(P,PV),T) : ifcons(I,neg_val(P,PV));step(T).
 
-:- fluent(X), not 1{ holds(val(X,A),T) }1, step(T). 
+:- fluent(X), not 1{ holds(val(X,A),T):domain(X,A) }1, step(T). 
 :- fluent(X), holds(val(X,Y),T), holds(neg_val(X,Y),T), step(T).
 
 #program query.

@@ -5,6 +5,7 @@ import parse_objects as ps
 import ply.yacc as yacc
 import lexer
 import os
+from samba.ms_schema import multivalued_attrs
 		
 # Parsing rules
 
@@ -159,9 +160,10 @@ class Parser(object):
 		
 	def p_flu_fact(self,t): # <fluent> f_1,...,f_n <where> bla.
 		''' flu_fact : FLU fluent_formula where_part
-					| DFLU fluent_formula where_part
+					| defined_fluent fluent_formula where_part
+					| FLU term EQ term_numeric DDOT term_numeric where_part
 					| FLU fluent_formula int_domain where_part
-					| DFLU fluent_formula int_domain where_part
+					| defined_fluent fluent_formula int_domain where_part
 					| INT fluent_formula where_part '''		
 #					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
 #					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
@@ -177,6 +179,17 @@ class Parser(object):
 				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 			else:
 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
+		elif len(t) == 8:
+			lower = t[4]
+			upper = t[6]
+			if t[7] == None:
+				try:
+					ran = range(int(lower),int(upper)+1)
+				except:
+					ran = [lower,upper]
+				t[0] = ps.fluent_fact(ps.atom_list(t[2]),None,multivalued=ran,line=line,filename=filename)
+			else:
+				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],dotted_domain=(lower,upper),line=line,filename=filename)
 #		elif len(t) == 8:
 #			termlist = t[5]
 #			if t[1] not in ['<fluent>','fluent']:
@@ -220,6 +233,11 @@ class Parser(object):
 # 			#	t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
 # 			#else:
 # 				t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
+		
+	def p_defined_fluent(self,t):
+		'''defined_fluent : DFLU
+						| DEF FLU'''
+		t[0] = "definedfluent"
 		
 	def p_static_law(self,t): # f_1,...,f_n <if> g_1,...,g_m <where> bla.
 		''' static_law : formula IF formula ifcons_part where_part
@@ -362,7 +380,8 @@ class Parser(object):
 	def p_binding(self,t):
 		''' binding : ACT term
 					| FLU term equalpart
-					| term_boolean '''		
+					| term_boolean'''
+#####					| ARITH asp_arith'''		
 #					| NOT asp_term
 ####		#			| MINUS fluent'''
 		#			| MINUS asp_term # Some things should not happen - 1==1
@@ -370,8 +389,12 @@ class Parser(object):
 			t[0] = t[1] #ps.predicate(t[1],None)
 		elif t[1] in ['<action>','action']:
 			t[0] = ps.action(t[2])
-#		elif t[1] in ('not','-'):
-#			t[0] = ps.negation(t[2]) #ps.predicate(ps.negation(t[2]))
+##		elif t[1] in ('not','-'):
+##			t[0] = ps.negation(t[2]) #ps.predicate(ps.negation(t[2]))
+#		elif t[1] in ['<arith>','arith']:
+#			#t[0] = ps.action(t[2])
+#			t[0] = t[2]
+#			t[0].is_arithmetic_helper = True
 		else:
 			t[0] = ps.fluent(t[2],t[3])
 			
@@ -520,11 +543,15 @@ class Parser(object):
 		
 	def p_identifier(self,t):
 		''' identifier : IDENTIFIER 
-					| IDENTIFIER APOS '''
+					| IDENTIFIER APOS
+					| TRUE
+					| FALSE '''
 		if len(t) == 2:
 			t[0] = ps.unknown(t[1])
 		else:
-			t[0] = ps.unknown(t[1],apostroph=True)
+			if t[1] in ["true","<true>"]: t[0] = ps.unknown("true")
+			elif t[1] in ["false","<false>"]: t[0] = ps.unknown("false")
+			else: t[0] = ps.unknown(t[1],apostroph=True)
 		
 	def p_int_domain(self,t):
 		''' int_domain : COLON term_numeric DDOT term_numeric 
@@ -556,20 +583,23 @@ class Parser(object):
 		''' asp_term : term ASSIGN asp_operation
 					| term PLUSEQ asp_operation
 					| term MINUSEQ asp_operation
-					| asp_operation asp_eqoperator asp_operation'''
+					| asp_arith '''
 #					| MINUS term
 #					| NOT term
-#	if len(t) == 4:
-		if t[2] == ":=":
+		if len(t) == 2:
+			t[0] = t[1]
+		elif t[2] == ":=":
 			t[0] = ps.assignment(t[1],t[3])
 		elif t[2] == "+=":
 			t[0] = ps.incremental_assignment(t[1],t[3])
 		elif t[2] == "-=":
 			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
-		else:
-			t[0] = ps.equation(t[1],t[3],operator=t[2])
 #	else:
 #		t[0] = t[1]
+			
+	def p_asp_arith(self,t):
+		''' asp_arith : asp_operation asp_eqoperator asp_operation '''
+		t[0] = ps.equation(t[1],t[3],operator=t[2])
 			
 	def p_asp_eqoperator(self,t):
 		''' asp_eqoperator : EQQ

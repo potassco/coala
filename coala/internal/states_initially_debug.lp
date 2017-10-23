@@ -21,7 +21,7 @@ error(i,I,0) :- impossible(I,_), holds(val(P,PV),0) : impossible(I,val(P,PV));
     not not holds(val(P,PV),0) : ifcons(I,val(P,PV)); 
     not holds(val(P,PV),0) : ifcons(I,neg_val(P,PV)).
 
-error(f,X,0) :- fluent(X), not 1{ holds(val(X,A),0) }1.
+error(f,X,0) :- fluent(X), not 1{ holds(val(X,A),0):domain(X,A) }1.
 
 error(nf,X,0) :- fluent(X), holds(val(X,Y),0), holds(neg_val(X,Y),0).
 

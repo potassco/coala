@@ -9,7 +9,7 @@ setup(
     name="coala",
 
     # Version number (initial):
-    version="2.445",
+    version="2.446",
 
     # Application author details:
     author="Christian Schulz-Hanke",
@@ -50,7 +50,8 @@ setup(
                 "coala/internal/states.lp", \
                 "coala/internal/states_not_decoupled.lp", \
                 "coala/internal/transitions.lp", \
-                "coala/internal/transitions_not_decoupled.lp"]),
+                "coala/internal/transitions_not_decoupled.lp", \
+                "coala/internal/only_in_domains.lp"]),
 
             ("coala/testcases", [ "coala/testcases/add_1.bc", \
                 "coala/testcases/add_2.bc", \
@@ -58,10 +59,15 @@ setup(
                 "coala/testcases/add_4.bc", \
                 "coala/testcases/bug2.b", \
                 "coala/testcases/bug.b", \
+                "coala/testcases/binding_1.bc", \
+                "coala/testcases/binding_2.bc", \
+                "coala/testcases/binding_3.bc", \
                 "coala/testcases/dom_1.bc", \
                 "coala/testcases/dom_2.bc", \
                 "coala/testcases/dom_3.bc", \
                 "coala/testcases/dom_4.bc", \
+                "coala/testcases/dom_5.bc", \
+                "coala/testcases/dom_6.bc", \
                 "coala/testcases/ex_int_2.sh", \
                 "coala/testcases/ex_int.sh", \
                 "coala/testcases/flu.bc", \

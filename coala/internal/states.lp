@@ -15,5 +15,5 @@ holds(F,0) :- static_law(I), head(I,F),
     holds(P,0) : impossible(I,P); 
     not not holds(P,0) : ifcons(I,P).
 
-:- fluent(X), not 1{ holds(val(X,A),0) }1.
+:- fluent(X), not 1{ holds(val(X,A),0):domain(X,A) }1.
 :- holds(_false,0).

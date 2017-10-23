@@ -31,8 +31,8 @@ fail :- nonexecutable(I,_),
     not holds(val(P,O),1) : ifcons(I,val(P,C)), domain(P,O), C != O; 
     not not holds(P,1) : ifcons(I,P).
 
-fail :- fluent(X), 2{ holds(val(X,A),1) }. 
-:- fluent(X), not { holds(val(X,A),1) }1.
+fail :- fluent(X), 2{ holds(val(X,A),1):domain(X,A) }. 
+:- fluent(X), not { holds(val(X,A),1):domain(X,A) }1.
 fail :- holds(_false,1).
 
 :- not fail.

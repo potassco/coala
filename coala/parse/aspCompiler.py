@@ -99,6 +99,25 @@ class AspCompiler(aspCom.AspCompiler):
 		self.integers = result
 		self.integer_ids = integer_ids
 	
+# 	def update_mark(self,data):
+# 		for key in data:
+# 			for a in data[key]:
+# 				if key in ['static_laws',
+# 					'dynamic_laws',
+# 					'impossible_laws',
+# 					'nonexecutable_laws',
+# 					'default_laws',
+# 					'inertial_laws']:
+# 					result= a.mark_update_all(False)
+# 					if result is not None:
+# 						print "!!! marked:",result  #TODO: Remove
+# 						pass
+# 				#else:
+# 				#	result= a.mark_all(True)
+# 				#	if result is not None:
+# 				#		print >> sys.stderr, "% Error! Arithmetic Part in non-law"
+# 		return data
+	
 	def update_data(self, data):
 		update_results = []
 		for key in data:
@@ -179,6 +198,7 @@ class AspCompiler(aspCom.AspCompiler):
 			#print "actions:","; ".join(str(x) for x in self.actions)
 			self.compile_others(data['others'])
 			
+			###data = self.update_mark(data)
 			data = self.update_data(data)
 			
 			if self.debug: self.print_data(data)

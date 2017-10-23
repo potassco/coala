@@ -1,0 +1,4 @@
+fluent a,b.
+
+a if b=true.
+-a if b=false.

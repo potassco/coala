@@ -40,6 +40,7 @@ coala/bc_legacy/lexer.py
 coala/bc_legacy/parser.py
 coala/bc_legacy/parsetab.py
 coala/bc_legacy/translator.py
+coala/internal/only_in_domains.lp
 coala/internal/arithmetic.lp
 coala/internal/csp.lp
 coala/internal/fixed.lp

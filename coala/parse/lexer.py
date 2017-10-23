@@ -15,7 +15,7 @@ class Lexer(object):
 		'VARIABLE',
 		'ACT',
 		'FLU',
-		'DFLU',
+		'DFLU','DEF',
 		'CAUSES',
 		'IF',
 		'IFCONS',
@@ -34,6 +34,7 @@ class Lexer(object):
 #		'HO_AT',
 		'GOAL',
 		'WHERE',
+#		'ARITH',
 		'TRUE',
 		'FALSE',
 		'COMMA',
@@ -67,8 +68,14 @@ class Lexer(object):
 		'action':'ACT',
 		'fluent':'FLU',
 		'where':'WHERE',
+#		'arith':'ARITH',
 		'initially':'INIT',
-		'finally':'GOAL',}
+		'definedfluent':'DFLU',
+		'defined':'DEF',
+		'finally':'GOAL',
+		'true':'TRUE',
+		'false':'FALSE',
+	}
 		
 	#t_ESCAPE_BRACELETS = r'{[^}]*}'
 	t_ESCAPE_ASP = r'<asp>(.*?\n)*?.*?</asp>'
@@ -89,6 +96,7 @@ class Lexer(object):
 	t_INT = r'<int>'
 #		t_SFLU = r'<static(\ )?fluent>'
 	t_DFLU = r'<defined(\ )?fluent>'
+	t_DEF = r'<defined>'
 	t_CAUSES = r'<causes>'
 	t_IF = r'<if>'
 	t_IFCONS = r'<ifcons>'
@@ -101,6 +109,7 @@ class Lexer(object):
 	t_INIT = r'<initially>'
 	t_GOAL = r'<finally>'
 	t_WHERE = r'<where>'
+#	t_ARITH = r'<arith>'
 	t_TRUE = r'<true>'
 	t_FALSE = r'<false>'
 #		t_PRED = r'<pred>'

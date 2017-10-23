@@ -21,6 +21,6 @@ holds(F,0) :- static_law(I), head(I,F), holds(val(P,VP),0) : if(I,val(P,VP));
     not not holds(val(P,PV),0) : ifcons(I,val(P,PV)); 
     not holds(val(P,PV),0) : ifcons(I,neg_val(P,PV)).
 
-:- fluent(X), not 1{ holds(val(X,A),0) }1.
+:- fluent(X), not 1{ holds(val(X,A),0):domain(X,A) }1.
 
 :- fluent(X), holds(val(X,Y),0), holds(neg_val(X,Y),0).
