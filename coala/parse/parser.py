@@ -49,17 +49,21 @@ class Parser(object):
 	start = 'program'
 	
 	def p_program(self,t):
-		'''program :
-					| program rule DOT
-					| program ESCAPE_ASP
-					| program ROLE_BEGIN role ROLE_END'''
-		if len(t) == 3:
-			self.data['others'].append(ps.asp_code(str(t[2])[5:-6]))
-		elif len(t) == 4:
-			if not t[2] is None:
-				self.data[t[2].get_law_type()].append(t[2])
-		elif len(t) == 5: 
-			name = str(t[2])[5:-1].lstrip()
+		''' program : program_part
+					| program program_part'''
+		pass
+	
+	def p_program_part(self,t):
+		'''program_part : rule DOT
+					| ESCAPE_ASP
+					| ROLE_BEGIN role ROLE_END'''
+		if len(t) == 2:
+			self.data['others'].append(ps.asp_code(str(t[1])[5:-6]))
+		elif len(t) == 3:
+			if not t[1] is None:
+				self.data[t[1].get_law_type()].append(t[1])
+		elif len(t) == 4: 
+			name = str(t[1])[5:-1].lstrip()
 			index = name.find("(")
 			end_ind = name.find(")")
 			params = []
@@ -72,12 +76,12 @@ class Parser(object):
 					subs = subs[index+1:]
 					index = subs.find(",")
 				params.append(subs)
-				t[3]['params'] = params
+				t[2]['params'] = params
 				name = name_real
-			self.data['roles'][name]=t[3]
+			self.data['roles'][name]=t[2]
 	
 	def p_role(self,t):
-		'''role :
+		'''role : 
 				| role rule DOT
 				| role ESCAPE_ASP'''
 		if len(t) == 1:
@@ -160,7 +164,7 @@ class Parser(object):
 	def p_flu_fact(self,t): # <fluent> f_1,...,f_n <where> bla.
 		''' flu_fact : FLU fluent_formula where_part
 					| defined_fluent fluent_formula where_part
-					| FLU term EQ term_numeric DDOT term_numeric where_part
+					| FLU term EQ dotted_numeric_bound where_part
 					| FLU fluent_formula int_domain where_part
 					| defined_fluent fluent_formula int_domain where_part
 					| INT fluent_formula where_part '''		
@@ -178,17 +182,17 @@ class Parser(object):
 				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 			else:
 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
-		elif len(t) == 8:
-			lower = t[4]
-			upper = t[6]
-			if t[7] == None:
+		elif len(t) == 6: #8:
+			lower = t[4][0]
+			upper = t[4][1] #t[6]
+			if t[5] == None:
 				try:
 					ran = range(int(lower),int(upper)+1)
 				except:
 					ran = [lower,upper]
 				t[0] = ps.fluent_fact(ps.atom_list(t[2]),None,multivalued=ran,line=line,filename=filename)
 			else:
-				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],dotted_domain=(lower,upper),line=line,filename=filename)
+				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[5],dotted_domain=(lower,upper),line=line,filename=filename)
 #		elif len(t) == 8:
 #			termlist = t[5]
 #			if t[1] not in ['<fluent>','fluent']:
@@ -379,7 +383,8 @@ class Parser(object):
 	def p_binding(self,t):
 		''' binding : ACT term
 					| FLU term equalpart
-					| term_boolean'''
+					| term_boolean
+ 					| variable EQ dotted_numeric_bound'''
 #####					| ARITH asp_arith'''		
 #					| NOT asp_term
 ####		#			| MINUS fluent'''
@@ -394,8 +399,16 @@ class Parser(object):
 #			#t[0] = ps.action(t[2])
 #			t[0] = t[2]
 #			t[0].is_arithmetic_helper = True
-		else:
+		elif t[1] in ['<fluent>','fluent']:
+		#else:
 			t[0] = ps.fluent(t[2],t[3])
+ 		else:
+ 			t[0] = ps.asp_dotted_fact(t[1],t[3][0],t[3][1]) #ps.equation(t[1],t[3])
+			
+ 	def p_dotted_numeric_bound(self,t):
+ 		''' dotted_numeric_bound : term_numeric DDOT term_numeric'''
+ 		t[0] = [t[1],t[3]]
+		
 			
 	def p_equalpart(self,t):
 		''' equalpart : 
@@ -484,8 +497,8 @@ class Parser(object):
 		if len(t) == 3:
 			t[0] = ps.negation(t[2])
 		else:
-			if t[1] == "<true>": t[0] = None #ps.atom_list()
-			elif t[1] == "<false>": t[0] = ps.false_atom()
+			if t[1] in ["true","<true>"]: t[0] = None #ps.atom_list()
+			elif t[1] in ["false","<false>"]: t[0] = ps.false_atom()
 			else: t[0] = t[1]
 
 # 	def p_term_boolean(self,t):
@@ -553,7 +566,7 @@ class Parser(object):
 			else: t[0] = ps.unknown(t[1],apostroph=True)
 		
 	def p_int_domain(self,t):
-		''' int_domain : COLON term_numeric DDOT term_numeric 
+		''' int_domain : COLON dotted_numeric_bound
 				| COLON INT '''
 		#''' int_domain : 
 		#		| COLON term DDOT term 

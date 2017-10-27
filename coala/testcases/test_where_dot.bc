@@ -1,0 +1,3 @@
+fluent a=1..5.
+
+a=1 after a=X where X=2..5.

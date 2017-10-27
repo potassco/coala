@@ -570,81 +570,6 @@ class law(rule):
                 elif val is not None and type(val) != str:
                     setattr(self, att, val.replace_unbound_variables(assignm,neg))
         return self
-    
-    # Check if an equation in a where part is marked as arithmetic (wanders to the body) 
-    def mark_update_all(self,report_only=False):
-        REMOVE
-        if not hasattr(self,"where"):
-            return None
-        where = getattr(self,"where")
-        if where is None:
-            return None
-        
-        result = where.mark_check_where()
-        if result is None:
-            return None
-        if report_only:
-            return result
-        
-        print "where: ",result
-        
-        hits = []
-        for att in self.child_attributes:
-            if att != "where" and hasattr(self,att):
-                val = getattr(self,att)
-                if val is not None:
-                    res = val.mark_check_body(result,head=(att=="head"),ifcons=(att=="ifcons"))
-                    if res is None: continue
-                    if type(res) == list: hits += res
-                    else: hits.append(res)
-        
-#         for att in self.child_attributes:
-#             if att != "where" and hasattr(self,att):
-#                 val = getattr(self,att)
-#                 if val is not None:
-#                     val.mark_rewrite(result,head=(att=="head"),ifcons=(att=="ifcons"))
-
-        #print "Hits:",hits
-        if where_replacemant_arithmetics:#TODO: we only think about where the only head is part of the equation
-            for e in res: e["equation"].is_arithmetic_helper = True
-            #replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
-            replaced_law = equation_where_arithmetics(hits)
-            has_head = False
-            has_body = False   
-            has_ifcons = False      
-            for h in hits:
-                h["equation"].is_arithmetic_helper = True
-                #print "Hit:",h
-                if h["head"] : 
-                    has_head = True
-                    self.add_part(replaced_law,"head")
-                elif h["ifcons"] : has_ifcons = True
-                else: has_body = True
-            if not has_head:
-                if has_body: self.add_part(replaced_law,"body")
-                elif has_ifcons: self.add_part(replaced_law,"ifcons")
-                
-        else:
-            for h in hits:
-                print "Hit:",h
-                if h["head"] :
-                    print "head"
-                elif h["ifcons"] :
-                    print "ifcons"
-                else:
-                    print "body"
-                    
-        return result
-        
-#     def mark_check(self):
-#         result = None
-#         for att in self.child_attributes:
-#             if att != "where" and hasattr(self,att):
-#                 val = getattr(self,att)
-#                 res = val.mark_checked()
-#                 if res is not None:
-#                     if result is None: result = []
-#                     result.append(res)
 
 class static_law(law): #static
     def __init__(self, head, if_part, ifcons_part, where,line=None,filename=None):
@@ -2899,6 +2824,7 @@ class asp_dotted_fact(parse_object):
         self.term = term
         self.lower = lower
         self.upper = upper
+        self.child_attributes = ["term","lower","upper"]
         
     def __str__(self):
         return str(self.term)+"="+str(self.lower)+".."+str(self.upper)
