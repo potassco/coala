@@ -472,6 +472,9 @@ class law(rule):
         print  >> sys.stderr, "ERROR, not implemented add_part for", self.__class__ 
         errout.error("ERROR, not implemented add_part for"+str(self.__class__ ))
     
+    # This checks for unbound variables and
+    # adds their domain statements to the where part.
+    # TODO : If there are integer vars, there should be a difference!
     def pass_down_update_overwrite(self, update):
         self.law_id = update.idfunction()
         def criteria(self): 
@@ -484,36 +487,44 @@ class law(rule):
         for (equ,va) in var:
             if update.where_variables is None:
                 update.where_variables = atom_list()
+            one_not_found = False
             for v in va:
                 found = False
                 for bv in bound_vars:
                     if bv.compare_to(v):
                         found=True
                         break
-                if found: continue
+                if not found: 
+                    one_not_found = True
+                    update.where_variables.append(str(v))
+                    if not str(v) in self.variables: 
+                        self.variables.append(str(v))
+            
+            if one_not_found:
                 
-                update.where_variables.append(str(v))
-                if not str(v) in self.variables: 
-                    self.variables.append(str(v))
+                # We will only come here if v is a unbound variable
+                
+                
                 if not hasattr(self, "where") or self.where is None:
                     self.where = atom_list()
                 if type(self.where) == atom_list:
                     if type(equ)==equation and type(equ.left) in [variable,unknown,predicate,str] and equ.operator in ["=","=="]:
-                        if equ.right == "<true>": #in ["<true>","true"] : 
-                            return fluent(equ.left,False)
+                        if equ.right == "<true>": #in ["<true>","true"] :
+                            self.where.append( fluent(equ.left,True) )
+                            return 
                         if equ.right == "<false>": #in ["<false>","false"] : 
-                            return fluent(equ.left,True)
-                        #replace = assignment(equ.left,equ.right,False)
-                        #replace = replace.simplify()
-                        #update.is
-                        replace = None
+                            self.where.append( fluent(equ.left,False) )
+                            return
+
+                        additional_law = None
                         
-                        #check if action or fluent
+                        #check if action or fluent / integer fluent
                         definite_type = False
                         if not definite_type:
                             for flu in update.fluents:
                                 if equ.left.compare_to(flu):
-                                    replace = fluent(equ.left,equ.right)
+                                    additional_law = fluent(equ.left,equ.right)
+                                    definite_type = True
                                     break 
                         if not definite_type:
                             for inte in update.integer_ids:
@@ -533,8 +544,8 @@ class law(rule):
 #                                 if definite_type:
 #                                     print "type:",self.type
                         #end check
-                        if replace is not None:
-                            self.where.append(replace)
+                        if additional_law is not None:
+                            self.where.append(additional_law)
                     else:
                         raise NameError("Unbound Variable cannot be fixed, not bound in equation!")
                 else:
@@ -544,7 +555,10 @@ class law(rule):
     def get_law_type(self):
         return self.law_type
 
+    #TODO: Removes unbound variables for integer assignments
     def replace_unbound_variables(self,assignm,negate=False):
+        return self
+        #TODO: Check and cleanup
         if len(self.variables) > 0:
             nva = []
             for va in self.variables:
@@ -552,7 +566,7 @@ class law(rule):
                 for (x,y,after) in assignm:
                     if str(va) == str(y):
                         found = True
-                        break
+                        continue
                 if not found:
                     nva.append(va)
             self.variables = nva
@@ -1913,7 +1927,8 @@ class equation(parse_object):
                 if not v in self.variables:
                     self.variables.append(v)
         
-        if len(update.unbound_variables)>0:
+        #TODO: Is this for integer arithmetic or a general multivalue thing?
+        if len(update.unbound_variables)>0: # Variable of law not bound in where part
             if update.is_in_head():
                 #print "head"
                 #self.replace_unbound_variables(update.unbound_assignment)

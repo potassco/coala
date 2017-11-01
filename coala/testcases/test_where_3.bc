@@ -1,0 +1,9 @@
+fluent a=1..10.
+fluent b=5..20.
+
+action arg.
+inertial a,b.
+
+a=X if b=X where X=0..25.
+% 10*10 + 6 states
+% 2* transitions

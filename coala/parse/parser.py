@@ -44,7 +44,7 @@ class Parser(object):
 	my_lines = []
 	meta_info = None
 	
-	debug = False
+	debug = True #False
 	
 	start = 'program'
 	
@@ -578,7 +578,7 @@ class Parser(object):
 		if len(t) == 5:
 			t[0] = ps.atom_list(t[2],t[4])
 		elif len(t) == 3:
-			t[0] = None
+			t[0] = ps.atom_list(t[2][0],t[2][1])
 		else: 
 			t[0] = None
 		
