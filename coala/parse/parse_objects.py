@@ -458,7 +458,21 @@ class atom_list(parse_object):
         for i in range(len(self.content)):
             self.content[i] = self.content[i].replace_unbound_variables(assignm,negate)
         return self
-
+    
+class value_range(parse_object):
+    def __init__(self,lower,upper):
+        self.lower = lower
+        self.upper = upper
+        try:
+            lo = int(str(self.lower))
+            up = int(str(self.upper))
+            self.content = range(lo,up+1)
+        except:
+            self.content = [self.lower,self.upper]
+        
+    def __iter__(self):
+        return iter(self.content)
+        
 class rule(parse_object):
     pass
 
@@ -482,11 +496,23 @@ class law(rule):
                 my_vars = self.get_variables()
                 if len(my_vars) > 0:
                     return (self,my_vars)
+#         def criteria(self): 
+#             if type(self) == equation: 
+#                 if self.right is not None:
+#                     if type(self.right) == str: #starts capital?
+#                         return (self,[self.right,]) ## VAR!
+#                     my_vars = self.right.get_variables()
+#                     if type(my_vars) == list:
+#                         if len(my_vars) > 0:
+#                             return (self,my_vars)
+#                     elif my_vars is not None:
+#                         return (self,[my_vars,])
         var = self.search_and_return(criteria) #get_variables()
         bound_vars = self.get_explicitly_bound_variables()
         for (equ,va) in var:
             if update.where_variables is None:
                 update.where_variables = atom_list()
+            #one_not_found = True
             one_not_found = False
             for v in va:
                 found = False
@@ -545,7 +571,12 @@ class law(rule):
 #                                     print "type:",self.type
                         #end check
                         if additional_law is not None:
-                            self.where.append(additional_law)
+                            old_found=False
+                            for old in self.where:
+                                if additional_law.compare_to(old):
+                                    old_found=True
+                                    break
+                            if not old_found: self.where.append(additional_law)
                     else:
                         raise NameError("Unbound Variable cannot be fixed, not bound in equation!")
                 else:
@@ -907,6 +938,8 @@ class false_atom(parse_object):
         parse_object.__init__(self)
     def typestr(self):
         return "FALSE"
+    def __str__(self):
+        return "FALSE"
     def is_false(self):
         return True
       
@@ -1003,24 +1036,26 @@ class fluent_fact(fact):
         result = []
         wh = self.get_where()
         for x in self.head:
-            do = x.get_fluents_domains()
-            for d in do:
-                if wh is not None: d.where = wh
-                else: wh = d.where
-                if self.dotted_domain is not None:
-                    (lo,up) = self.dotted_domain
-                    dotted = asp_dotted_fact("_Value",lo,up)
-                    if wh is not None:
-                            wh.append(dotted)
-                    else:
-                        wh = atom_list(dotted)
-                    result.append(domain(d.fluent, "_Value", wh))
-                elif self.multivalued is not None:
-                    #if d.values == None: self.multivalued.append(d.values)
-                    for x in self.multivalued:
-                        result.append(domain(d.fluent, x, wh))
+            
+            if self.dotted_domain is not None:
+                (lo,up) = self.dotted_domain
+                dotted = asp_dotted_fact("_Value",lo,up)
+                if wh is not None:
+                        wh.append(dotted)
                 else:
-                    result.append(d)
+                    wh = atom_list(dotted)
+                result.append(domain(x.content, "_Value", wh))
+            else:
+                do = x.get_fluents_domains()
+                for d in do:
+                    if wh is not None: d.where = wh
+                    else: wh = d.where
+                    if self.multivalued is not None:
+                        #if d.values == None: self.multivalued.append(d.values)
+                        for x in self.multivalued:
+                            result.append(domain(d.fluent, x, wh))
+                    else:
+                        result.append(d)
         return result
         self.type = "fluent" 
         return [domain(self,None),]

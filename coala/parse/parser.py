@@ -44,7 +44,7 @@ class Parser(object):
 	my_lines = []
 	meta_info = None
 	
-	debug = True #False
+	debug = False
 	
 	start = 'program'
 	
@@ -61,7 +61,11 @@ class Parser(object):
 			self.data['others'].append(ps.asp_code(str(t[1])[5:-6]))
 		elif len(t) == 3:
 			if not t[1] is None:
-				self.data[t[1].get_law_type()].append(t[1])
+				if type(t[1])==list:
+					for x in t[1]:
+						self.data[x.get_law_type()].append(x)
+				else:
+					self.data[t[1].get_law_type()].append(t[1])
 		elif len(t) == 4: 
 			name = str(t[1])[5:-1].lstrip()
 			index = name.find("(")
@@ -119,7 +123,6 @@ class Parser(object):
 		''' fact : pred_fact
 				| act_fact 
 				| flu_fact '''
-		#		| int_fact
 		t[0] = t[1]		
 
 	def p_law(self,t):
@@ -134,8 +137,6 @@ class Parser(object):
 	
 	def p_visible_law(self,t):
 		''' visible_law : VISIBLE fluent_formula if_part where_part '''
-#				| VISIBLE fluent_formula after_part where_part '''
-		# TODO: is t[2], t[3] or t[4] false? Then ignore this law!
 		line,filename=self.get_meta(t.lineno(1))
 		t[0] = ps.visible_law(t[2],t[3],t[4],line=line,filename=filename)			
 	
@@ -156,86 +157,39 @@ class Parser(object):
 		line,filename=self.get_meta(t.lineno(1))
 		t[0] = ps.action_fact(t[2],t[3],line=line,filename=filename)
 		
-# 	def p_int_fact(self,t): # <action> a_1,...,a_n <where> bla.
-# 		''' int_fact :  INT fluent_formula int_domain where_part'''
-# 		line,filename=self.get_meta(t.lineno(1))
-# 		t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
-		
 	def p_flu_fact(self,t): # <fluent> f_1,...,f_n <where> bla.
 		''' flu_fact : FLU fluent_formula where_part
-					| defined_fluent fluent_formula where_part
-					| FLU term EQ dotted_numeric_bound where_part
-					| FLU fluent_formula int_domain where_part
-					| defined_fluent fluent_formula int_domain where_part
-					| INT fluent_formula where_part '''		
-#					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
-#					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
-#					| FLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
-#					| DFLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
-#					| FLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
-#					| DFLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
+					| INT fluent_formula where_part
+					| defined_fluent fluent_formula where_part '''		
 		line,filename=self.get_meta(t.lineno(1))
-		if len(t) == 4:
-			if t[1] == '<int>':
-				t[0] = ps.integer_fact(t[2],None,t[4],line=line,filename=filename)
-			elif t[1] not in ['<fluent>','fluent']:
-				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
-			else:
-				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
-		elif len(t) == 6: #8:
-			lower = t[4][0]
-			upper = t[4][1] #t[6]
-			if t[5] == None:
-				try:
-					ran = range(int(lower),int(upper)+1)
-				except:
-					ran = [lower,upper]
-				t[0] = ps.fluent_fact(ps.atom_list(t[2]),None,multivalued=ran,line=line,filename=filename)
-			else:
-				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[5],dotted_domain=(lower,upper),line=line,filename=filename)
-#		elif len(t) == 8:
-#			termlist = t[5]
-#			if t[1] not in ['<fluent>','fluent']:
-#				t[0] = ps.defined_fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
-#			else:
-#				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
+		if t[1] == '<int>':
+			t[0] = ps.integer_fact(t[2],None,t[4],line=line,filename=filename)
+		elif t[1] not in ['<fluent>','fluent']:
+			t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 		else:
-			#if t[1] not in ['<fluent>','fluent']:
-			#	t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
-			#else:
-				t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
-				
-#	def p_flu_fact(self,t): # <fluent> f_1,...,f_n <where> bla.
-# 		''' flu_fact : FLU fluent_formula where_part
-# 					| DFLU fluent_formula where_part
-# 					| FLU fluent_formula int_domain where_part
-# 					| DFLU fluent_formula int_domain where_part
-# 					| FLU term EQ LBRAC term_number_list_two RBRAC where_part
-# 					| DFLU term EQ LBRAC term_number_list_two RBRAC where_part
-# 					| INT fluent_formula where_part '''		
-# #					| FLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
-# #					| DFLU fluent_list EQ LBRAC term COMMA term_list RBRAC where_part
-# #					| FLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
-# #					| DFLU fluent EQ LBRAC term COMMA term_list RBRAC where_part
-# 		line,filename=self.get_meta(t.lineno(1))
-# 		if len(t) == 4:
-# 			if t[1] == '<int>':
-# 				t[0] = ps.integer_fact(t[2],None,t[4],line=line,filename=filename)
-# 			elif t[1] not in ['<fluent>','fluent']:
-# 				t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
-# 			else:
-# 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
-# 		elif len(t) == 8:
-# 			termlist = t[5]
-# 			if t[1] not in ['<fluent>','fluent']:
-# 				t[0] = ps.defined_fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
-# 			else:
-# 				t[0] = ps.fluent_fact(ps.atom_list(t[2]),t[7],multivalued=termlist,line=line,filename=filename)
-# 		else:
-# 			#if t[1] not in ['<fluent>','fluent']:
-# 			#	t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
-# 			#else:
-# 				t[0] = ps.integer_fact(t[2],t[3],t[4],line=line,filename=filename)
+			if type(t[2]) == ps.atom_list:
+				others = []
+				regular = []
+				for x in t[2]:
+					
+					if type(x) == ps.fluent_multival and \
+					type(x.multidomain)==ps.value_range and len(x.multidomain.content) == 2:
+						lower = x.multidomain.content[0]
+						upper = x.multidomain.content[1]
+						others.append(ps.fluent_fact(ps.atom_list(x),t[3],dotted_domain=(lower,upper),line=line,filename=filename))
+					else:
+						regular.append(x)
+				if len(others) > 0:
+					if len(regular)+len(others)>1:
+						t[0] = ps.atom_list(regular,others)
+					else:
+						t[0] = others[0]
+				else:
+					t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
+			else:
+				#print "Do WE even get here? <-- NO."
+				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
+		
 		
 	def p_defined_fluent(self,t):
 		'''defined_fluent : DFLU
@@ -259,9 +213,6 @@ class Parser(object):
 		''' dynamic_law : formula after_part ifcons_part where_part
 					| formula CAUSES formula where_part
 					| formula CAUSES formula IF formula where_part'''
-#		 ''' dynamic_law : formula after_part ifcons_part where_part
-#					 | formula CAUSES formula where_part
-#					 | formula CAUSES formula IF formula where_part'''
 		line,filename=self.get_meta(t.lineno(1))
 		if t[2] in ['<causes>','causes']:
 			if len(t) == 5: 
@@ -341,7 +292,7 @@ class Parser(object):
 		
 ##########################
 
-	def p_if_part(self,t):
+	def p_if_part(self,t): # If parts can be empty
 		''' if_part : 
 					| IF formula '''
 		if len(t) == 3:
@@ -350,18 +301,16 @@ class Parser(object):
 			else: t[0] = t[2]
 		else: t[0] = None
 
-	def p_after_part(self,t):
+	def p_after_part(self,t): # After parts canNOT be empty (dynamic laws are static laws without)
 		''' after_part : AFTER formula '''
-		if t[2].is_false(): t[0] = t[2]
-		elif len(t[2]) == 0: t[0] = None #TODO: is this required?
+		if len(t[2]) == 0: t[0] = None
 		else: t[0] = t[2]
 
-	def p_ifcons_part(self,t):
+	def p_ifcons_part(self,t): # Ifcons parts can be empty
 		''' ifcons_part : 
 					| IFCONS formula '''
 		if len(t) == 3: 
-			if t[2].is_false(): t[0] = t[2]
-			elif len(t[2]) == 0: t[0] = None #TODO: is this required?
+			if type(t[2]) == ps.atom_list and len(t[2]) == 0: t[0] = None
 			else: t[0] = t[2]
 		else: t[0] = None
 
@@ -369,7 +318,7 @@ class Parser(object):
 		''' where_part : 
 					| WHERE bindings '''
 		if len(t) == 3: t[0] = t[2]
-		else: t[0] = None #[]
+		else: t[0] = None
 		
 	def p_bindings(self,t):
 		''' bindings : binding
@@ -382,41 +331,38 @@ class Parser(object):
 		
 	def p_binding(self,t):
 		''' binding : ACT term
-					| FLU term equalpart
-					| term_boolean
- 					| variable EQ dotted_numeric_bound'''
-#####					| ARITH asp_arith'''		
-#					| NOT asp_term
-####		#			| MINUS fluent'''
-		#			| MINUS asp_term # Some things should not happen - 1==1
+					| FLU term_equalpart
+					| term_boolean'''
 		if len(t) == 2: 
 			t[0] = t[1] #ps.predicate(t[1],None)
 		elif t[1] in ['<action>','action']:
 			t[0] = ps.action(t[2])
-##		elif t[1] in ('not','-'):
-##			t[0] = ps.negation(t[2]) #ps.predicate(ps.negation(t[2]))
-#		elif t[1] in ['<arith>','arith']:
-#			#t[0] = ps.action(t[2])
-#			t[0] = t[2]
-#			t[0].is_arithmetic_helper = True
 		elif t[1] in ['<fluent>','fluent']:
-		#else:
-			t[0] = ps.fluent(t[2],t[3])
- 		else:
- 			t[0] = ps.asp_dotted_fact(t[1],t[3][0],t[3][1]) #ps.equation(t[1],t[3])
+			if type(t[2]) == ps.fluent_multival:
+				t[0] = ps.fluent(t[2].content,t[2].multidomain)
+			elif type(t[2]) == ps.equation:
+				t[0] = ps.fluent(t[2].left,t[2].right)
+			else:
+				t[0] = ps.fluent(t[2])
 			
- 	def p_dotted_numeric_bound(self,t):
- 		''' dotted_numeric_bound : term_numeric DDOT term_numeric'''
- 		t[0] = [t[1],t[3]]
-		
-			
-	def p_equalpart(self,t):
-		''' equalpart : 
-					| EQ term_numeric'''
-		if len(t) == 3: 
-			t[0] = t[2]
-		else: 
-			t[0] = None
+	def p_term_equalpart(self,t):
+		''' term_equalpart : term
+					| term EQ term_numeric
+					| term EQ LBRAC term_number_list RBRAC
+					| term EQ term_numeric DDOT term_numeric
+					| term COLON term_numeric DDOT term_numeric
+					| term COLON LBRAC term_numeric DDOT term_numeric RBRAC '''
+		if len(t) == 2: 
+			t[0] = t[1]
+		elif len(t) == 4: 
+			t[0] = ps.equation(t[1],t[3])
+		elif len(t) == 6:
+			if t[4] == "..":
+				t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
+			else:
+				t[0] = ps.fluent_multival(t[1],t[4])
+		elif len(t) == 8:
+			t[0] = ps.fluent_multival(t[1],ps.value_range(t[4],t[6]))
 			
 ##########################
 
@@ -435,48 +381,16 @@ class Parser(object):
 			elif t[1].is_false(): t[0] = t[1]
 			else: t[0] = ps.atom_list(t[1])
 
-# 	def p_fluent_formula(self,t):
-# 		''' fluent_formula : term_boolean 
-# 					| term_boolean COMMA fluent_formula '''
-# 		if len(t) == 4:
-# 			if t[1] is None: t[0] = t[3]
-# 			elif t[1].is_false(): t[0] = t[1]
-# 			elif t[3].is_false(): t[0] = t[3]
-# 			else:
-# 				t[3].combine(t[1])
-# 				t[0] = t[3]
-# 		else:
-# 			if t[1] is None: t[0] = ps.atom_list()
-# 			elif t[1].is_false(): t[0] = t[1]
-# 			else: t[0] = ps.atom_list(t[1])
 
 	def p_fluent_formula(self,t): # f_1,...,f_n
-		''' fluent_formula : term equalpart
-					| term equalpart COMMA fluent_formula
-					| term EQ LBRAC term_number_list_two RBRAC 
-					| term EQ LBRAC term_number_list_two RBRAC COMMA fluent_formula'''
-		if len(t) == 5: 
-			if t[2] == None: 
-				t[4].append(t[1])
-				t[0] = t[4]
-			else: 
-				t[4].append(ps.equation(t[1],t[2]))
-				t[0] = t[4]
-		elif len(t) == 3: 
-			if t[2] == None: 
-				t[0] = ps.atom_list(t[1])
-			else: 
-				t[0] = ps.atom_list(ps.equation(t[1],t[2]))
-		elif len(t) == 6:
-			t[0] = ps.atom_list(ps.fluent_multival(t[1],t[4]))
+		''' fluent_formula : term_equalpart
+					| term_equalpart COMMA fluent_formula'''
+		if len(t) == 4:
+			t[3].append(t[1])
+			t[0] = t[3]
 		else:
-			t[7].append(ps.fluent_multival(t[1],t[4]))
-			t[0] = t[7]
-
-	def p_term_number_list_two(self,t):
-		''' term_number_list_two : term_numeric COMMA term_number_list '''
-		t[3].combine(t[1],reverse=True)
-		t[0] = t[3]
+			t[0] = ps.atom_list(t[1])
+		
 			
 	def p_term_number_list(self,t):
 		''' term_number_list : term_numeric
@@ -491,35 +405,13 @@ class Parser(object):
 		''' term_boolean : term 
 					| NOT term
 					| MINUS term
-					| asp_term
-					| TRUE 
-					| FALSE '''
+					| asp_term '''
 		if len(t) == 3:
 			t[0] = ps.negation(t[2])
 		else:
 			if t[1] in ["true","<true>"]: t[0] = None #ps.atom_list()
 			elif t[1] in ["false","<false>"]: t[0] = ps.false_atom()
 			else: t[0] = t[1]
-
-# 	def p_term_boolean(self,t):
-# 		''' term_boolean : term_negated
-# 					| asp_term
-# 					| TRUE 
-# 					| FALSE '''
-# 		if t[1] == "<true>": t[0] = None #ps.atom_list()
-# 		elif t[1] == "<false>": t[0] = ps.false_atom()
-# 		else: t[0] = t[1]
-
-# 	def p_term_negated(self,t):
-# 		''' term_negated : term equalpart
-# 					| NOT term equalpart
-# 					| MINUS term equalpart '''
-# 		if len(t) == 3:
-# 			if t[2] is not None: t[0] = ps.equation(t[1],t[2])
-# 			else: t[0] = t[1]
-# 		else: 
-# 			if t[3] is not None: t[0] = ps.negation(ps.equation(t[2],t[3]))
-# 			else: t[0] = ps.negation(t[2])
 
 	def p_term_numeric(self,t):
 		''' term_numeric : term
@@ -559,28 +451,11 @@ class Parser(object):
 					| TRUE
 					| FALSE '''
 		if len(t) == 2:
-			t[0] = ps.unknown(t[1])
+			if t[1] in ["true","<true>"]: t[0] = t[1] #ps.unknown("true")
+			elif t[1] in ["false","<false>"]: t[0] = t[1] #ps.false_atom() #unknown("false")
+			else: t[0] = ps.unknown(t[1])
 		else:
-			if t[1] in ["true","<true>"]: t[0] = ps.unknown("true")
-			elif t[1] in ["false","<false>"]: t[0] = ps.unknown("false")
-			else: t[0] = ps.unknown(t[1],apostroph=True)
-		
-	def p_int_domain(self,t):
-		''' int_domain : COLON dotted_numeric_bound
-				| COLON INT '''
-		#''' int_domain : 
-		#		| COLON term DDOT term 
-		#		| COLON INT '''
-		#		| COLON term
-		#if len(t) == 3:
-		#	t[0] = t[2]
-		#el
-		if len(t) == 5:
-			t[0] = ps.atom_list(t[2],t[4])
-		elif len(t) == 3:
-			t[0] = ps.atom_list(t[2][0],t[2][1])
-		else: 
-			t[0] = None
+			t[0] = ps.unknown(t[1],apostroph=True)
 		
 #################
 #expr --> expr + term | term
@@ -591,23 +466,27 @@ class Parser(object):
 #################
 
 	def p_asp_term(self,t):
-		#''' asp_term : asp_operation
-		''' asp_term : term ASSIGN asp_operation
-					| term PLUSEQ asp_operation
-					| term MINUSEQ asp_operation
-					| asp_arith '''
-#					| MINUS term
-#					| NOT term
-		if len(t) == 2:
-			t[0] = t[1]
-		elif t[2] == ":=":
-			t[0] = ps.assignment(t[1],t[3])
-		elif t[2] == "+=":
-			t[0] = ps.incremental_assignment(t[1],t[3])
-		elif t[2] == "-=":
-			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
-#	else:
-#		t[0] = t[1]
+		''' asp_term : asp_arith '''
+		t[0] = t[1]
+
+# 	def p_asp_term(self,t):
+# 		#''' asp_term : asp_operation
+# 		''' asp_term : term ASSIGN asp_operation
+# 					| term PLUSEQ asp_operation
+# 					| term MINUSEQ asp_operation
+# 					| asp_arith '''
+# #					| MINUS term
+# #					| NOT term
+# 		if len(t) == 2:
+# 			t[0] = t[1]
+# 		elif t[2] == ":=":
+# 			t[0] = ps.assignment(t[1],t[3])
+# 		elif t[2] == "+=":
+# 			t[0] = ps.incremental_assignment(t[1],t[3])
+# 		elif t[2] == "-=":
+# 			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
+##	else:
+##		t[0] = t[1]
 			
 	def p_asp_arith(self,t):
 		''' asp_arith : asp_operation asp_eqoperator asp_operation '''
@@ -620,13 +499,17 @@ class Parser(object):
 							| LT 
 							| GT 
 							| LE 
-							| GE '''
+							| GE 
+							| ASSIGN
+							| PLUSEQ
+							| MINUSEQ '''
 		t[0] = t[1]
 
 	def p_asp_operation(self,t):
 		''' asp_operation : asp_mult_operation
 						| asp_operation PLUS asp_mult_operation
-						| asp_operation MINUS asp_mult_operation '''
+						| asp_operation MINUS asp_mult_operation
+						| term_numeric DDOT term_numeric '''
 		if len(t) == 2:
 			t[0] = t[1]
 		else: 

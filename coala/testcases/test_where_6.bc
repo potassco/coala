@@ -1,0 +1,11 @@
+fluent plan(1)=1..10.
+fluent plan(2)=(1,16,14).
+
+<asp>p(5..20).b(10..18).</asp>
+
+inertial plan(X) where X=1..2.
+
+plan(1)=X if plan(2)=Y where p(X), b(Y), X*2=Y.
+
+% 10+2 states
+% 0 transitions
