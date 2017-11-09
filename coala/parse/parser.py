@@ -61,7 +61,7 @@ class Parser(object):
 			self.data['others'].append(ps.asp_code(str(t[1])[5:-6]))
 		elif len(t) == 3:
 			if not t[1] is None:
-				if type(t[1])==list:
+				if type(t[1])==list or type(t[1])==ps.atom_list:
 					for x in t[1]:
 						self.data[x.get_law_type()].append(x)
 				else:
@@ -163,25 +163,54 @@ class Parser(object):
 					| defined_fluent fluent_formula where_part '''		
 		line,filename=self.get_meta(t.lineno(1))
 		if t[1] == '<int>':
-			t[0] = ps.integer_fact(t[2],None,t[4],line=line,filename=filename)
+			stuff = []
+			if type(t[2]) == ps.atom_list:
+				for x in t[2]:
+					if type(x) == ps.fluent_multival:
+						if type(x.multidomain) == list:
+							int_dom = ps.atom_list(x.multidomain)
+						else:
+							int_dom = x.multidomain
+						
+						#stuff.append(x.content)
+						stuff.append(ps.integer_fact(ps.atom_list(x.content),int_dom,t[3],line=line,filename=filename))
+					else:
+						stuff.append(ps.integer_fact(ps.atom_list(x),None,t[3],line=line,filename=filename))
+				#t[0] = ps.integer_fact(ps.atom_list(stuff),None,t[3],line=line,filename=filename)
+				t[0] = ps.atom_list(stuff)
+			else:
+				t[0] = ps.integer_fact(ps.atom_list(t[2]),None,t[3],line=line,filename=filename)
 		elif t[1] not in ['<fluent>','fluent']:
 			t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 		else:
-			if type(t[2]) == ps.atom_list:
+			if type(t[2]) == ps.atom_list: # Get integer fluent declarations
 				others = []
 				regular = []
-				for x in t[2]:
-					
-					if type(x) == ps.fluent_multival and \
-					type(x.multidomain)==ps.value_range and len(x.multidomain.content) == 2:
-						lower = x.multidomain.content[0]
-						upper = x.multidomain.content[1]
-						others.append(ps.fluent_fact(ps.atom_list(x),t[3],dotted_domain=(lower,upper),line=line,filename=filename))
+				for x in t[2]: # This happens if integer and non_integers are mixed in one declaration.
+					if type(x) == ps.fluent_multival:
+						if type(x.multidomain) == list:
+							if x.is_int:
+								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(x.multidomain),t[3],line=line,filename=filename))
+							else:
+								regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))						 
+						elif type(x.multidomain)==ps.value_range and len(x.multidomain.content) == 2:
+							lower = x.multidomain.content[0]
+							upper = x.multidomain.content[1]
+							if x.is_int:
+								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(lower,upper),t[3],line=line,filename=filename))
+							else:
+								others.append(ps.fluent_fact(ps.atom_list(x),t[3],dotted_domain=(lower,upper),line=line,filename=filename))
+						else:
+							regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
 					else:
-						regular.append(x)
+						regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
 				if len(others) > 0:
 					if len(regular)+len(others)>1:
-						t[0] = ps.atom_list(regular,others)
+						if len(others) == 1:
+							int_dom=others[0].domain
+							t[0] = ps.integer_fact(t[2],int_dom,t[3],line=line,filename=filename)								
+						else:
+							t[0] = ps.atom_list(regular,others)
 					else:
 						t[0] = others[0]
 				else:
@@ -358,11 +387,14 @@ class Parser(object):
 			t[0] = ps.equation(t[1],t[3])
 		elif len(t) == 6:
 			if t[4] == "..":
-				t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
+				if t[2]==":":
+					t[0] = ps.fluent_multival(t[1],[t[3],t[5]],int_operator=True)
+				else:
+					t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
 			else:
 				t[0] = ps.fluent_multival(t[1],t[4])
 		elif len(t) == 8:
-			t[0] = ps.fluent_multival(t[1],ps.value_range(t[4],t[6]))
+			t[0] = ps.fluent_multival(t[1],multidomain=ps.value_range(t[4],t[6]),int_operator=True)
 			
 ##########################
 
@@ -466,31 +498,15 @@ class Parser(object):
 #################
 
 	def p_asp_term(self,t):
-		''' asp_term : asp_arith '''
-		t[0] = t[1]
-
-# 	def p_asp_term(self,t):
-# 		#''' asp_term : asp_operation
-# 		''' asp_term : term ASSIGN asp_operation
-# 					| term PLUSEQ asp_operation
-# 					| term MINUSEQ asp_operation
-# 					| asp_arith '''
-# #					| MINUS term
-# #					| NOT term
-# 		if len(t) == 2:
-# 			t[0] = t[1]
-# 		elif t[2] == ":=":
-# 			t[0] = ps.assignment(t[1],t[3])
-# 		elif t[2] == "+=":
-# 			t[0] = ps.incremental_assignment(t[1],t[3])
-# 		elif t[2] == "-=":
-# 			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
-##	else:
-##		t[0] = t[1]
-			
-	def p_asp_arith(self,t):
-		''' asp_arith : asp_operation asp_eqoperator asp_operation '''
-		t[0] = ps.equation(t[1],t[3],operator=t[2])
+		''' asp_term : asp_operation asp_eqoperator asp_operation '''
+		if t[2] == ":=":
+			t[0] = ps.assignment(t[1],t[3])
+		elif t[2] == "+=":
+			t[0] = ps.incremental_assignment(t[1],t[3])
+		elif t[2] == "-=":
+			t[0] = ps.incremental_assignment(t[1],t[3],negated=True)
+		else:
+			t[0] = ps.equation(t[1],t[3],operator=t[2])
 			
 	def p_asp_eqoperator(self,t):
 		''' asp_eqoperator : EQQ

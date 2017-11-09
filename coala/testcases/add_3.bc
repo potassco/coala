@@ -1,4 +1,5 @@
-fluent x : <int>. %0..20.
+%fluent x : <int>. %0..20.
+<int> x.
 action a,b,c.
 
 %inertial x.

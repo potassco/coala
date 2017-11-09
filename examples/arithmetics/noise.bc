@@ -5,7 +5,7 @@ fluent pain:0..10.
 action call.
 
 inertial noise. % your neighbors
-noise:=noise+2 after noise<20 ifcons -police.
+noise:=noise'+2 after noise<20 ifcons -police.
 noise:=0 if police.
 
 pain:=0 if noise<10. % yourself

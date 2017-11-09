@@ -68,6 +68,7 @@ class Lexer(object):
 		'action':'ACT',
 		'fluent':'FLU',
 		'where':'WHERE',
+#		'int':'INT',
 #		'arith':'ARITH',
 		'initially':'INIT',
 		'definedfluent':'DFLU',

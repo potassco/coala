@@ -1322,9 +1322,10 @@ class fluent(parse_object):
         return [self,]
 
 class fluent_multival(fluent): #TODO: Clean this one up; It should have another parent class
-    def __init__(self, content, multidomain=None):
+    def __init__(self, content, multidomain=None, int_operator=False):
         fluent.__init__(self, content, None)
         self.multidomain = multidomain
+        self.is_int = int_operator
  
     def get_fluents_domains(self):
         result = []
@@ -2373,9 +2374,9 @@ class operation(parse_object):
             unkn = l.unknown or r.unknown or len(l.variables) > 0 or len(r.variables) > 0
             
             helper_elements = [variable]
-            if l.unknown: helper_elements += [lunknown]
+            if l.unknown and lunknown is not None: helper_elements += [lunknown]
             helper_elements += [str(int(factor))]
-            if r.unknown: helper_elements += [runknown]
+            if r.unknown and runknown  is not None: helper_elements += [runknown]
             
             # hlp = "_division_helper("+",".join(helper_elements)+")" # Clingcon does not like _
             hlp = "division_helper("+",".join(helper_elements)+")"
