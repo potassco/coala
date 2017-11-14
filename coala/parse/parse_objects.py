@@ -26,6 +26,11 @@ where_replacemant_arithmetics = True
 # 4. Simplify the tree (some laws can be reduced if there is no information; This is needed for arithmetic laws)
 #    - This works as a reconstruction of the tree
 # 5. Generate ASP code (this uses the print_facts() function)
+#
+# All classes here have "parse_object" as parent,
+# All laws additionally have "law" as parent
+#
+# There is a update function in parse_object that changes how objects will be printed.
 
 class parse_object(object):
     
@@ -512,19 +517,19 @@ class law(rule):
         for (equ,va) in var:
             if update.where_variables is None:
                 update.where_variables = atom_list()
-            #one_not_found = True
-            one_not_found = False
-            for v in va:
-                found = False
-                for bv in bound_vars:
-                    if bv.compare_to(v):
-                        found=True
-                        break
-                if not found: 
-                    one_not_found = True
-                    update.where_variables.append(str(v))
-                    if not str(v) in self.variables: 
-                        self.variables.append(str(v))
+            one_not_found = True
+#             one_not_found = False
+#             for v in va:
+#                 found = False
+#                 for bv in bound_vars:
+#                     if str(v) == str(bv): #bv.compare_to(v):
+#                         found=True
+#                         break
+#                 if not found: 
+#                     one_not_found = True
+#                     update.where_variables.append(str(v))
+#                     if not str(v) in self.variables: 
+#                         self.variables.append(str(v))
             
             if one_not_found:
                 
@@ -1031,6 +1036,9 @@ class fluent_fact(fact):
 #     def get_fluents(self,simple=True):
 #         if type(self.head) == str: return self.head
 #         else: return self.head.get_fluents(simple)
+
+    def pass_down_update_overwrite(self, update):
+        self.law_id = update.idfunction()
 
     def get_fluents_domains(self): 
         result = []
