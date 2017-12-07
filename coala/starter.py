@@ -24,7 +24,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.451"
+version = "2.452"
 
 
 try:
@@ -150,6 +150,7 @@ def usage():
 	print "\t--ignore_undefined, -u\tTranslation ignore Errors due to undefined fluents or actions"
 	print "\t--verbose\tPrint some additional output"
 	print "\t--silent, -s\tPrint no output"
+	print "\t--arith, -a\tPrint no output"
 	#print "\t--tau, -y\tUse tau function; This adds abnormalities to each static law"
 	#print "\t--beta, -b\tUse beta function; This adds abnormalities to each dynamic law"
 	
@@ -365,12 +366,12 @@ def main(argv):
 		usage()
 		sys.exit(0)
 	try:                                
-		opts, args = getopt.getopt(argv, "hsm:l:o:iuz:dpbynr:c:x", ["help", "mode=", "language=", \
+		opts, args = getopt.getopt(argv, "hsm:l:o:iuz:dpbynr:c:xa", ["help", "mode=", "language=", \
 			"output_file=","outputfile=","debug", "not_decoupled", "not_decouple", \
 			"write_file=","ignore_errors","verbose","silent","ignore_undefined" \
 			"encoding_s=","encoding_t=","encoding_i=","encoding_f=","max_horizon=", \
 			"beta","tau","encoding_non_internal=","eni=","encoding_non_internal_transl=", \
-			"enit=","old_arithmetics"])
+			"enit=","old_arithmetics","arith"])
 	except getopt.GetoptError:          
 		usage()                         
 		sys.exit(2)
@@ -453,7 +454,9 @@ def main(argv):
 			coala.parse.parse_objects.old_arithmetics = True
 		elif opt == "-x":
 			coala.parse.parse_objects.additional_ifcons_facts = True
-	
+		elif opt in ("-a","--arith"):
+			coala.parse.parse_objects.clingcon_arithmetic = True
+			
 	if len(args) > 0:
 		input_fi = args
 	elif mode not in ("testcases","test","testencodings"):

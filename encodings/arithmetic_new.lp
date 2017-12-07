@@ -50,7 +50,7 @@ arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,F),
 % Initial values are assumed to be assigned for the initial step
 assigned(V,0) :- integer(V), step(0).
 
-% Handle inertial laws (domain/2 doesn't exist for integers)
+% Handle inertial laws (domain/2 doesn't exist integers)
 assigned(V,T) :- integer(V), inertial(V),
     &sum{val(V,T); -K*val(C,T):arithmetic_head(I,C,K,_),arithmetic_additive_fluent(I,V)} = val(V,T-1), 
     step(T), step(T-1). % Includes increment helpers!
@@ -76,7 +76,9 @@ assigned(V,T) :- integer(V), arithmetic_head(L,V,_,_),
 
 % Collect assigned atoms
 allassigned(L,T) :- arithmetic_law(L,_),
-    assigned(V,T) : arithmetic(L,V,_,_,_), integer(V);  
+%    assigned(V,T) : arithmetic(L,V,_,_,_), integer(V);
+    assigned(V,T) : arithmetic(L,V,C,ID,_), integer(V), not arithmetic_ifcons(L,V,C,ID);
+    not not assigned(V,T) : arithmetic(L,V,C,ID,_), integer(V), arithmetic_ifcons(L,V,C,ID);        
     step(T).
 
 allassigned_head(L,T) :- arithmetic_law(L,_),
@@ -84,6 +86,7 @@ allassigned_head(L,T) :- arithmetic_law(L,_),
     step(T).
 
 allassigned(L,T) :- arithmetic_law(L,_), ifcons(_,_arithmetic(L)), 
+%    not not assigned(V,T) : arithmetic(L,V,C,ID,_), integer(V), not arithmetic_ifcons(L,V,C,ID);  
     not not assigned(V,T) : arithmetic(L,V,_,_,_), integer(V);  
     step(T).
 

@@ -17,8 +17,9 @@ holds(H,T) :- static_law(I), head(I,H),
         not not holds(F,T) : ifcons(I,F); 
         step(T).
 
-% Dynamic laws
+% Dynamic laws % Added If part for arithmetic laws and others!
 holds(H,T) :- dynamic_law(I), head(I,H), 
+        holds(F,T) : if(I,F), atom(F); 
         holds(F,T-1) : after(I,F), atom(F); 
         occurs(A,T-1) : after(I,A), action(A); 
         #false : after(I,F), not atom(F), not action(F);

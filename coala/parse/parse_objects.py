@@ -9,8 +9,7 @@ import sys
 
 old_arithmetics = False
 additional_ifcons_facts = False
-
-where_replacemant_arithmetics = True
+clingcon_arithmetic = False
 
 #
 # The following classes are used to represent the parse tree.
@@ -87,12 +86,12 @@ class parse_object(object):
     
     # Gets variables from the leafs of the tree
     # Is overwritten by classes: Variable
-    def get_variables(self):
+    def get_variables(self,checkbound=False):
         my_vars = []
         ch = self.get_children()
         for c in ch:
             if c is None or type(c) == str: continue
-            vs = c.get_variables()
+            vs = c.get_variables(checkbound)
             if type(vs) == list:
                 my_vars += vs
             else:
@@ -156,6 +155,32 @@ class parse_object(object):
                 result.append(res) 
         return result
     
+    def search_and_return_path(self,criteria):
+        result = []
+        check = criteria(self)
+        if check is not None:
+            return [[check,[(self,""),]],]
+        ch = self.get_children_dict()
+        for att in ch:
+            ix = ch[att]
+            if type(ix) != list:
+                ix = [ix,]
+            for x in ix:
+                if type(x) == str:
+                    continue
+                res = x.search_and_return_path(criteria)
+                if type(res) == list:
+                    for r in res:
+                        if len(r) == 2:
+                            r[1].insert(0,(self,att))
+                        result.append(r)
+                    #result += res
+                else:
+                    # error!
+                    res[1].insert(0,(self,att))
+                    result.append(res)
+        return result
+    
     # Prints the tree as ASP text.
     # This is used as the final translation.
     # Every class should overwrite this.
@@ -179,8 +204,8 @@ class parse_object(object):
     # Get the context so that we can integrate it somewhere.
     # Every class should overwrite this.
     def compile_where_single(self):
-        print  >> sys.stderr, "ERROR, not implemented compile_where_single for", self.__class__
-        errout.error("ERROR, not implemented compile_where_single for"+str(self.__class__))
+        print  >> sys.stderr, "%ERROR, not implemented compile_where_single for", self.__class__
+        errout.error("%ERROR, not implemented compile_where_single for"+str(self.__class__))
         return self.print_facts()
     
     # If arithmetics are moved to the where part,
@@ -221,12 +246,77 @@ class parse_object(object):
     # and there are some classes that wil overwrite this one as well
     def pass_down_update(self,update):
         wh = self.get_where()
+        ch = self.get_children_dict()
+        
         if wh is not None:
+#             # First: Find backwards declared integer fluent Variables
+#             def subcrit(self,update): # Find int fluents in equations
+#                 if type(self) in [fluent,unknown,predicate]:
+#                     for inte in update.integer_ids:
+#                         if self.compare_to(inte):
+#                             return self
+#             def criteria(self,variab,update): # Find variable and get int flu
+#                 if type(self) == equation: 
+#                     my_vars = self.get_variables()
+#                     for mvar in my_vars:
+#                         if str(mvar) == str(variab):
+#                             match = self.search_and_return(lambda x: subcrit(x,update))
+#                             if match is not None:
+#                                 if len(match) == 1:
+#                                     return (match[0],variab,self)
+#                                 else:
+#                                     return (match,variab,self)
+#             pre_vars = wh.get_variables()
+#             #pre_vars_bound = wh.get_variables(checkbound=True)
+#             for v in pre_vars: 
+#                 #match = self.search_and_return(lambda x: criteria(x,v,update))
+#                 match = self.search_and_return_path(lambda x: criteria(x,v,update))
+#                 if match is not None:
+#                     update.add_indirectly_bound_integer_variable(match)
+#             # Now, update.get_int_for_indirectly_bound_variable can check if a variable is indir. bound to int
+                    
+            # Get Variables of Body and bound where
+            body_vars = self.get_variables()
+            where_vars = [str(x) for x in wh.get_variables(checkbound=True)]
+            # Remove duplicates?
+            
+            # Check if bound in where
+            unbound = []
+            for v in body_vars:
+                if str(v) not in where_vars:
+                    unbound.append(v)
+                    
+            def subcrit(self,update): # Find int fluents in equations
+                if type(self) in [fluent,unknown,predicate]:
+                    for inte in update.integer_ids:
+                        if self.compare_to(inte):
+                            return self
+            def criteria(self,variab,update): # Find variable and get int flu
+                if type(self) == equation: 
+                    my_vars = self.get_variables()
+                    for mvar in my_vars:
+                        if str(mvar) == str(variab):
+                            match = self.search_and_return(lambda x: subcrit(x,update))
+                            if match is not None and type(match) == list and len(match)>0:
+                                if len(match) == 1:
+                                    return (match[0],variab,self)
+                                else:
+                                    return (match,variab,self)
+            for v in unbound:
+                match = self.search_and_return_path(lambda x: criteria(x,v,update))
+                if match is not None:
+                    update.add_indirectly_bound_integer_variable(match)
+                    
             update.where_start(wh)
+            update.path_inc(self,"where")
             update.where_variables = wh.pass_down_update(update)
+            update.path_dec()
+            #update.where_variables = [str(x) for x in wh.get_variables(True)] 
+            #wh_vars = wh.pass_down_update(update) # Ignoring Return Variables!
+            #if wh_vars != update.where_variables:
+            #    print "unequal"
             update.where_end()                
                     
-        ch = self.get_children_dict()
         for kc in ch:
             c = ch[kc]
             update.path_inc(self,kc)
@@ -247,11 +337,21 @@ class parse_object(object):
     # After updating, some things might get simpified.
     # Normaly, an object returns itself.
     # In order to replace oneself in the tree, a class might return the replacement for itself instead.
-    def simplify(self,negation=False):
+    def simplify(self,negation=False,in_where=False):
         if negation:
             self.negation = not self.negation
             negation = False
-        for att in ["head","body","if_part","ifcons_part","after_part","content","left","right"]:
+        #,"where"]: #################################ADD THIS
+        for att in ["head","body","if_part","ifcons_part","after_part","content","left","right","where"]: #################################ADD THIS
+        #,"where"]: #################################ADD THIS
+        #,"where"]: #################################ADD THIS
+        #,"where"]: #################################ADD THIS
+        # Verschluckt aktuell "not" im where part!
+        # plan(X)=Y macht aus X einen integer!!!
+        #,"where"]: #################################ADD THIS
+        #,"where"]: #################################ADD THIS
+        #,"where"]: #################################ADD THIS
+            my_in_where = in_where or att == "where"
             if hasattr(self,att):
                 val = getattr(self,att)
                 if val is not None:
@@ -264,10 +364,10 @@ class parse_object(object):
                                 if type(v) == str: nval.append(v)
                                 else:
                                     if v.is_false(): return None 
-                                    simp = v.simplify(negation)
+                                    simp = v.simplify(negation,my_in_where)
                                     if simp is not None: nval.append(simp)
                         else:
-                            nval = val.simplify(negation)
+                            nval = val.simplify(negation,my_in_where)
                         setattr(self,att,nval)
         return self
     
@@ -430,7 +530,7 @@ class atom_list(parse_object):
         return self.variables
     
     
-#     def simplify(self,negation=False):
+#     def simplify(self,negation=False,in_where=False):
 #         if negation:
 #             self.negation = not self.negation
 #             negation = False
@@ -442,7 +542,7 @@ class atom_list(parse_object):
 #                 if type(v) == str: new_content.append(v)
 #                 elif v is not None:
 #                     if v.is_false(): return None 
-#                     simp = v.simplify(negation)
+#                     simp = v.simplify(negation,in_where)
 #                     if simp is not None: new_content.append(simp)
 #                 self.content = new_content
 #         if len(self.content) == 0:
@@ -486,6 +586,8 @@ class law(rule):
     def __init__(self):
         parse_object.__init__(self)
         self.law_type = None
+        self.other_conditions_if = atom_list()
+        self.other_conditions_head = atom_list()
         
     def add_part(self,part,law_position):
         print  >> sys.stderr, "ERROR, not implemented add_part for", self.__class__ 
@@ -496,6 +598,15 @@ class law(rule):
     # TODO : If there are integer vars, there should be a difference!
     def pass_down_update_overwrite(self, update):
         self.law_id = update.idfunction()
+        
+        #Creating arithmetic laws in the body
+        for (caller,replaced_law,replacement,law_part) in update.where_arithmetic:
+            if law_part == "head":
+                self.other_conditions_head.append(replacement)
+            else:
+                self.other_conditions_if.append(replacement)
+        
+        #Checking for variables in the body that are not bound and putting them into the where part
         def criteria(self): 
             if type(self) == equation: 
                 my_vars = self.get_variables()
@@ -665,7 +776,8 @@ class static_law(law): #static
         #Law
         result = [ "static_law("+myid+")"+wherepart+"." ]
         
-        stuff = [(self.head,"head"),(self.if_part,"if"),(self.ifcons_part,"ifcons")]
+        stuff = [(self.head,"head"),(self.if_part,"if"),(self.ifcons_part,"ifcons"), \
+            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -709,7 +821,8 @@ class dynamic_law(law): #dynamic
         #Law
         result = [ "dynamic_law("+myid+")"+wherepart+"." ]
         
-        stuff = [(self.head,"head"),(self.after_part,"after"),(self.ifcons_part,"ifcons")]
+        stuff = [(self.head,"head"),(self.after_part,"after"),(self.ifcons_part,"ifcons"), \
+            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -751,7 +864,8 @@ class nonexecutable_law(law): #nonexecutable
         #Law
         result = []
         
-        stuff = [(self.body,"nonexecutable"),(self.if_part,"nonexecutable"),(self.ifcons_part,"ifcons")]
+        stuff = [(self.body,"nonexecutable"),(self.if_part,"nonexecutable"),(self.ifcons_part,"ifcons"), \
+            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -762,8 +876,8 @@ class nonexecutable_law(law): #nonexecutable
                 result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
     
-    def simplify(self,negation=False):
-        res = parse_object.simplify(self, negation)
+    def simplify(self,negation=False,in_where=False):
+        res = parse_object.simplify(self, negation, in_where)
         if ((self.body is None) or (len(self.body)==0)) \
             and ((self.if_part is None) or (len(self.if_part)==0)) \
             and ((self.ifcons_part is None) or (len(self.ifcons_part)==0)):
@@ -799,7 +913,8 @@ class impossible_law(law): #impossible
         #Law
         result = []
         
-        stuff = [(self.body,"impossible"),(self.ifcons_part,"ifcons")]
+        stuff = [(self.body,"impossible"),(self.ifcons_part,"ifcons"), \
+            (self.other_conditions_if,"impossible"),(self.other_conditions_head,"impossible")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -834,7 +949,7 @@ class inertial_law(law): #inertial
         result = []
         
         children = self.head.get_children()
-        for ch in children:
+        for ch in children + self.other_conditions_if.get_children() + self.other_conditions_head.get_children():
             result += [ "inertial("+ch.print_facts()+")"+wherepart+"." ] #Note that prime=False
         return result
 
@@ -879,7 +994,8 @@ class default_law(law): #default
             return result
         
         
-        stuff = [(self.head,"default"),(self.if_part,"if"),(self.after_part,"after")]
+        stuff = [(self.head,"default"),(self.if_part,"if"),(self.after_part,"after"), \
+            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -921,7 +1037,8 @@ class visible_law(law): #visible
         #Law
         result = []
         
-        stuff = [(self.head,"visible"),(self.if_part,"if")]
+        stuff = [(self.head,"visible"),(self.if_part,"if"), \
+            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
         for st in stuff:
             current = st[0]
             if current is None:
@@ -1324,6 +1441,12 @@ class fluent(parse_object):
         if not update.where:
             print >> sys.stderr, "% Fluent "+str(self)+" can only appear in where parts!"
             errout.error("% Fluent "+str(self)+" can only appear in where parts!")
+        for x in update.integers:
+            if str(self.content) == str(x):
+                print >> sys.stderr, "% \"where fluent "+str(self)+"="+str(self.domainelement)+"\" is not supported for integer fluent "+str(self)+"."
+                errout.error("% \"where fluent "+str(self)+"="+str(self.domainelement)+"\" is not supported for integer fluent "+str(self)+".")
+                self.variables = []
+                return
         update.add_where_fluent(self.content)
     
     def get_bottom_elements(self):
@@ -1575,6 +1698,10 @@ class arithmetic_law(law): # Will be generated out of equations!
         return "["+str(self.head) + str(self.operator)+ \
             ("+".join(str(x) for x in self.body))+  "]"
     
+    
+    def typestr(self):#TODO: Why required??
+        return str(self)
+    
     def print_facts(self, prime=False):
         wherepart = self.compile_where()
         result = []
@@ -1600,7 +1727,10 @@ class arithmetic_law(law): # Will be generated out of equations!
                 result.append("arithmetic_head("+stid+","+e.print_facts()+")"+wherepart+".")
         else:
             for e in self.head:
-                result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
+                if e.law_part is not None: # CONDITION for part knowing it's timestep
+                    result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
+                else:
+                    result.append("arithmetic("+stid+","+e.print_facts()+",0)"+wherepart+".")
         
         if old_arithmetics: inverse_apostroph = not inverse_apostroph 
         # In old arithmetics, it was the other way...
@@ -1608,7 +1738,9 @@ class arithmetic_law(law): # Will be generated out of equations!
         
         for e in self.body:
             try:
-                if e.variable is None and not e.unknown:
+                # CONDITION for part knowing it's timestep
+                if e.law_part is not None or \
+                    (e.variable is None and not e.unknown): #: # CONDITION for numbers
                     result.append("arithmetic("+stid+","+e.print_facts()+")"+wherepart+".")
                 elif e.apostroph != inverse_apostroph:
                     if self.is_dynamic_law_part:
@@ -1624,6 +1756,8 @@ class arithmetic_law(law): # Will be generated out of equations!
         return result
 
 class arithmetic_additive_law(arithmetic_law): # Will be generated out of equations!
+    #TODO: Does not use self.other_conditions !!
+    
     def __init__(self,head,body,my_id,dynamic_law_part,variables,where=None):
         arithmetic_law.__init__(self,head,body,"=",my_id,True,dynamic_law_part,variables,where)
         #print >> sys.stderr, "Warning! Incremental statements using += will result in inertial behavior for the fluent." 
@@ -1698,6 +1832,7 @@ class arithmetic_atom(parse_object):
             self.variable = value
             self.factor = 1
         self.negation = negation
+        self.law_part = None # head after if ifcons
     
     #def negate(self):
     #    self.negation = not self.negation
@@ -1828,13 +1963,19 @@ class arithmetic_atom(parse_object):
         return "("+str(self.variable)+("'" if self.apostroph else "")+"*"+("-" if self.negation else "")+(str(self.value) if self.value is not None else "1")+")"
     
     def print_facts(self, prime=False):
+        addition = ""
+        if self.law_part in ["head","if","ifcons","body"]:
+            addition = ",0"
+        elif self.law_part == "after":
+            addition = ",-1"
+            # TODO: remove other options!!
         if self.unknown:
             if self.variable is not None:
-                return "_unknown,"+self.variable+","+((self.value+",") if self.value is not None else "")+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
+                return "_unknown,"+self.variable+","+((self.value+",") if self.value is not None else "")+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)+addition
             else:
-                return "_unknown,"+self.value+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
+                return "_unknown,"+self.value+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)+addition
         elif self.variable is not None:
-            return self.variable+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)
+            return self.variable+","+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)+addition
         else:
             # Invert negation here: A single number will be written on the other side of the equation
             #return ("-" if not self.negation else "")+str(int(self.factor))
@@ -1880,6 +2021,7 @@ class equation(parse_object):
         self.replacement = None
         self.replaced_law = None
         self.is_arithmetic_helper = False
+        self.is_in_where = False # Needed for simplify
         
     def __str__(self):
         return str(self.left)+str(self.operator)+str(self.right)
@@ -1946,9 +2088,11 @@ class equation(parse_object):
         if self.is_arithmetic_helper:
             return []
         
+        self.is_in_where = update.where
         update.set("has_integer",False)
         update.reset_unbound_variables()
         simple=False
+        
         
         if self.operator in ["="] and \
             self.left.__class__ in [unknown, variable, predicate] \
@@ -1956,7 +2100,9 @@ class equation(parse_object):
                 simple=True
         
         if type(self.left) != str:
+            update.path_inc(self,"left")
             variables = self.left.pass_down_update(update)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -1964,9 +2110,11 @@ class equation(parse_object):
         if update.get("has_integer"): simple=False
         
         if type(self.right) != str:
+            update.path_inc(self,"right")
             if simple: update.set("fluent equation head",True)
             variables = self.right.pass_down_update(update)
             if simple: update.set("fluent equation head",None)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -1997,8 +2145,17 @@ class equation(parse_object):
             #update.
             pass
 
-
-        if update.get("has_integer") or (not simple and not update.where): #rewrite to arithmetic(X)
+        # Replace equations using substitution laws
+        if  not self.operator == ".." and ( \
+            update.get("has_integer") or (not simple) \
+            and ( not update.where or \
+            (len(update.indir_bound_int_var) > 0 and update.can_replace_where_arithmetic()))): #rewrite to arithmetic(X)
+            
+            for elem in update.indir_bound_int_var:
+                if elem[2] == self:
+                    self.replacement = True
+                    return []
+            
             self.has_integer = True
             self.my_id = update.arith_idfunction()
             self.replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
@@ -2019,30 +2176,73 @@ class equation(parse_object):
             ri = [x for x in ri if x is not None] # remove all Nones from list
             le = [x for x in le if x is not None]
             
+            #law_part=update.get_law_part()
             val = None
             head = []
             body = []
+            occurrences = []
             for l in le:
+                #l.law_part = law_part
                 if l.has_no_variable():
                     if val is None: val = l
                     else: val.add(l)
                 else:
-                    head.append(l)
+                    for elem in update.indir_bound_int_var:
+                        if str(l.value) == str(elem[1]):
+                            l.value = None
+                            l.variable = str(elem[0])
+                            l.law_part = elem[3]
+                            l.unknown = False
+                            l.unknown_is = None
+                            #new_l = arithmetic_atom(str(elem[0]),l.id,l.negation,variables=[])
+                            if not elem[3] in occurrences:
+                                occurrences.append(elem[3])
+                            head.append(l)
+                            break
+                    else:
+                        head.append(l)
             for r in ri:
+                #r.law_part = law_part
                 if r.has_no_variable():
                     if val is None: val = r
                     else: val.add(r)
                 else:
-                    r.negate() # These are moved from the right side to the left... therefore negated
-                    body.append(r)
+                    
+                    for elem in update.indir_bound_int_var:
+                        if str(r.value) == str(elem[1]):
+                            r.value = None
+                            r.variable = str(elem[0])
+                            r.law_part = elem[3]
+                            r.unknown = False
+                            r.unknown_is = None
+                            if not elem[3] in occurrences:
+                                occurrences.append(elem[3])
+                            r.negate()
+                            body.append(r)
+                            break
+                    else:
+                        r.negate() # These are moved from the right side to the left... therefore negated
+                        body.append(r)
             if val is not None:
                 body.append(val)
             #print " ".join(x.print_facts() for x in head)
             #print " ".join(x.print_facts() for x in body)
             
-            self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
-            update.add_arithmetic_law(self.replaced_law)
             
+            if update.where:
+                arithmetic_law_placement = "if"
+                if "head" in occurrences:
+                    arithmetic_law_placement = "head"
+                elif "ifcons" in occurrences and not "if" in occurrences and not "after" in occurrences:
+                    arithmetic_law_placement = "ifcons"
+                    
+                self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+                update.add_arithmetic_law(self.replaced_law)
+                update.add_where_arithmetic(self,self.replaced_law,self.replacement,arithmetic_law_placement)
+                self.replacement = True
+            else: # This is replaced by a fact if not in where
+                self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+                update.add_arithmetic_law(self.replaced_law)
         
         return self.variables
 
@@ -2050,19 +2250,21 @@ class equation(parse_object):
         if self.is_arithmetic_helper: return None
         return self.print_facts()
         
-    def simplify(self, negation=False):
+    def simplify(self, negation=False,in_where=False):
         if self.is_arithmetic_helper: # These helpers are removed for the translation
             return None
+        if type(self.replacement) == bool and self.replacement==True:
+            return None 
         if self.replacement is not None:
             #print "rep:",self.replacement
-            return self.replacement.simplify(negation)
-        if type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
+            return self.replacement.simplify(negation,in_where)
+        if not self.is_in_where and type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
             if self.right == "<true>": #in ["<true>","true"] : 
                 return fluent(self.left,not negation)
             if self.right == "<false>": #in ["<false>","false"] : 
                 return fluent(self.left,negation)
             inner = assignment(self.left,self.right,negation)
-            return inner.simplify()
+            return inner.simplify(negation,in_where)
         #return parse_object.simplify(self, negation=negation)
         if negation:
             if self.operator in ["=","=="]: self.operator = "!="
@@ -2097,6 +2299,20 @@ class equation(parse_object):
         #print "repl:",self
         return self
 
+    # we overwrite this method and see only variables as bound,
+    # when there is just a single one.
+    def get_variables(self,checkbound=False):
+        my_vars = []
+        ch = self.get_children()
+        for c in ch:
+            if c is None or type(c) == str: continue
+            vs = c.get_variables(checkbound)
+            if type(vs) == list:
+                my_vars += vs
+            else:
+                my_vars.append(vs)
+        if checkbound and len(my_vars) > 1: return [] 
+        return my_vars
 
 class equation_where_arithmetics(parse_object):
     def __init__(self, arith_list):
@@ -2200,7 +2416,9 @@ class equation_where_arithmetics(parse_object):
                 simple=True
         
         if type(self.left) != str:
+            update.path_inc(self,"left")
             variables = self.left.pass_down_update(update)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -2208,9 +2426,11 @@ class equation_where_arithmetics(parse_object):
         if update.get("has_integer"): simple=False
         
         if type(self.right) != str:
+            update.path_inc(self,"right")
             if simple: update.set("fluent equation head",True)
             variables = self.right.pass_down_update(update)
             if simple: update.set("fluent equation head",None)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -2292,10 +2512,10 @@ class equation_where_arithmetics(parse_object):
     def compile_where_single(self):
         return self.print_facts()
         
-    def simplify(self, negation=False):
+    def simplify(self, negation=False,in_where=False):
         if self.replacement is not None:
             #print "rep:",self.replacement
-            return self.replacement.simplify(negation)
+            return self.replacement.simplify(negation,in_where)
         return self
     
         
@@ -2455,7 +2675,9 @@ class assignment(parse_object):
         
         update.set("has_integer",False)
         if type(self.head) != str:
+            update.path_inc(self,"head")
             variables = self.head.pass_down_update(update)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -2464,7 +2686,9 @@ class assignment(parse_object):
             is_arithmetic_assignment = True
             
         if type(self.body) != str:
+            update.path_inc(self,"body")
             variables = self.body.pass_down_update(update)
+            update.path_dec()
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
@@ -2521,9 +2745,9 @@ class assignment(parse_object):
     def create_replacement(self):
         return predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
     
-    def simplify(self, negation=False):
+    def simplify(self, negation=False,in_where=False):
         if self.replacement is not None:
-            return self.replacement.simplify(negation)
+            return self.replacement.simplify(negation,in_where)
         if negation:
             self.negation = not self.negation
         return self
@@ -2750,6 +2974,7 @@ class variable(parse_object):
         if update.had_where: #where_binding is not None:
             fls = update.where_fluents #where_binding["fluents"]
             acs = update.where_actions #where_binding["actions"]
+            ins = update.indir_bound_int_var
             assigned_fluent = False
             for x in fls:
                 if str(self) == str(x):
@@ -2766,6 +2991,15 @@ class variable(parse_object):
                     found = True
                     self.unbound = False
                     break
+            for x in ins:#TODO: Use if in where but not in fluent/action binding
+                if str(self) == str(x[1]):
+                    self.type = "fluent" # integer!!
+                    found = True
+                    assigned_fluent = True
+                    self.unbound = True
+                    update.set("has_integer",True)
+                    update.add_unbound_variables((self,str(self)))
+                    return [] # This is not a bound variable 
             if self.type not in ["action","fluent"]:
                 if not update.is_action_allowed():
                     self.type = "fluent"
@@ -2773,8 +3007,9 @@ class variable(parse_object):
         if not found and not update.where and not str(self) in update.where_variables:
             self.unbound = True
             update.add_unbound_variables((self,str(self)))
-            print >> sys.stderr, "% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!"
-            errout.error("% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!")
+            # This may not be an error anymore
+            #print >> sys.stderr, "% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!"
+            #errout.error("% Warning! Variable "+str(self)+" is not bound in: "+str(update.law)+"!")
         return [str(self),]
     
     def print_facts(self,prime=False):
@@ -2796,7 +3031,7 @@ class variable(parse_object):
                     return "val("+my_str+",true)"
         return my_str
     
-    def get_variables(self):
+    def get_variables(self,checkbound=False):
         return self
     
     def get_explicitly_bound_variables(self,where=False,bound=False):
@@ -2847,12 +3082,15 @@ class negation(parse_object):
                 return self.content.print_facts()
                 #return "val("+self.content.print_facts()+",false)"
 
-    def simplify(self, negation=False):
+    def simplify(self, negation=False,in_where=False):
         if self.content is None:
             return None
         if type(self.content) == str:
             return "not "+self.content
-        return self.content.simplify(negation=True)
+        if in_where:
+            self.content = self.content.simplify(negation=negation,in_where=in_where)
+            return self
+        return self.content.simplify(negation=not negation,in_where=in_where)
     
     def compile_where_single(self):
         if self.content is None:
@@ -2953,6 +3191,8 @@ class update_passdown(object):
         self.where_variables = []
         self.unbound_variables = []
         self.unbound_assignment = []
+        self.where_arithmetic = []
+        self.indir_bound_int_var = []
         self.path = []
         if type(others) == dict:
             self.others = others
@@ -3018,6 +3258,20 @@ class update_passdown(object):
                 return True
         return False
     
+    def is_in_body(self):
+        for ob in self.path:
+            caller = ob[0]; att = ob[1]
+            if att in ["if_part","after_part","body"] and law in inspect.getmro(caller.__class__):
+                return True
+        return False
+    
+    def is_in_ifcons(self):
+        for ob in self.path:
+            caller = ob[0]; att = ob[1]
+            if att == "ifcons_part" and law in inspect.getmro(caller.__class__):
+                return True
+        return False
+    
     def is_in_dynamic_law(self,check_default_laws=False):
         for ob in self.path:
             caller = ob[0];
@@ -3049,6 +3303,17 @@ class update_passdown(object):
                 if func == "after_part": return True
             if nonexecutable_law == caller.__class__ or nonexecutable_law in inspect.getmro(caller.__class__):
                 if func in ["body", "if_part"]: return True
+        return False
+    
+    def can_replace_where_arithmetic(self):
+        for ob in self.path: # + [(totest,"self")]:
+            caller = ob[0]
+            if caller.__class__ in [static_law,dynamic_law,default_law,impossible_law,inertial_law,nonexecutable_law]:
+                return True
+            else: 
+                for x in inspect.getmro(caller.__class__):
+                    if x in [static_law,dynamic_law,default_law,impossible_law,inertial_law,nonexecutable_law]:
+                        return True
         return False
         
     def add_arithmetic_law(self,elem):
@@ -3084,6 +3349,63 @@ class update_passdown(object):
         x = (elem[0],elem[1],self.is_action_allowed())
         if not x in self.unbound_assignment:
             self.unbound_assignment.append(x)
+            
+    # Expects output of update.search_..._path !
+    def add_indirectly_bound_integer_variable(self,elem):
+        if type(elem) == list:
+            for e in elem:
+                part_of = "body"
+                if type(e) == list and len(e) == 2:
+                    pa = e[1]
+                    for tup in pa:
+                        if tup[1] == "head":
+                            part_of = "head"
+                            break
+                        elif tup[1] == "ifcons_part":
+                            part_of = "ifcons"
+                            break
+                    # Get head/ifcons/if out of pa
+                    
+                    e = (e[0][0],e[0][1],e[0][2],part_of)
+#                 for ex in self.indir_bound_int_var:
+#                     for i in range(len(e)):
+#                         if str(e[i])!=str(ex[i]):
+#                             break
+#                     else:
+#                         return                            
+                if not e in self.indir_bound_int_var:
+                    self.indir_bound_int_var.append(e)
+        elif not elem in self.indir_bound_int_var:
+            self.indir_bound_int_var.append(elem)
+    
+    def add_where_arithmetic(self,caller,replaced_law,replacement,arithmetic_law_placement):
+        self.where_arithmetic.append((caller,replaced_law,replacement,arithmetic_law_placement))
+    
+    # Returns fluent, path in law
+    def get_int_for_indirectly_bound_variable(self,var):
+        vst = str(var)
+        for elem in self.indir_bound_int_var:
+            if str(elem[1]) == vst:
+                return elem[0], elem[3]
+        return None, None # If not found 
+        
+    def get_law_part(self):
+        for ob in self.path:
+            caller = ob[0]
+            func = ob[1];
+            if dynamic_law == caller.__class__ or dynamic_law in inspect.getmro(caller.__class__):
+                if func == "ifcons_part" : return "ifcons"
+                if func == "after_part" : return "after"
+                if func == "head" : return "head"
+            elif nonexecutable_law == caller.__class__ or nonexecutable_law in inspect.getmro(caller.__class__):
+                if func in ["body", "if_part"]: return "after"
+                if func == "ifcons_part" : return "ifcons"
+            elif law in inspect.getmro(caller.__class__):
+                if func == "ifcons_part" : return "ifcons"
+                elif func == "after_part" : return "after"
+                elif func == "head" : return "head"
+                else: return "if" #TODO: cheeeck!
+        eaasdas
         
 
 class errout(object):

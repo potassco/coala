@@ -1,0 +1,7 @@
+fluent wheels:0..10.
+fluent count:0..2.
+
+wheels := count*5 if <true>.
+
+% 3 States
+% 0 Transitions

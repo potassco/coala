@@ -1,0 +1,9 @@
+fluent wheels=(0,1,2,3,4,5,6,7,8,9,10).
+fluent count=(0,1,2).
+
+wheels = 0 if count = 0.
+wheels = 5 if count = 1.
+wheels = 10 if count = 2.
+
+% 3 States
+% 0 Transitions
