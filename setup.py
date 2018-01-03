@@ -50,7 +50,8 @@ setup(
                 "coala/internal/states.lp", \
                 "coala/internal/states_not_decoupled.lp", \
                 "coala/internal/transitions.lp", \
-                "coala/internal/transitions_not_decoupled.lp"]),
+                "coala/internal/transitions_not_decoupled.lp", \
+                "coala/internal/only_in_domains.lp"]),
 
             ("coala/testcases", [ "coala/testcases/add_1.bc", \
                 "coala/testcases/add_2.bc", \
@@ -118,7 +119,23 @@ setup(
                 "coala/testcases/test_nex.bc", \
                 "coala/testcases/test_true.bc", \
                 "coala/testcases/test_where.b", \
-                "coala/testcases/test_where.bc"])
+                "coala/testcases/test_where.bc", \
+		"coala/testcases/test_true_2.bc", \
+		"coala/testcases/var_bug_2.bc", \
+		"coala/testcases/var_bug_1.bc", \
+		"coala/testcases/binding_3.bc", \
+		"coala/testcases/binding_2.bc", \
+		"coala/testcases/binding_1.bc", \
+		"coala/testcases/test_domain_var.bc", \
+		"coala/testcases/dom_6.bc", \
+		"coala/testcases/dom_5.bc", \
+		"coala/testcases/test_where_dot.bc", \
+		"coala/testcases/test_where_6.bc", \
+		"coala/testcases/test_where_5.bc", \
+		"coala/testcases/test_where_4.bc", \
+		"coala/testcases/test_where_3.bc", \
+		"coala/testcases/test_where_2.bc", \
+		"coala/testcases/test_true_false.bc"])
             ]
 )
 
