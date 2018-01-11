@@ -1639,7 +1639,7 @@ class predicate(parse_object):
         return False
     
     def arith_flatten(self,negation,update):
-        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation,variables=self.variables)
+        return arithmetic_atom(self.print_facts(),update.arith_helper_idfunction(),negation,variables=self.variables,apostroph=self.apostroph)
 
     def get_explicitly_bound_variables(self,where=False,bound=False):
         if where: 
@@ -3405,7 +3405,7 @@ class update_passdown(object):
                 elif func == "after_part" : return "after"
                 elif func == "head" : return "head"
                 else: return "if" #TODO: cheeeck!
-        eaasdas
+        
         
 
 class errout(object):
