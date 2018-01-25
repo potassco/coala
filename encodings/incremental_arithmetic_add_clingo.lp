@@ -133,7 +133,7 @@ arith_law_atom(K,X,I,L,M) :- arithmetic(L,X,K,I,M).
 arith_law_atom(K,X,I,L,0) :- arithmetic_head(L,X,K,I), 
     arithmetic(L,C).
 
-arith_law_atom(K,X,I,L,M) :- arithmetic(L,_sum,X,K,I,M), 
+arith_law_atom(K,X,I,L) :- arithmetic(L,_sum,X,K,I,_), 
     arithmetic(L,C).
 
 % Convert laws to "lower than"

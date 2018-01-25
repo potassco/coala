@@ -1,7 +1,8 @@
 fluent wheels:0..10.
 fluent count:0..2.
 
-wheels = A if count = C where fluent wheels=A, fluent count=C, A = C*5.
+%wheels = A if count = C where fluent wheels=A, fluent count=C, A = C*5.
+wheels = A if count = C where A = C*5.
 
 % 3 States
 % 0 Transitions

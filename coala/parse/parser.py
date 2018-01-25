@@ -378,36 +378,65 @@ class Parser(object):
 		''' term_equalpart : term
 					| term EQ term_numeric
 					| term EQ LBRAC term_number_list RBRAC
-					| term EQ term_numeric DDOT term_numeric
-					| term COLON term_numeric DDOT term_numeric
-					| term COLON LBRAC term_numeric DDOT term_numeric RBRAC '''
+					| term EQ term_numeric DDOT term_numeric'''
+					#| term COLON term_numeric DDOT term_numeric'''
+					#| term COLON LBRAC term_numeric DDOT term_numeric RBRAC '''
 		if len(t) == 2: 
 			t[0] = t[1]
 		elif len(t) == 4: 
 			t[0] = ps.equation(t[1],t[3])
 		elif len(t) == 6:
 			if t[4] == "..":
-				if t[2]==":":
-					t[0] = ps.fluent_multival(t[1],[t[3],t[5]],int_operator=True)
-				else:
-					t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
+				t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
+				#if t[2]==":":
+				#	t[0] = ps.fluent_multival(t[1],[t[3],t[5]],int_operator=True)
+				#else:
+				#	t[0] = ps.fluent_multival(t[1],ps.value_range(t[3],t[5]))
 			else:
 				t[0] = ps.fluent_multival(t[1],t[4])
-		elif len(t) == 8:
-			t[0] = ps.fluent_multival(t[1],multidomain=ps.value_range(t[4],t[6]),int_operator=True)
+		#elif len(t) == 8:
+		#	t[0] = ps.fluent_multival(t[1],multidomain=ps.value_range(t[4],t[6]),int_operator=True)
 			
 ##########################
 
+	def p_binding_or_range(self,t):
+		'''binding_or_range : term
+							| term_numeric DDOT term_numeric'''
+		if len(t) == 2:
+			t[0] = t[1]
+		else:
+			t[0] = [t[1],t[3]]
+
 	def p_formula(self,t):
 		''' formula : term_boolean 
-					| term_boolean COMMA formula '''
+					| term_boolean COMMA formula
+					| term_boolean COLON binding_or_range 
+					| term_boolean COLON binding_or_range COMMA formula '''
 		if len(t) == 4:
-			if t[1] is None: t[0] = t[3]
-			elif t[1].is_false(): t[0] = t[1]
-			elif t[3].is_false(): t[0] = t[3]
+			if t[2] == ":":
+				if t[1] is None: t[0] = ps.atom_list()
+				elif t[1].is_false(): t[0] = t[1]
+				else:
+					t[1].binding = t[3] 
+					t[0] = ps.atom_list(t[1])
 			else:
-				t[3].combine(t[1])
-				t[0] = t[3]
+				if t[1] is None: t[0] = t[3]
+				elif t[1].is_false(): t[0] = t[1]
+				elif t[3].is_false(): t[0] = t[3]
+				else:
+					t[3].combine(t[1])
+					t[0] = t[3]
+		elif len(t) == 6:
+			if t[1] is None: t[0] = t[5]
+			elif t[1].is_false():
+				t[0] = t[1]
+			elif t[5].is_false(): 
+				#t[1].binding = t[5] 
+				t[0] = t[5]
+			else:
+				t[1].binding = t[3]
+				t[5].combine(t[1])
+				t[0] = t[5]
 		else:
 			if t[1] is None: t[0] = ps.atom_list()
 			elif t[1].is_false(): t[0] = t[1]
@@ -416,10 +445,19 @@ class Parser(object):
 
 	def p_fluent_formula(self,t): # f_1,...,f_n
 		''' fluent_formula : term_equalpart
-					| term_equalpart COMMA fluent_formula'''
+					| term_equalpart COMMA fluent_formula
+					| term_equalpart COLON binding_or_range
+					| term_equalpart COLON binding_or_range COMMA fluent_formula'''
 		if len(t) == 4:
-			t[3].append(t[1])
-			t[0] = t[3]
+			if t[2] == ':':
+				t[0] = ps.atom_list(ps.fluent_multival(t[1],t[3],int_operator=type(t[3]==list)))
+			else:
+				t[3].append(t[1])
+				t[0] = t[3]
+		elif len(t) == 6:
+			res = ps.fluent_multival(t[1],t[3],int_operator=type(t[3]==list))
+			t[5].append(res)
+			t[0] = t[5]
 		else:
 			t[0] = ps.atom_list(t[1])
 		

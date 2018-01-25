@@ -1,0 +1,12 @@
+
+<asp>p(1..5).
+:- not holds(val(b,true),0).
+</asp>
+fluent a(X) where p(X).
+fluent b.
+inertial a(X) where p(X).
+
+b if a(X) : p(X).
+
+% 32 State
+% 1 Transitions

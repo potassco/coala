@@ -38,6 +38,7 @@ class parse_object(object):
         self.child_attributes = []
         self.reference = None
         self.negation = False
+        self.binding = None
     
     # Get all children of the object (used for inheriting classes)
     def get_children(self):
@@ -670,14 +671,14 @@ class law(rule):
                                     break 
                         if not definite_type:
                             for inte in update.integer_ids:
-                                if equ.left.compare_to(inte):#TODO: get a number for this law?
+                                if equ.left.compare_to(inte):#get a number for this law?
                                     self.reference = inte
                                     self.type = "integer"
                                     update.set("has_integer",True)
                                     definite_type = True
                                     break 
 #                                 if not definite_type:
-#                                     if update.is_action_allowed() or True: #TODO: this check will not work here
+#                                     if update.is_action_allowed() or True: # this check will not work here
 #                                         for act in update.actions:
 #                                             if equ.left.compare_to(act):
 #                                                 raise NameError("BC does not allow actions with domains")
@@ -697,15 +698,21 @@ class law(rule):
                         raise NameError("Unbound Variable cannot be fixed, not bound in equation!")
                 else:
                     raise NameError("Unbound Variable cannot be fixed, no where part!")
+                
+        # Add additions, but do not add their variables
+        for addition in update.where_additions:
+            
+            if self.where is None:
+                self.where = atom_list(addition)
+            else:
+                self.where.append(addition)
                    
                    
     def get_law_type(self):
         return self.law_type
 
-    #TODO: Removes unbound variables for integer assignments
     def replace_unbound_variables(self,assignm,negate=False):
         return self
-        #TODO: Check and cleanup
         if len(self.variables) > 0:
             nva = []
             for va in self.variables:
@@ -1452,7 +1459,7 @@ class fluent(parse_object):
     def get_bottom_elements(self):
         return [self,]
 
-class fluent_multival(fluent): #TODO: Clean this one up; It should have another parent class
+class fluent_multival(fluent):
     def __init__(self, content, multidomain=None, int_operator=False):
         fluent.__init__(self, content, None)
         self.multidomain = multidomain
@@ -1460,6 +1467,9 @@ class fluent_multival(fluent): #TODO: Clean this one up; It should have another 
  
     def get_fluents_domains(self):
         result = []
+        if self.multidomain is None and self.binding is not None:
+            self.multidomain = self.binding
+            self.is_int = True
         for x in self.multidomain:
             result.append(domain(self.content,x))
         return result
@@ -1595,7 +1605,7 @@ class predicate(parse_object):
                         break 
             if not definite_type:
                 for inte in update.integer_ids:
-                    if self.compare_to(inte):#TODO: get a number for this law?
+                    if self.compare_to(inte):#get a number for this law?
                         self.reference = inte
                         self.type = "integer"
                         update.set("has_integer",True)
@@ -1620,9 +1630,19 @@ class predicate(parse_object):
             for v in variables:
                 if not v in self.variables:
                     self.variables.append(v)
+                    
+        #Code for adding binding to where part! 
+        if self.binding is not None:#TODO: Add to other parse_objects!
+            update.add_to_where(self.binding)
+            variables = self.binding.get_variables()
+            for v in variables:
+                if str(v) in self.variables:
+                    self.variables.remove(str(v))
+            pass
+        
         return self.variables
     
-    #TODO: simplification for integers?
+    # simplification for integers?
     
     def compare_to(self,other,parent=True):
         if self.__class__ == other.__class__:
@@ -1688,8 +1708,6 @@ class arithmetic_law(law): # Will be generated out of equations!
                 break
         if not has_number:
             self.body.append(arithmetic_atom('0','0'))
-        
-        #TODO: extract stuff from body... it needs to be a list of int_variables with factors
             
     def __str__(self):
         if type(self.head) == list:
@@ -1699,7 +1717,7 @@ class arithmetic_law(law): # Will be generated out of equations!
             ("+".join(str(x) for x in self.body))+  "]"
     
     
-    def typestr(self):#TODO: Why required??
+    def typestr(self):
         return str(self)
     
     def print_facts(self, prime=False):
@@ -1846,13 +1864,11 @@ class arithmetic_atom(parse_object):
         
     def can_add(self,other):
         return not self.unknown and not other.unknown and self.variable == other.variable # Equal or both None
-        #TODO: Add unknown to unknown?
     
     def negate(self):
         self.negation = not self.negation
     
     def add(self,other):
-        #TODO: Add unknown to unknown?
         if self.variable == other.variable:
             a = self.factor
             b = other.factor
@@ -2119,7 +2135,6 @@ class equation(parse_object):
                 if not v in self.variables:
                     self.variables.append(v)
         
-        #TODO: Is this for integer arithmetic or a general multivalue thing?
         if len(update.unbound_variables)>0: # Variable of law not bound in where part
             if update.is_in_head():
                 #print "head"
@@ -2135,7 +2150,7 @@ class equation(parse_object):
                     and self.right.__class__ in [unknown,predicate]:
                         #print "v = p/u"
                         update.add_unbound_assignment((self.right,self.left))
-                # is equation? |bound| > 1 # TODO: asdasdsad
+                # is equation? |bound| > 1
                 # ignore for now
                 # is assignment? |bound| == 1
             #print update.unbound_variables
@@ -2330,8 +2345,6 @@ class equation_where_arithmetics(parse_object):
         self.replaced_law = None
         
         self.is_assignment = False
-        
-        #TODO: get stuff out of arith_list!
         
     def __str__(self):
         if self.head_atom is None:
@@ -2885,7 +2898,7 @@ class unknown(parse_object):
                     break 
         if not definite_type:
             for inte in update.integer_ids:
-                if self.compare_to(inte):#TODO: get a number for this law?
+                if self.compare_to(inte):# get a number for this law?
                     self.reference = inte
                     self.type = "integer"
                     update.set("has_integer",True)
@@ -2963,7 +2976,6 @@ class variable(parse_object):
         return [domain(self,None),]
     
     def pass_down_update(self,update):
-        #TODO: Get a way of knowing if this here is an action/fluent or integer!!...
         #where_binding = update.get("where_binding")
         if update.is_in_action_fact():
             self.type = "action"
@@ -3192,6 +3204,7 @@ class update_passdown(object):
         self.unbound_variables = []
         self.unbound_assignment = []
         self.where_arithmetic = []
+        self.where_additions = []
         self.indir_bound_int_var = []
         self.path = []
         if type(others) == dict:
@@ -3338,6 +3351,13 @@ class update_passdown(object):
         if not elem in self.where_actions:
             self.where_actions.append(elem)
     
+    def add_to_where(self,elem):#TODO: Check!!!
+        if self.where_part is not None:
+            if not elem in self.where_part:
+                self.where_part.append(elem)
+        else:
+            self.where_additions.append(elem)
+    
     def add_unbound_variables(self,elem):
         if not elem in self.unbound_variables:
             self.unbound_variables.append(elem)
@@ -3404,7 +3424,7 @@ class update_passdown(object):
                 if func == "ifcons_part" : return "ifcons"
                 elif func == "after_part" : return "after"
                 elif func == "head" : return "head"
-                else: return "if" #TODO: cheeeck!
+                else: return "if"
         
         
 
