@@ -121,6 +121,7 @@ setup(
                 "coala/testcases/test_where.b", \
                 "coala/testcases/test_where.bc", \
 		"coala/testcases/test_true_2.bc", \
+		"coala/testcases/test_bound.bc", \
 		"coala/testcases/var_bug_2.bc", \
 		"coala/testcases/var_bug_1.bc", \
 		"coala/testcases/binding_3.bc", \
