@@ -2258,6 +2258,15 @@ class equation(parse_object):
             else: # This is replaced by a fact if not in where
                 self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
                 update.add_arithmetic_law(self.replaced_law)
+                
+        #Code for adding binding to where part! 
+        if self.binding is not None:#TODO: Add to other parse_objects!
+            update.add_to_where(self.binding)
+            variables = self.binding.get_variables()
+            for v in variables:
+                if str(v) in self.variables:
+                    self.variables.remove(str(v))
+            pass
         
         return self.variables
 
@@ -2519,6 +2528,14 @@ class equation_where_arithmetics(parse_object):
             self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
             update.add_arithmetic_law(self.replaced_law)
             
+        #Code for adding binding to where part! 
+        if self.binding is not None:#TODO: Add to other parse_objects!
+            update.add_to_where(self.binding)
+            variables = self.binding.get_variables()
+            for v in variables:
+                if str(v) in self.variables:
+                    self.variables.remove(str(v))
+            pass
         
         return self.variables
 
@@ -2749,6 +2766,14 @@ class assignment(parse_object):
             #arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
             update.add_arithmetic_law(law)
             
+        #Code for adding binding to where part! 
+        if self.binding is not None:#TODO: Add to other parse_objects!
+            update.add_to_where(self.binding)
+            variables = self.binding.get_variables()
+            for v in variables:
+                if str(v) in self.variables:
+                    self.variables.remove(str(v))
+            pass
         
         return self.variables
     

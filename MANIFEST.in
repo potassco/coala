@@ -54,6 +54,7 @@ include testcases/binding_2.bc
 include testcases/binding_3.bc
 include testcases/test_domain_var.bc
 include testcases/test_bound.bc
+include testcases/test_bound_2.bc
 include examples/sumo.bc
 include examples/sumo_instance.bc
 include examples/walkbot.bc

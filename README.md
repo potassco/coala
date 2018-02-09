@@ -32,6 +32,10 @@ Note that installing coala as a command line tool may require
 
     sudo pip install https://github.com/potassco/coala/archive/master.zip
 
+Updates can be installed using
+
+    sudo pip install --upgrade https://github.com/potassco/coala/archive/master.zip
+
 ### Installing using python distutils
 
 After downloading and unpacking coala,

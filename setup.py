@@ -9,7 +9,7 @@ setup(
     name="coala",
 
     # Version number (initial):
-    version="2.454",
+    version="2.455",
 
     # Application author details:
     author="Christian Schulz-Hanke",
@@ -122,6 +122,7 @@ setup(
                 "coala/testcases/test_where.bc", \
 		"coala/testcases/test_true_2.bc", \
 		"coala/testcases/test_bound.bc", \
+		"coala/testcases/test_bound_2.bc", \
 		"coala/testcases/var_bug_2.bc", \
 		"coala/testcases/var_bug_1.bc", \
 		"coala/testcases/binding_3.bc", \
