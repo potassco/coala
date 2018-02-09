@@ -1,0 +1,14 @@
+
+<asp>p(1..3).
+q(1,2).q(2,3).
+:- not holds(val(b,true),0).
+</asp>
+fluent a(X)=Y where p(X),p(Y).
+fluent b.
+inertial a(X) where p(X).
+
+b if a(X)=Y : q(X,Y).
+%b if a(1)=2, a(2)=3.
+
+% 27 State
+% 1 Transitions
