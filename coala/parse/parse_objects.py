@@ -792,8 +792,19 @@ class static_law(law): #static
             cname = st[1]
             children = current.get_children()
             for ch in children:
-                if type(ch) == str: result += [ cname+"("+myid+","+ch+")"+wherepart+"." ]
-                else: result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                if type(ch) == str: resstr =  cname+"("+myid+","+ch+")"
+                else: resstr =  cname+"("+myid+","+ch.print_facts(prime=True)+")"
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ resstr+wherepart+", "+whnew+"." ] #Note that prime=False
+                        else:
+                            result += [ resstr+" :- "+whnew+"." ] #Note that prime=False
+                    else:
+                        result += [ resstr+wherepart+"." ] #Note that prime=False
+                else:
+                    result += [ resstr+wherepart+"." ]
         return result
         
 
@@ -837,7 +848,17 @@ class dynamic_law(law): #dynamic
             cname = st[1]
             children = current.get_children()
             for ch in children:
-                result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+", "+whnew+"." ]
+                        else:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+") :- "+whnew+"." ]
+                    else:
+                        result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                else:
+                    result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
 
 class nonexecutable_law(law): #nonexecutable
@@ -880,7 +901,17 @@ class nonexecutable_law(law): #nonexecutable
             cname = st[1]
             children = current.get_children()
             for ch in children:
-                result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+", "+whnew+"." ] #Note that prime=False
+                        else:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+") :- "+whnew+"." ] #Note that prime=False
+                    else:
+                        result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ] #Note that prime=False
+                else:
+                    result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
     
     def simplify(self,negation=False,in_where=False):
@@ -929,7 +960,17 @@ class impossible_law(law): #impossible
             cname = st[1]
             children = current.get_children()
             for ch in children:
-                result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+", "+whnew+"." ]
+                        else:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+") :- "+whnew+"." ]
+                    else:
+                        result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                else:
+                    result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
 
 
@@ -957,7 +998,17 @@ class inertial_law(law): #inertial
         
         children = self.head.get_children()
         for ch in children + self.other_conditions_if.get_children() + self.other_conditions_head.get_children():
-            result += [ "inertial("+ch.print_facts()+")"+wherepart+"." ] #Note that prime=False
+            if ch.binding is not None:
+                whnew = ch.binding.compile_where_single()
+                if len(whnew) > 0:
+                    if len(wherepart) > 0:
+                        result += [ "inertial("+ch.print_facts()+")"+wherepart+", "+whnew+"." ] #Note that prime=False
+                    else:
+                        result += [ "inertial("+ch.print_facts()+") :- "+whnew+"." ] #Note that prime=False
+                else:
+                    result += [ "inertial("+ch.print_facts()+")"+wherepart+"." ] #Note that prime=False
+            else:
+                result += [ "inertial("+ch.print_facts()+")"+wherepart+"." ] #Note that prime=False
         return result
 
 class default_law(law): #default
@@ -1012,7 +1063,17 @@ class default_law(law): #default
             #if self.dynamic:
             #    result += [ "dynamic_law("+myid+")"+wherepart+"." ]
             for ch in children:
-                result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+", "+whnew+"." ]
+                        else:
+                            result += [ cname+"("+myid+","+ch.print_facts(prime=True)+") :- "+whnew+"." ]
+                    else:
+                        result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
+                else:
+                    result += [ cname+"("+myid+","+ch.print_facts(prime=True)+")"+wherepart+"." ]
         return result
 
 
@@ -1053,7 +1114,17 @@ class visible_law(law): #visible
             cname = st[1]
             children = current.get_children()
             for ch in children:
-                result += [ cname+"("+myid+","+ch.print_facts()+")"+wherepart+"." ] #prime is False
+                if ch.binding is not None:
+                    whnew = ch.binding.compile_where_single()
+                    if len(whnew) > 0:
+                        if len(wherepart) > 0:
+                            result += [ cname+"("+myid+","+ch.print_facts()+")"+wherepart+", "+whnew+"." ] #Note that prime=False
+                        else:
+                            result += [ cname+"("+myid+","+ch.print_facts()+") :- "+whnew+"." ] #Note that prime=False
+                    else:
+                        result += [ cname+"("+myid+","+ch.print_facts()+")"+wherepart+"." ] #Note that prime=False
+                else:
+                    result += [ cname+"("+myid+","+ch.print_facts()+")"+wherepart+"." ] #prime is False
         return result
 
 class kill_encoding(law):
@@ -1290,7 +1361,17 @@ class initial_law(query):
         wherepart = self.compile_where()
         for ac in self.head:
             st = ac.print_facts(prime=True)
-            result.append("initially("+st+")"+wherepart+".")
+            if ac.binding is not None:
+                whnew = ac.binding.compile_where_single()
+                if len(whnew) > 0:
+                    if len(wherepart) > 0:
+                        result.append("initially("+st+")"+wherepart+", "+whnew+"." )
+                    else:
+                        result.append("initially("+st+") :- "+whnew+"." )
+                else:
+                    result.append("initially("+st+")"+wherepart+".")
+            else:
+                result.append("initially("+st+")"+wherepart+".")
         return result
 
 
@@ -1633,7 +1714,7 @@ class predicate(parse_object):
                     
         #Code for adding binding to where part! 
         if self.binding is not None:#TODO: Add to other parse_objects!
-            update.add_to_where(self.binding)
+            #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
                 if str(v) in self.variables:
@@ -2252,16 +2333,20 @@ class equation(parse_object):
                     arithmetic_law_placement = "ifcons"
                     
                 self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+                self.replaced_law.binding = self.binding
+                
                 update.add_arithmetic_law(self.replaced_law)
                 update.add_where_arithmetic(self,self.replaced_law,self.replacement,arithmetic_law_placement)
                 self.replacement = True
             else: # This is replaced by a fact if not in where
                 self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+                self.replaced_law.binding = self.binding
+                
                 update.add_arithmetic_law(self.replaced_law)
                 
         #Code for adding binding to where part! 
         if self.binding is not None:#TODO: Add to other parse_objects!
-            update.add_to_where(self.binding)
+            #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
                 if str(v) in self.variables:
@@ -2284,10 +2369,15 @@ class equation(parse_object):
             return self.replacement.simplify(negation,in_where)
         if not self.is_in_where and type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
             if self.right == "<true>": #in ["<true>","true"] : 
-                return fluent(self.left,not negation)
+                result = fluent(self.left,not negation)
+                result.binding = self.binding
+                return result
             if self.right == "<false>": #in ["<false>","false"] : 
-                return fluent(self.left,negation)
+                result = fluent(self.left,negation)
+                result.binding = self.binding
+                return result
             inner = assignment(self.left,self.right,negation)
+            inner.binding = self.binding
             return inner.simplify(negation,in_where)
         #return parse_object.simplify(self, negation=negation)
         if negation:
@@ -2526,11 +2616,12 @@ class equation_where_arithmetics(parse_object):
             #print " ".join(x.print_facts() for x in body)
             
             self.replaced_law = arithmetic_law(head,body,self.operator,self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+            self.replaced_law.binding = self.binding
             update.add_arithmetic_law(self.replaced_law)
             
         #Code for adding binding to where part! 
         if self.binding is not None:#TODO: Add to other parse_objects!
-            update.add_to_where(self.binding)
+            #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
                 if str(v) in self.variables:
@@ -2763,12 +2854,13 @@ class assignment(parse_object):
             #print " ".join(x.print_facts() for x in body)
             
             law = self.create_law(head,body,dynamic_law_part,update)
+            law.binding = self.binding
             #arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
             update.add_arithmetic_law(law)
             
         #Code for adding binding to where part! 
         if self.binding is not None:#TODO: Add to other parse_objects!
-            update.add_to_where(self.binding)
+            #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
                 if str(v) in self.variables:
@@ -2783,9 +2875,16 @@ class assignment(parse_object):
     def create_replacement(self):
         return predicate(self.replacement_name,atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
     
-    def simplify(self, negation=False,in_where=False):
+    def simplify(self, negation=False,in_where=False,binding=None):
         if self.replacement is not None:
-            return self.replacement.simplify(negation,in_where)
+            result = self.replacement.simplify(negation,in_where)
+            if binding is not None:
+                result.binding = binding
+                if self.binding is not None:
+                    result.binding += self.binding #TODO: Test!
+            else:
+                result.binding = self.binding
+            return result
         if negation:
             self.negation = not self.negation
         return self
