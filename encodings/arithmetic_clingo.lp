@@ -11,7 +11,7 @@ domain(F,L..U) :- integer_domain(F,L,U).
 atom(_arithmetic(L)) :- arithmetic_law(L,_).
 
 % Enforces arithmetics to hold when laws do.
-:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
+:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T), not arithmetic_illegal(L,T). %TODO: this can be rewritten as a domain() check inside the laws
 
 % Non-Assignments which appear in bodys:
 holds(_arithmetic(L),T) :- %not ifcons(_,_arithmetic(L)),
@@ -24,16 +24,18 @@ holds(_arithmetic(L),T) :- %not ifcons(_,_arithmetic(L)),
 %holds(_arithmetic(L),T) :- arithmetic_fulfilled(L,T), ifcons(_,_arithmetic(L)), step(T).
 
 %------------------------------------------------
-% Handle equations
-holds(val(F,V),T) :- domain(F,V), arithmetic_assignment(L), holds(_arithmetic(L),T), arithmetic_law(L,eq), arithmetic_head(L,F,M,_), arithmetic(L,C), 
+holds(val(F,V),T) :- domain(F,V), arithmetic_assignment(L), not arithmetic_illegal(L,T), holds(_arithmetic(L),T), arithmetic_law(L,eq), arithmetic_head(L,F,M,_), arithmetic(L,C), 
     holds(val(X,_),T+MD) : arithmetic(L,X,K,I,MD);
     V = (H+C)/M,
     #sum {-K*Z,I:arithmetic(L,X,K,I,MD),holds(val(X,Z),T+MD);-K*X,I:arithmetic(L,_sum,X,K,I,_)} = H, step(T).%%%
 
-holds(val(F,V),T) :- domain(F,V), arithmetic_assignment_dynamic(L), holds(_arithmetic(L),T), arithmetic_law(L,eq), arithmetic_head(L,F,M,_), arithmetic(L,C), 
+holds(val(F,V),T) :- domain(F,V), arithmetic_assignment_dynamic(L), not arithmetic_illegal(L,T), holds(_arithmetic(L),T), arithmetic_law(L,eq), arithmetic_head(L,F,M,_), arithmetic(L,C), 
     holds(val(X,_),T+MD) : arithmetic(L,X,K,I,MD);
     V = (H+C)/M,
     #sum {-K*Z,I:arithmetic(L,X,K,I,MD),holds(val(X,Z),T+MD);-K*X,I:arithmetic(L,_sum,X,K,I,_)} = H, step(T).%%%
+
+%------------------------------------------------
+% Handle equations
 
 arithmetic_fulfilled(L,T) :- arithmetic_law(L,eq),
     %&sum {K*val(X,t),I:arith_law_atom(K,X,I,L,0);K*X,I:arith_law_atom(K,X,I,L)} = C,
@@ -70,6 +72,16 @@ arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,_),
 %    &sum {F*K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M);F*K*X,I:arith_law_atom(K,X,I,L)} < C,
 %    step(T).
 
+%---------------------------------------------------------
+% An assignment is legal if the value of the head would be inside it's domain
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), #sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD;  step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), #sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD; step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), #sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD;  step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), #sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD; step(T).
 %---------------------------------------------------------
 % Simplifications
 

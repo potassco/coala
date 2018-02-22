@@ -3,7 +3,7 @@
 <fluent> y : 1 .. 200.
 <action> increase.
 
-%<inertial> x.%%%%%%%%ERR when commented out!
+%<inertial> x.
 <inertial> y.
 
 <nonexecutable> increase, y <= 1.

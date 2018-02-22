@@ -5,6 +5,7 @@ import parse_objects as ps
 import ply.yacc as yacc
 import lexer
 import os
+from coala.parse.parse_objects import atom_list
 		
 # Parsing rules
 
@@ -183,38 +184,76 @@ class Parser(object):
 		elif t[1] not in ['<fluent>','fluent']:
 			t[0] = ps.defined_fluent_fact(t[2],t[3],line=line,filename=filename)
 		else:
+			
 			if type(t[2]) == ps.atom_list: # Get integer fluent declarations
-				others = []
-				regular = []
-				for x in t[2]: # This happens if integer and non_integers are mixed in one declaration.
+				result = []
+				previous = []
+				t[2].get_children().reverse() # Reverse order that we get them as expected
+				for x in t[2]: # accumulate facts until there is a domain statement
 					if type(x) == ps.fluent_multival:
-						if type(x.multidomain) == list:
-							if x.is_int:
-								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(x.multidomain),t[3],line=line,filename=filename))
+						domain = x.multidomain
+						if x.is_int:
+							if type(x.multidomain) == list:
+								domain = ps.atom_list(x.multidomain)
+							elif type(x.multidomain) == ps.value_range and len(x.multidomain.content) == 2:
+								lower = x.multidomain.content[0]
+								upper = x.multidomain.content[1]
+								domain = ps.atom_list(lower,upper)
 							else:
-								regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))						 
-						elif type(x.multidomain)==ps.value_range and len(x.multidomain.content) == 2:
-							lower = x.multidomain.content[0]
-							upper = x.multidomain.content[1]
-							if x.is_int:
-								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(lower,upper),t[3],line=line,filename=filename))
+								domain = x.multidomain
+							
+							result.append(ps.integer_fact(ps.atom_list(previous+[ps.unknown(x.content)]),domain,t[3],line=line,filename=filename))
+						else:
+							if type(x.multidomain) == ps.value_range and len(x.multidomain.content) == 2:
+								lower = x.multidomain.content[0] #clingo 5..10 domain statement
+								upper = x.multidomain.content[1]
+								dotted_domain=(lower,upper)
+								for y in previous:
+									y.dotted_domain = dotted_domain
+								result.append(ps.fluent_fact(ps.atom_list(previous+[x]),t[3],dotted_domain=dotted_domain,line=line,filename=filename))
 							else:
-								others.append(ps.fluent_fact(ps.atom_list(x),t[3],dotted_domain=(lower,upper),line=line,filename=filename))
-						else:
-							regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
+								for y in previous:
+									y.multidomain = domain
+								result.append(ps.fluent_fact(ps.atom_list(previous+[x]),t[3],multivalued=domain,line=line,filename=filename))
+							#add list for this domain.
+						previous = []
 					else:
-						regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
-				if len(others) > 0:
-					if len(regular)+len(others)>1:
-						if len(others) == 1:
-							int_dom=others[0].domain
-							t[0] = ps.integer_fact(t[2],int_dom,t[3],line=line,filename=filename)								
-						else:
-							t[0] = ps.atom_list(regular,others)
-					else:
-						t[0] = others[0]
-				else:
-					t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
+						previous.append(x)
+				result.append(ps.fluent_fact(ps.atom_list(previous),t[3],line=line,filename=filename))
+				t[0] = ps.atom_list(result)
+			
+# 			if type(t[2]) == ps.atom_list: # Get integer fluent declarations
+# 				others = []
+# 				regular = []
+# 				for x in t[2]: # This happens if integer and non_integers are mixed in one declaration.
+# 					if type(x) == ps.fluent_multival:
+# 						if type(x.multidomain) == list:
+# 							if x.is_int:
+# 								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(x.multidomain),t[3],line=line,filename=filename))
+# 							else:
+# 								regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))						 
+# 						elif type(x.multidomain)==ps.value_range and len(x.multidomain.content) == 2:
+# 							lower = x.multidomain.content[0]
+# 							upper = x.multidomain.content[1]
+# 							if x.is_int:
+# 								others.append(ps.integer_fact(ps.atom_list(x.content),ps.atom_list(lower,upper),t[3],line=line,filename=filename))
+# 							else:
+# 								others.append(ps.fluent_fact(ps.atom_list(x),t[3],dotted_domain=(lower,upper),line=line,filename=filename))
+# 						else:
+# 							regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
+# 					else:
+# 						regular.append(ps.fluent_fact(ps.atom_list(x),t[3],line=line,filename=filename))
+# 				if len(others) > 0:
+# 					if len(regular)+len(others)>1:
+# 						if len(others) == 1:
+# 							int_dom=others[0].domain
+# 							t[0] = ps.integer_fact(t[2],int_dom,t[3],line=line,filename=filename)								
+# 						else:
+# 							t[0] = ps.atom_list(regular,others)
+# 					else:
+# 						t[0] = others[0]
+# 				else:
+# 					t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)
 			else:
 				#print "Do WE even get here? <-- NO."
 				t[0] = ps.fluent_fact(t[2],t[3],line=line,filename=filename)

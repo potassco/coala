@@ -33,6 +33,27 @@ def isBoolDomain(data):
 			
 	return find_false and find_true
 
+# Adds dictionary / list structures recursively
+def combine_structures(struc,tocomb):
+	result = struc
+	if type(result) == dict and type(tocomb) == dict:
+		for x in tocomb:
+			if not x in result:
+				result[x] = tocomb[x]
+			else:
+				result[x] = combine_structures(result[x], tocomb[x])
+	elif type(result) == list:
+		if type(tocomb) == list:
+			for x in tocomb:
+				if not x in result:
+					result.append(x)
+		else:
+			result.append(tocomb)
+	else:
+		result = [result,tocomb]
+	return result
+		
+
 class AspCompiler(aspCom.AspCompiler):
 
 	def __init__(self,ignorance=False,decoupled=False):
@@ -78,9 +99,20 @@ class AspCompiler(aspCom.AspCompiler):
 			else:
 				dom["others"].append(d)
 			
-		self.flu_domains = dom
+		#for x in dom:
+		#	if x in self.flu_domains:
+		#		if type(x)==list:
+		#			for y in x:
+		#				)
+		#		else:
+		#			if not x in self.flu_domains[x]
+		#	else:
+		#		self.flu_domains[x] = dom[x]
+		self.flu_domains = combine_structures(self.flu_domains,dom)
+		self.fluents += full_fluents
+		#self.flu_domains = dom
+		#self.fluents = full_fluents
 		#print "domains:",dom
-		self.fluents = full_fluents
 	
 	def get_clean_actions(self,data):
 		result = []
@@ -146,6 +178,15 @@ class AspCompiler(aspCom.AspCompiler):
 		#print arith
 		data["arithmetic_laws"] = arith
 		data["arithmetic_helper_laws"] = arith_helper
+		
+		changed_int_list = []
+		for up in update:
+			for changedint in up.integers_changed_to_fluents:
+				changed_int_list.append(changedint)
+		if len(changed_int_list) > 0:
+			self.get_clean_fluents(changed_int_list)
+		#		data["fluents"].append(changedint)
+		
 		return data
 		
 	

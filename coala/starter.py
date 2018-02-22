@@ -2,29 +2,30 @@
 #
 # Copyright (c) 2016, Christian Schulz-Hanke
 #
+import coala.b.translator
+import coala.bc.translator
+import coala.bcAgent.translator
+import coala.bcAgent_legacy.translator
+import coala.bcLc.translator
+import coala.bc_legacy.translator
+#import coala.parse.parse_objects
 import getopt
 import os
 import sys
 import traceback
 
+
 global mypath
 mypath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+"/"
 sys.path.append(mypath)
 
-import coala.parse.parse_objects
-import coala.b.translator
-import coala.bc.translator
-import coala.bcAgent.translator
-import coala.bcLc.translator
-import coala.bc_legacy.translator
-import coala.bcAgent_legacy.translator
 
 
 global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.456"
+version = "2.457"
 
 
 try:
@@ -371,7 +372,7 @@ def main(argv):
 			"write_file=","ignore_errors","verbose","silent","ignore_undefined" \
 			"encoding_s=","encoding_t=","encoding_i=","encoding_f=","max_horizon=", \
 			"beta","tau","encoding_non_internal=","eni=","encoding_non_internal_transl=", \
-			"enit=","old_arithmetics","arith"])
+			"enit=","old_arithmetics","clingo_arith"])
 	except getopt.GetoptError:          
 		usage()                         
 		sys.exit(2)
@@ -454,8 +455,8 @@ def main(argv):
 			coala.parse.parse_objects.old_arithmetics = True
 		elif opt == "-x":
 			coala.parse.parse_objects.additional_ifcons_facts = True
-		elif opt in ("-a","--arith"):
-			coala.parse.parse_objects.clingcon_arithmetic = True
+		elif opt in ("-a","--clingo_arith"):
+			coala.parse.parse_objects.clingo_arithmetics = True
 			
 	if len(args) > 0:
 		input_fi = args
@@ -505,7 +506,8 @@ def main(argv):
 				(mypath+"coala/testcases/var_bug_1.bc",4,0),
 				(mypath+"coala/testcases/var_bug_2.bc",16,0),
 				(mypath+"coala/testcases/test_bound.bc",32,1),
-				(mypath+"coala/testcases/test_bound_2.bc",27,3)]
+				(mypath+"coala/testcases/test_bound_2.bc",27,3),
+				(mypath+"coala/testcases/test_bound_3.bc",8,8)]
 	
 	if negated_actions:
 		testcases.append((mypath+"coala/testcases/test_neg_act.bc",1,4))

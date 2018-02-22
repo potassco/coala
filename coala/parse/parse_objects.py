@@ -9,7 +9,7 @@ import sys
 
 old_arithmetics = False
 additional_ifcons_facts = False
-clingcon_arithmetic = False
+clingo_arithmetics = False
 
 #
 # The following classes are used to represent the parse tree.
@@ -316,7 +316,33 @@ class parse_object(object):
             #wh_vars = wh.pass_down_update(update) # Ignoring Return Variables!
             #if wh_vars != update.where_variables:
             #    print "unequal"
-            update.where_end()                
+            update.where_end()    
+        else:
+            # No where means all variables are unbound
+#             unbound_vars = self.get_variables()
+#             def subcrit(self,update): # Find int fluents in equations
+#                 if type(self) in [fluent,unknown,predicate]:
+#                     for inte in update.integer_ids:
+#                         #if self.compare_to(inte):
+#                         if str(self) == str(inte):
+#                             return self
+#             def criteria(self,variab,update): # Find variable and get int flu
+#                 if type(self) == equation: 
+#                     my_vars = self.get_variables()
+#                     for mvar in my_vars:
+#                         if str(mvar) == str(variab):
+#                             match = self.search_and_return(lambda x: subcrit(x,update))
+#                             if match is not None and type(match) == list and len(match)>0:
+#                                 if len(match) == 1:
+#                                     return (match[0],variab,self)
+#                                 else:
+#                                     return (match,variab,self)
+#             for v in unbound_vars:
+#                 match = self.search_and_return_path(lambda x: criteria(x,v,update))
+#                 if match is not None:
+#                     update.add_indirectly_bound_integer_variable(match)
+                
+            pass            
                     
         for kc in ch:
             c = ch[kc]
@@ -352,13 +378,13 @@ class parse_object(object):
         #,"where"]: #################################ADD THIS
         #,"where"]: #################################ADD THIS
         #,"where"]: #################################ADD THIS
-            my_in_where = in_where or att == "where"
             if hasattr(self,att):
                 val = getattr(self,att)
                 if val is not None:
                     if type(val) == false_atom:
                         return None
                     if type(val) != str:
+                        my_in_where = in_where or att == "where"
                         if type(val) == list:
                             nval = [] 
                             for v in val:
@@ -366,7 +392,9 @@ class parse_object(object):
                                 else:
                                     if v.is_false(): return None 
                                     simp = v.simplify(negation,my_in_where)
-                                    if simp is not None: nval.append(simp)
+                                    if simp is not None: 
+                                        if type(simp) == list: nval += simp
+                                        else: nval.append(simp)
                         else:
                             nval = val.simplify(negation,my_in_where)
                         setattr(self,att,nval)
@@ -587,8 +615,7 @@ class law(rule):
     def __init__(self):
         parse_object.__init__(self)
         self.law_type = None
-        self.other_conditions_if = atom_list()
-        self.other_conditions_head = atom_list()
+        self.other_conditions = {}
         
     def add_part(self,part,law_position):
         print  >> sys.stderr, "ERROR, not implemented add_part for", self.__class__ 
@@ -601,11 +628,12 @@ class law(rule):
         self.law_id = update.idfunction()
         
         #Creating arithmetic laws in the body
-        for (caller,replaced_law,replacement,law_part) in update.where_arithmetic:
-            if law_part == "head":
-                self.other_conditions_head.append(replacement)
+        # (caller,replaced_law,replacement,law_part)
+        for (_,_,replacement,law_part) in update.where_arithmetic:
+            if law_part in self.other_conditions:
+                self.other_conditions[law_part].append(replacement)
             else:
-                self.other_conditions_if.append(replacement)
+                self.other_conditions[law_part] = atom_list(replacement)
         
         #Checking for variables in the body that are not bound and putting them into the where part
         def criteria(self): 
@@ -625,11 +653,12 @@ class law(rule):
 #                     elif my_vars is not None:
 #                         return (self,[my_vars,])
         var = self.search_and_return(criteria) #get_variables()
-        bound_vars = self.get_explicitly_bound_variables()
-        for (equ,va) in var:
+        #bound_vars = self.get_explicitly_bound_variables()
+        # (equ,va)
+        for (equ,_) in var:
             if update.where_variables is None:
                 update.where_variables = atom_list()
-            one_not_found = True
+                
 #             one_not_found = False
 #             for v in va:
 #                 found = False
@@ -643,40 +672,40 @@ class law(rule):
 #                     if not str(v) in self.variables: 
 #                         self.variables.append(str(v))
             
-            if one_not_found:
+#            if one_not_found:
                 
                 # We will only come here if v is a unbound variable
                 
                 
-                if not hasattr(self, "where") or self.where is None:
-                    self.where = atom_list()
-                if type(self.where) == atom_list:
-                    if type(equ)==equation and type(equ.left) in [variable,unknown,predicate,str] and equ.operator in ["=","=="]:
-                        if equ.right == "<true>": #in ["<true>","true"] :
-                            self.where.append( fluent(equ.left,True) )
-                            return 
-                        if equ.right == "<false>": #in ["<false>","false"] : 
-                            self.where.append( fluent(equ.left,False) )
-                            return
+            if not hasattr(self, "where") or self.where is None:
+                self.where = atom_list()
+            if type(self.where) == atom_list:
+                if type(equ)==equation and type(equ.left) in [variable,unknown,predicate,str] and equ.operator in ["=","=="]:
+                    if equ.right == "<true>": #in ["<true>","true"] :
+                        self.where.append( fluent(equ.left,True) )
+                        continue 
+                    if equ.right == "<false>": #in ["<false>","false"] : 
+                        self.where.append( fluent(equ.left,False) )
+                        continue
 
-                        additional_law = None
-                        
-                        #check if action or fluent / integer fluent
-                        definite_type = False
-                        if not definite_type:
-                            for flu in update.fluents:
-                                if equ.left.compare_to(flu):
-                                    additional_law = fluent(equ.left,equ.right)
-                                    definite_type = True
-                                    break 
-                        if not definite_type:
-                            for inte in update.integer_ids:
-                                if equ.left.compare_to(inte):#get a number for this law?
-                                    self.reference = inte
-                                    self.type = "integer"
-                                    update.set("has_integer",True)
-                                    definite_type = True
-                                    break 
+                    additional_law = None
+                    
+                    #check if action or fluent / integer fluent
+                    definite_type = False
+                    if not definite_type:
+                        for flu in update.fluents:
+                            if equ.left.compare_to(flu):
+                                additional_law = fluent(equ.left,equ.right)
+                                definite_type = True
+                                break 
+                    if not definite_type:
+                        for inte in update.integer_ids: #TODO: do we need this?
+                            if equ.left.compare_to(inte):#get a number for this law?
+                                #self.reference = inte
+                                #self.type = "integer"
+                                update.set("has_integer",True)
+                                definite_type = True
+                                break 
 #                                 if not definite_type:
 #                                     if update.is_action_allowed() or True: # this check will not work here
 #                                         for act in update.actions:
@@ -686,18 +715,18 @@ class law(rule):
 #                                                 break 
 #                                 if definite_type:
 #                                     print "type:",self.type
-                        #end check
-                        if additional_law is not None:
-                            old_found=False
-                            for old in self.where:
-                                if additional_law.compare_to(old):
-                                    old_found=True
-                                    break
-                            if not old_found: self.where.append(additional_law)
-                    else:
-                        raise NameError("Unbound Variable cannot be fixed, not bound in equation!")
+                    #end check
+                    if additional_law is not None:
+                        old_found=False
+                        for old in self.where:
+                            if additional_law.compare_to(old):
+                                old_found=True
+                                break
+                        if not old_found: self.where.append(additional_law)
                 else:
-                    raise NameError("Unbound Variable cannot be fixed, no where part!")
+                    raise NameError("Unbound Variable cannot be fixed, not bound in equation!")
+            else:
+                raise NameError("Unbound Variable cannot be fixed, no where part!")
                 
         # Add additions, but do not add their variables
         for addition in update.where_additions:
@@ -712,16 +741,15 @@ class law(rule):
         return self.law_type
 
     def replace_unbound_variables(self,assignm,negate=False):
-        return self
+        #return self
         if len(self.variables) > 0:
             nva = []
             for va in self.variables:
-                found = False
-                for (x,y,after) in assignm:
+                # (x,y,after)
+                for (x,y,_) in assignm:
                     if str(va) == str(y):
-                        found = True
-                        continue
-                if not found:
+                        break
+                else:
                     nva.append(va)
             self.variables = nva
         for att in self.child_attributes:
@@ -783,8 +811,12 @@ class static_law(law): #static
         #Law
         result = [ "static_law("+myid+")"+wherepart+"." ]
         
-        stuff = [(self.head,"head"),(self.if_part,"if"),(self.ifcons_part,"ifcons"), \
-            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
+        stuff = [(self.head,"head"),(self.if_part,"if"),(self.ifcons_part,"ifcons")]
+        for x in self.other_conditions:
+            if x == "head":
+                stuff.append((self.other_conditions[x],"head"))
+            else:
+                stuff.append((self.other_conditions[x],"if"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -839,8 +871,14 @@ class dynamic_law(law): #dynamic
         #Law
         result = [ "dynamic_law("+myid+")"+wherepart+"." ]
         
-        stuff = [(self.head,"head"),(self.after_part,"after"),(self.ifcons_part,"ifcons"), \
-            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
+        stuff = [(self.head,"head"),(self.after_part,"after"),(self.ifcons_part,"ifcons")]
+        for x in self.other_conditions:
+            if x == "head":
+                stuff.append((self.other_conditions[x],"head"))
+            elif x == "after":
+                stuff.append((self.other_conditions[x],"after"))
+            else:
+                stuff.append((self.other_conditions[x],"if"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -892,8 +930,12 @@ class nonexecutable_law(law): #nonexecutable
         #Law
         result = []
         
-        stuff = [(self.body,"nonexecutable"),(self.if_part,"nonexecutable"),(self.ifcons_part,"ifcons"), \
-            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
+        stuff = [(self.body,"nonexecutable"),(self.if_part,"nonexecutable"),(self.ifcons_part,"ifcons")]
+        for x in self.other_conditions:
+            if x == "head":
+                stuff.append((self.other_conditions[x],"head"))
+            else:
+                stuff.append((self.other_conditions[x],"if"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -951,8 +993,9 @@ class impossible_law(law): #impossible
         #Law
         result = []
         
-        stuff = [(self.body,"impossible"),(self.ifcons_part,"ifcons"), \
-            (self.other_conditions_if,"impossible"),(self.other_conditions_head,"impossible")]
+        stuff = [(self.body,"impossible"),(self.ifcons_part,"ifcons")]
+        for x in self.other_conditions:
+                stuff.append((self.other_conditions[x],"impossible"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -997,7 +1040,9 @@ class inertial_law(law): #inertial
         result = []
         
         children = self.head.get_children()
-        for ch in children + self.other_conditions_if.get_children() + self.other_conditions_head.get_children():
+        for x in self.other_conditions:
+            children += self.other_conditions[x].get_children()
+        for ch in children:
             if ch.binding is not None:
                 whnew = ch.binding.compile_where_single()
                 if len(whnew) > 0:
@@ -1052,8 +1097,12 @@ class default_law(law): #default
             return result
         
         
-        stuff = [(self.head,"default"),(self.if_part,"if"),(self.after_part,"after"), \
-            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
+        stuff = [(self.head,"default"),(self.if_part,"if"),(self.after_part,"after")]
+        for x in self.other_conditions:
+            if x == "head":
+                stuff.append((self.other_conditions[x],"head"))
+            else:
+                stuff.append((self.other_conditions[x],"if"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -1105,8 +1154,12 @@ class visible_law(law): #visible
         #Law
         result = []
         
-        stuff = [(self.head,"visible"),(self.if_part,"if"), \
-            (self.other_conditions_if,"if"),(self.other_conditions_head,"head")]
+        stuff = [(self.head,"visible"),(self.if_part,"if")]
+        for x in self.other_conditions:
+            if x == "head":
+                stuff.append((self.other_conditions[x],"head"))
+            else:
+                stuff.append((self.other_conditions[x],"if"))
         for st in stuff:
             current = st[0]
             if current is None:
@@ -1334,6 +1387,19 @@ class integer_fact(fact):
 
     def get_integers(self):
         return [self,]
+    
+    # We use this to translate integers to fluents if needed
+    def pass_down_update_overwrite(self,update):
+        if clingo_arithmetics:
+            self.replacement = fluent_fact(atom_list(unknown(self.head)), self.where, None, self.line_number, self.filename, self.domain)
+            update.integers_changed_to_fluents.append(self.replacement)
+    
+    # We use this to translate integers to fluents if needed
+    def simplify(self,negation=False,in_where=False):
+        if clingo_arithmetics and self.replacement is not None:
+            return self.replacement
+        else:
+            return parse_object.simplify(self, negation, in_where)
 
 class query(law):
     def __init__(self):
@@ -2217,23 +2283,30 @@ class equation(parse_object):
                     self.variables.append(v)
         
         if len(update.unbound_variables)>0: # Variable of law not bound in where part
-            if update.is_in_head():
-                #print "head"
-                #self.replace_unbound_variables(update.unbound_assignment)
-                pass           
-            else:
-                if self.operator in ["="]:
-                    if self.left.__class__ in [unknown, predicate] \
-                    and self.right.__class__ == variable:
-                        #print "p/u = v"
-                        update.add_unbound_assignment((self.left,self.right))
-                    if self.left.__class__ == variable \
-                    and self.right.__class__ in [unknown,predicate]:
-                        #print "v = p/u"
-                        update.add_unbound_assignment((self.right,self.left))
-                # is equation? |bound| > 1
-                # ignore for now
-                # is assignment? |bound| == 1
+            #    pass           
+            #else:
+            if self.operator in ["="]: # Variables are removed from the indexes of laws.
+                if self.left.__class__ in [unknown, predicate] \
+                and self.right.__class__ == variable:
+                    #print "p/u = v"
+                    for inte in update.integers:
+                        if self.left.compare_to(inte):
+                            if update.is_in_head():
+                                self.replace_unbound_variables(update.unbound_assignment)
+                            update.add_unbound_assignment((self.left,self.right))
+                            break
+                if self.left.__class__ == variable \
+                and self.right.__class__ in [unknown,predicate]:
+                    #print "v = p/u"
+                    for inte in update.integers:
+                        if self.right.compare_to(inte):
+                            if update.is_in_head():
+                                self.replace_unbound_variables(update.unbound_assignment)
+                            update.add_unbound_assignment((self.right,self.left))
+                            break
+            # is equation? |bound| > 1
+            # ignore for now
+            # is assignment? |bound| == 1
             #print update.unbound_variables
         if type(self.left) == unknown and type(self.right) == variable and self.right.unbound == True:
             #print str(self.left) + str(self.operator) + str(self.right)
@@ -2250,7 +2323,7 @@ class equation(parse_object):
             for elem in update.indir_bound_int_var:
                 if elem[2] == self:
                     self.replacement = True
-                    return []
+                    return [] #TODO: can this be a problem?
             
             self.has_integer = True
             self.my_id = update.arith_idfunction()
@@ -2324,7 +2397,7 @@ class equation(parse_object):
             #print " ".join(x.print_facts() for x in head)
             #print " ".join(x.print_facts() for x in body)
             
-            
+            # If we are in the where part, equations are replaced (update is used to keep track and add it to the law)
             if update.where:
                 arithmetic_law_placement = "if"
                 if "head" in occurrences:
@@ -2367,7 +2440,7 @@ class equation(parse_object):
         if self.replacement is not None:
             #print "rep:",self.replacement
             return self.replacement.simplify(negation,in_where)
-        if not self.is_in_where and type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
+        if not in_where and not self.is_in_where and type(self.left) in [variable,unknown,predicate,str] and self.operator in ["=","=="]:
             if self.right == "<true>": #in ["<true>","true"] : 
                 result = fluent(self.left,not negation)
                 result.binding = self.binding
@@ -2395,13 +2468,14 @@ class equation(parse_object):
     def replace_unbound_variables(self,assignment,negate=False):
         #self.left = self.left.replace_unbound_variables(assignment,negate)
         #self.right = self.right.replace_unbound_variables(assignment,negate)
-        if self.replacement is not None:
+        if self.replacement is not None and type(self.replacement) != bool:
             for co in self.replacement.parameters.content:
                 con = co.parameters.content
                 repl = []
                 for c in con:
                     found = False
-                    for (x,y,after) in assignment:
+                    # (x,y,after)
+                    for (_,y,_) in assignment:
                         if str(c) == str(y):
                             found = True
                             break
@@ -2815,48 +2889,108 @@ class assignment(parse_object):
                     self.variables.append(v)
 
         if is_arithmetic_assignment:
-            self.has_integer = True
-            self.my_id = update.arith_idfunction()
-            self.replacement = self.create_replacement()
-            assignment = update.is_in_head()
-            if not assignment:
-                print >> sys.stderr, "Error: Assignment in Body!"
-                errout.error("Error: Assignment in Body!")
-            dynamic_law_part = update.is_in_dynamic_law(check_default_laws=True)
-            if type(self.head) == str: le = [arithmetic_atom(self.head,update.arith_helper_idfunction()),]
+            if clingo_arithmetics:
+                # HEAD := BODY
+                # split to HEAD=_X , BODY_1=_Y, BODY_2=_Z # That's a bad encoding...
+                # replace self with assignment(Head=_X)
+                self.replacement = True
+                
+                # Get head fluents
+                
+                head_leaf = self.head.get_bottom_elements()
+                body_leaf = self.body.get_bottom_elements()
+                
+                # generate variables
+                
+                replacements = {}
+                for x in head_leaf:
+                    varn = "_VAR_"
+                    if x.apostroph:
+                        varn += "PAST_"
+                    varn += str(x)
+                    replacements[x] = varn
+                    if not varn in self.variables:
+                        self.variables.append(varn)
+                    
+                for x in body_leaf:
+                    varn = "_VAR_"
+                    if x.apostroph:
+                        varn += "PAST_"
+                    varn += str(x)
+                    replacements[x] = varn
+                    if not varn in self.variables:
+                        self.variables.append(varn)
+                
+                # generate new assignments
+
+                for x in head_leaf:
+                    y = copy.deepcopy(x)
+                    repl = variable(replacements[x])
+                    x.content = repl # Replace fluent, will be used for moving the law to the where part
+                    update.add_where_arithmetic(self,self,assignment(y,repl),"head")
+                    domain_statement = fluent(y,domainelement=repl)
+                    update.add_to_where(domain_statement)
+                for x in body_leaf:
+                    y = copy.deepcopy(x)
+                    repl = variable(replacements[x])
+                    x.content = repl # Replace fluent, will be used for moving the law to the where part
+                    domain_statement = fluent(y,domainelement=repl)
+                    update.add_to_where(domain_statement)
+                    if y.apostroph:
+                        update.add_where_arithmetic(self,self,assignment(y,repl),"after")
+                    else:
+                        update.add_where_arithmetic(self,self,assignment(y,repl),"body")
+                        
+                # Add Law with replaced variables to where part!
+                
+                
+                
+                my_where_arithmetic = equation(self.head,self.body,"=")
+                update.add_to_where(my_where_arithmetic)
+                
             else:
-                le = self.head.arith_flatten(negation=False,update=update)
-                if type(le) is not list: le = [le,]
-            if type(self.body) == str: ri = [arithmetic_atom(self.body,update.arith_helper_idfunction()),]
-            else:
-                ri = self.body.arith_flatten(negation=False,update=update)#True) #The right part is negates
-                if type(ri) is not list: ri = [ri,]
-            # This part summarizes the single numbers
-            val = None
-            head = []
-            body = []
-            for l in le:
-                if l.has_no_variable():
-                    if val is None: val = l
-                    else: val.add(l)
+                self.has_integer = True
+                self.my_id = update.arith_idfunction()
+                self.replacement = self.create_replacement()
+                has_assignment = update.is_in_head()
+                if not has_assignment:
+                    print >> sys.stderr, "Error: Assignment in Body!"
+                    errout.error("Error: Assignment in Body!")
+                dynamic_law_part = update.is_in_dynamic_law(check_default_laws=True)
+                if type(self.head) == str: le = [arithmetic_atom(self.head,update.arith_helper_idfunction()),]
                 else:
-                    head.append(l)
-            for r in ri:
-                if r.has_no_variable():
-                    if val is None: val = r
-                    else: val.add(r)
+                    le = self.head.arith_flatten(negation=False,update=update)
+                    if type(le) is not list: le = [le,]
+                if type(self.body) == str: ri = [arithmetic_atom(self.body,update.arith_helper_idfunction()),]
                 else:
-                    r.negate() # These are moved from the right side to the left... therefore negated
-                    body.append(r)
-            if val is not None:
-                body.append(val)
-            #print " ".join(x.print_facts() for x in head)
-            #print " ".join(x.print_facts() for x in body)
-            
-            law = self.create_law(head,body,dynamic_law_part,update)
-            law.binding = self.binding
-            #arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
-            update.add_arithmetic_law(law)
+                    ri = self.body.arith_flatten(negation=False,update=update)#True) #The right part is negates
+                    if type(ri) is not list: ri = [ri,]
+                # This part summarizes the single numbers
+                val = None
+                head = []
+                body = []
+                for l in le:
+                    if l.has_no_variable():
+                        if val is None: val = l
+                        else: val.add(l)
+                    else:
+                        head.append(l)
+                for r in ri:
+                    if r.has_no_variable():
+                        if val is None: val = r
+                        else: val.add(r)
+                    else:
+                        r.negate() # These are moved from the right side to the left... therefore negated
+                        body.append(r)
+                if val is not None:
+                    body.append(val)
+                #print " ".join(x.print_facts() for x in head)
+                #print " ".join(x.print_facts() for x in body)
+                
+                law = self.create_law(head,body,dynamic_law_part,update)
+                law.binding = self.binding
+                #arithmatic_law(head,body,"=",self.my_id,assignment,dynamic_law_part,self.variables,update.get_where())#self.get_where())
+                update.add_arithmetic_law(law)
             
         #Code for adding binding to where part! 
         if self.binding is not None:#TODO: Add to other parse_objects!
@@ -2877,6 +3011,8 @@ class assignment(parse_object):
     
     def simplify(self, negation=False,in_where=False,binding=None):
         if self.replacement is not None:
+            if type(self.replacement) == bool and self.replacement==True:
+                return None
             result = self.replacement.simplify(negation,in_where)
             if binding is not None:
                 result.binding = binding
@@ -3331,6 +3467,7 @@ class update_passdown(object):
         self.where_additions = []
         self.indir_bound_int_var = []
         self.path = []
+        self.integers_changed_to_fluents = []
         if type(others) == dict:
             self.others = others
         else:

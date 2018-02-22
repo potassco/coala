@@ -1,0 +1,9 @@
+
+fluent a(X) where X=1..3 .
+fluent b.
+inertial a(X) where X=1..3.
+
+b if a(X)=Y : q(X,Y).
+
+% 8 State
+% 8 Transitions

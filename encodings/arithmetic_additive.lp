@@ -15,7 +15,7 @@
 atom(_arithmetic(L)) :- arithmetic_law(L,_).
 
 % Enforces arithmetics to hold when laws do.
-:- holds(_arithmetic(L),T), allassigned(L,T), not arithmetic_fulfilled(L,T).
+:- holds(_arithmetic(L),T), allassigned(L,T), not arithmetic_fulfilled(L,T), not arithmetic_illegal(L,T).
 %:- holds(_arithmetic(L),T), not arithmetic_fulfilled(L,T).
 
 % Non-Assignments which appear in bodys:
@@ -44,6 +44,16 @@ arithmetic_fulfilled(L,T) :- arith_law_simp(L,C,F),
     step(T).
 
 %---------------------------------------------------------
+% An assignment is legal if the value of the head would be inside it's domain
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD;  step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD; step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD;  step(T).
+
+arithmetic_illegal(L,T) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,T+M),I:arith_law_atom(K,X,I,L,M),step(T+M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD; step(T).
+%---------------------------------------------------------
 % SMT to HTC encoding
 % (Integers must be assigned at each step.)
 
@@ -57,14 +67,14 @@ assigned(V,T) :- integer(V), inertial(V),
 
 % An integer is assigned if there is a dynamic law assigning it.
 assigned(V,T) :- integer(V), arithmetic_head(L,V,_,_), 
-    holds(_arithmetic(L),T), 
+    holds(_arithmetic(L),T), not arithmetic_illegal(L,T),
     allassigned(L,T-1),
     arithmetic_assignment_dynamic(L), 
     step(T), step(T-1).
 
 % An integer is assigned if there is a static law assigning it.
 assigned(V,T) :- integer(V), arithmetic_head(L,V,_,_), 
-    holds(_arithmetic(L),T), 
+    holds(_arithmetic(L),T), not arithmetic_illegal(L,T),
     allassigned(L,T),
     arithmetic_assignment(L), step(T).
 
