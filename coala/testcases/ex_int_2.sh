@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Testing with clingo using encodings/arithmetic_clingo.lp"
 ls int*.bc | while read x; do
     echo $x
 

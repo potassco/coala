@@ -9,7 +9,7 @@ setup(
     name="coala",
 
     # Version number (initial):
-    version="2.457",
+    version="2.458",
 
     # Application author details:
     author="Christian Schulz-Hanke",

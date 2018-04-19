@@ -297,13 +297,13 @@ arithmetic_fulfilled(L,t) :- arith_law_simp(L,C,F),
 %---------------------------------------------------------
 % An assignment is legal if the value of the head would be inside it's domain
 
-arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD.
+arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), step(T+M):arith_law_atom(_,_,_,L,M); arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD.
 
-arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD.
+arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), step(T+M):arith_law_atom(_,_,_,L,M); arithmetic_assignment(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD.
 
-arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD.
+arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), step(T+M):arith_law_atom(_,_,_,L,M); arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} < C-UD.
 
-arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD.
+arithmetic_illegal(L,t) :- arithmetic_head(L,V,_,_), step(T+M):arith_law_atom(_,_,_,L,M); arithmetic_assignment_dynamic(L), arithmetic(L,C), integer_domain(V,LD,UD), &sum {K*val(X,t+M),I:arith_law_atom(K,X,I,L,M),not arithmetic_head(L,X,K,I);K*X,I:arith_law_atom(K,X,I,L)} > C-LD.
 %---------------------------------------------------------
 % SMT to HTC encoding
 % (Integers must be assigned at each step.)

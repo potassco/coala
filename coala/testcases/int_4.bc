@@ -1,5 +1,5 @@
 
-<fluent> x : 1 .. 100.
+<fluent> x : 1 .. 200.
 <fluent> y : 1 .. 200.
 <action> increase.
 
@@ -10,5 +10,5 @@
 y:=10 <after> increase.
 x:=y+1 <ifcons> y > 2. 
 
-% 297 States
-% 294 Transitions
+% 797 States (if x:1..100, x:=y+1 not allowed for y+1>100, then 297)
+% 794 Transitions (... 294)

@@ -7,4 +7,4 @@
 x:=x'+1 <after> increase.
 
 % 96 States
-% 191 Transitions (2*states -1)
+% 192 Transitions (2*states, only -1 if x:=101 after increase, x=100 would be allowed )

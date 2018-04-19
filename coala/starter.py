@@ -25,7 +25,7 @@ global no_clingo_library
 no_clingo_library = False
 
 global version
-version = "2.457"
+version = "2.458"
 
 
 try:

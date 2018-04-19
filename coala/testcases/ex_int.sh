@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "Testing with clingcom using encodings/arithmetic.lp"
 ls int*.bc | while read x; do
     echo $x
 
@@ -16,6 +17,7 @@ ls int*.bc | while read x; do
         grep "Transit" $x
     fi
 done
+echo "Testing with clingcom using encodings/arithmetic_additive.lp"
 ls add*.bc | while read x; do
     echo $x
     res=`coala $x 2>/dev/null | clingcon - ../../encodings/arithmetic_additive.lp 5000 -c k=0 2>&1 | tail -n 4 | head -n 1  | grep -o "[0-9]*"`   

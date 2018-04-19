@@ -17,4 +17,4 @@ nonexecutable call, pain<3.
 
 
 % 22 States
-% 29 Transitions
+% 30 Transitions (29 if noise:=21 after noise=19 would be allowed)
