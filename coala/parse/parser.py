@@ -5,7 +5,6 @@ import parse_objects as ps
 import ply.yacc as yacc
 import lexer
 import os
-from coala.parse.parse_objects import atom_list
 		
 # Parsing rules
 
@@ -687,7 +686,8 @@ class Parser(object):
 		if self.debug:
 			self.parser = yacc.yacc(module=self, debug=True, outputdir=mypath, **kwargs) # SILENT MODE!
 		else:
-			self.parser = yacc.yacc(module=self, debug=False, optimize=False, outputdir=mypath, write_tables=False, **kwargs) # SILENT MODE!
+			self.parser = yacc.yacc(module=self, debug=False, optimize=False, outputdir=mypath, **kwargs) # SILENT MODE!
+			#write_tables=False,
 		#self.parser = yacc.yacc(module=self, **kwargs)
 		
 	def reset_data(self):

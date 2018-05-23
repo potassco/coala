@@ -1,0 +1,21 @@
+<asp>
+#const max=2.
+dir(up;down).
+office(1..max).
+
+initialrequest(X,Y) :- office(X), office(Y), X!=Y.
+notinitialrequest(X,X) :- office(X).
+</asp>
+
+% FLUENTS + ACTIONS
+<fluent> at=X <where> office(X).
+
+<action> pickup(From, To) <where> office(From), office(To).
+<action> deliver(From, To) <where> office(From), office(To).
+<nonexecutable> deliver(From,To), pickup(To,To2) <where> office(From), office(To), office(To2). 
+
+
+<inertial> at.
+
+% 2 State
+% 98 Transitions

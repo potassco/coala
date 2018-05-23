@@ -433,8 +433,8 @@ class parse_object(object):
     def compare_to(self,other,parent=True,accept_variables=True):
         #print >> sys.stderr, "compare: ",self,"("+self.__class__.__name__+"), ",other,"("+other.__class__.__name__+")"
         if self == other: return True
+        if accept_variables and (other.__class__ == variable or self.__class__ == variable): return True
         if self.__class__ != other.__class__:
-            if accept_variables and (other.__class__ == variable or self.__class__ == variable): return True
             return False
         c1 = self.get_children()
         c2 = other.get_children()
@@ -779,16 +779,16 @@ class law(rule):
                 else:
                     prime_var = var_equ[var_key][0][0] 
                     prime_pos = var_equ[var_key][0][1]
-                prime_pos = var_equ[var_key][-1][1]
-                prime_var = var_equ[var_key][-1][0] #TODO: remove?
-                for (flu, my_pos) in stuff: #TODO: This will not work for after/ifcons parts!
+                #prime_pos = var_equ[var_key][-1][1]
+                #prime_var = var_equ[var_key][-1][0]
+                for (flu, my_pos) in stuff:
                     
                     #if prime: 
                     #    prime = False
                     #    prime_var = flu
                     #    prime_pos = my_pos
                     #else:
-                    if prime_var != flu or prime_pos != my_pos: #TODO: and ???
+                    if prime_var != flu or prime_pos != my_pos:
                         new_id = update.arith_idfunction()
                         arith_replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(new_id),[]))))
                         assignment = False
@@ -1519,7 +1519,6 @@ class integer_fact(fact):
             result.append("integer("+st+")"+wherepart+".")
             if domain:
                 result.append("integer_domain("+st+","+lower+","+upper+")"+wherepart+".")
-        # TODO: else??
         return result
 
     def get_integers(self):
@@ -1925,7 +1924,7 @@ class predicate(parse_object):
                     self.variables.append(v)
                     
         #Code for adding binding to where part! 
-        if self.binding is not None:#TODO: Add to other parse_objects!
+        if self.binding is not None:
             #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
@@ -2040,7 +2039,7 @@ class arithmetic_law(law): # Will be generated out of equations!
             for e in self.head:
                 if e.law_part is not None: # CONDITION for part knowing it's timestep
                     if e.law_part == "ifcons":
-                        result.append("arithmetic_ifcons("+stid+","+e.print_facts()+")"+wherepart+".") #TODO: NEW, check! 
+                        result.append("arithmetic_ifcons("+stid+","+e.print_facts()+")"+wherepart+".") 
                     if e.law_part == "head":
                         result.append("arithmetic_head("+stid+","+e.print_facts()+")"+wherepart+".")
                     else:
@@ -2077,7 +2076,6 @@ class arithmetic_law(law): # Will be generated out of equations!
         return result
 
 class arithmetic_additive_law(arithmetic_law): # Will be generated out of equations!
-    #TODO: Does not use self.other_conditions !!
     
     def __init__(self,head,body,my_id,dynamic_law_part,variables,where=None):
         arithmetic_law.__init__(self,head,body,"=",my_id,True,dynamic_law_part,variables,where)
@@ -2085,6 +2083,10 @@ class arithmetic_additive_law(arithmetic_law): # Will be generated out of equati
         #print >> sys.stderr, "Warning! Incremental statements using += may result in different behavior!"
     
     def print_facts(self, prime=False):
+        
+        if self.other_conditions is not None and len(self.other_conditions) > 0:
+            errout.error("Arithmetic additive law with other_conditions: "+str(self.other_conditions))
+        
         wherepart = self.compile_where()
         result = []
         stid = "law("+','.join([str(self.my_id)]+self.variables)+")"
@@ -2187,22 +2189,17 @@ class arithmetic_atom(parse_object):
                 
             return self
         else:
-            raise NameError("Arithmetics: Another Nooooooooooooo!")
+            raise NameError("Arithmetics: Internal error adding two variables.")
     
-    def multiply(self,other): #TODO: If this was unknown, we cannot be certain what will happen!
-        if other.__class__ is not arithmetic_atom: raise NameError("Arithmetics: Nooooooooooooo!")
+    def multiply(self,other):
+        if other.__class__ is not arithmetic_atom: raise NameError("Arithmetics: Found wrong object for multiplication!")
         if self.unknown:
             if other.unknown:
-                if self.value == other.value:
-                    raise NameError("Arithmetics: There are some limitations on how to use variables in arithmetics!")
-                    #TODO: oh Shit. Can we do anything here?
+                if self.variable is None and other.variable is None:
+                    self.variable = other.value
+                    self.unknown_is = "Factor"
                 else:
-                    if self.variable is None and other.variable is None:
-                        self.variable = other.value
-                        self.unknown_is = "Factor"
-                    else:
-                        raise NameError("Arithmetics: There are some limitations on how to use variables in arithmetics!")
-                        #TODO: oh shit. Can we do anything here?
+                    raise NameError("Arithmetics: Multiplying variables is not possible with linear constraints!")
             a = self.factor
             b = other.factor
             c = other.variable
@@ -2256,12 +2253,17 @@ class arithmetic_atom(parse_object):
     def dividable_by_any_chance(self,other):
         return other.variable is None
     
-    def divide(self, other): #TODO: If this was unknown, we cannot be certain what will happen!
-        if other.__class__ is not arithmetic_atom: raise NameError("Arithmetics: Nooooooooooooo!")
-        if other.variable is not None:
-            raise NameError("Arithmetics: There are some limitations on how to use variables in arithmetics!")
+    def divide(self, other):
+        if other.__class__ is not arithmetic_atom: raise NameError("Arithmetics: Found wrong object for division!")
+        if other.variable is not None: 
+            if self.variable == other.variable: # 123*a / ( 321*a ) == 123/321 (if "a" is a variable) 
+                self.variable = None
+                self.factor /= other.factor
+                return self
+            else:
+                raise NameError("Arithmetics: Division using linear constraints cannot be done using variables!")
         if self.unknown or other.unknown:
-            raise NameError("Arithmetics: TODO: We cannot be sure what to do here!") #TODO math?
+            raise NameError("Arithmetics: Our current version requires a clear distinction between fluents and numbers for division!")
         a = self.factor
         b = other.factor
         #if float(a) / float(b) == a/b:
@@ -2285,13 +2287,11 @@ class arithmetic_atom(parse_object):
     
     def print_facts(self, prime=False):
         addition = ""
-        #if not prime: "head",
-        if self.law_part in ["if","ifcons","body"]:
+        if self.law_part in ["if","ifcons","body"]: # Adding time step
             addition = ",0"
         elif self.law_part == "after":
             addition = ",-1"
-            # TODO: remove other options!!
-        if self.unknown:
+        if self.unknown: # If we do not know is a variable is a fluent, we let asp handle it.
             if self.variable is not None:
                 return "_unknown,"+self.variable+","+((self.value+",") if self.value is not None else "")+("-" if self.negation else "")+str(int(self.factor))+","+str(self.helper_id)+addition
             else:
@@ -2371,40 +2371,6 @@ class equation(parse_object):
             return [domain(self.left,self.right),]
         else:
             return None
-        
-#     def mark_rewrite(self,marks,head=False,ifcons=False):
-#         my_mark = None
-#         my_vars = self.get_variables()
-#         for m in marks:
-#             for va in m[1]:
-#                 if va in my_vars:
-#                     my_mark #TODO: correct this
-#         
-#     def mark_check_body(self,marks,head=False,ifcons=False):
-#         variables = self.get_variables()
-#         shared_vars = []
-#         corresponding_marks = []
-#         for v in variables:
-#             for m in marks:
-#                 for mv in m["variables"]:
-#                     #print v,type(v),mv,type(mv),str(v) == str(mv),v.compare_to(mv)
-#                     if str(v) == str(mv):#v.compare_to(mv): #TODO: NOOOOOOOOOOOOOOOOOOOOOOOT WORKING
-#                         shared_vars.append(v)
-#                         corresponding_marks.append(m)
-#         if len(shared_vars) == 1:
-#             #print "--> ",type(self.left),self.operator,type(self.right)
-#             return {"equation":self,"variables":shared_vars,"head":head,"ifcons":ifcons,"marks":corresponding_marks}
-#         elif len(shared_vars) > 1:
-#             raise NameError("Error: Too many ("+len(shared_vars)+") unbound variables in equation!")
-#         else:
-#             return None
-#         
-#     def mark_check_where(self):
-#         if self.is_arithmetic_helper:
-#             variables = self.get_variables()
-#             return { "equation":self, "variables":variables }
-#         else:
-#             return None
         
     def pass_down_update(self,update):
         if self.is_arithmetic_helper:
@@ -2592,16 +2558,16 @@ class equation(parse_object):
             
             for elem in update.indir_bound_int_var:
                 if elem[2] == self:
-                    self.replacement = True
-                    return [] #TODO: can this be a problem?
+                    self.replacement = True # We will replace this element, since it contains an unbound varialbe.
+                    return []               # ^- The replacement will be done in the pass_down_update_overwrite function of the law, not here (check there if there are any errors)!
             
             self.has_integer = True
             self.my_id = update.arith_idfunction()
             self.replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
             my_assignment = update.is_in_head()
             dynamic_law_part = update.is_in_dynamic_law()
-            # TODO: During Flattenning, we should identify INTEGERS that we know and others
-            # That we can handle them differently
+
+            # Create a flat structure from our arithmetics.
             if type(self.left) == str: le = [arithmetic_atom(self.left,update.arith_helper_idfunction()),]
             else:
                 le = self.left.arith_flatten(negation=False,update=update)
@@ -2626,7 +2592,7 @@ class equation(parse_object):
                     if val is None: val = l
                     else: val.add(l)
                 else:
-                    for elem in update.indir_bound_int_var: #TODO: We have to add the resprective parts: after/ifcons here
+                    for elem in update.indir_bound_int_var: 
                         if str(l.value) == str(elem[1]):
                             l.value = None
                             l.variable = str(elem[0])
@@ -2656,7 +2622,7 @@ class equation(parse_object):
                     else: val.add(r)
                 else:
                     
-                    for elem in update.indir_bound_int_var: #TODO: We have to add the resprective parts: after/ifcons here
+                    for elem in update.indir_bound_int_var: 
                         if str(r.value) == str(elem[1]):
                             r.value = None
                             r.variable = str(elem[0])
@@ -2707,7 +2673,7 @@ class equation(parse_object):
                 update.add_arithmetic_law(self.replaced_law)
                 
         #Code for adding binding to where part! 
-        if self.binding is not None:#TODO: Add to other parse_objects!
+        if self.binding is not None:
             #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
@@ -2925,10 +2891,8 @@ class equation_where_arithmetics(parse_object):
                     and self.right.__class__ in [unknown,predicate]:
                         #print "v = p/u"
                         update.add_unbound_assignment((self.right,self.left))
-                # is equation? |bound| > 1 # TODO: asdasdsad
-                # ignore for now
-                # is assignment? |bound| == 1
-            #print update.unbound_variables
+                # Equations with multiple unbound variables will be handled later.
+                # We need at least on of these to somehow bind variables (no, we will not do fancy stuff)
         if type(self.left) == unknown and type(self.right) == variable and self.right.unbound == True:
             #print str(self.left) + str(self.operator) + str(self.right)
             #update.set()
@@ -2942,8 +2906,8 @@ class equation_where_arithmetics(parse_object):
             self.replacement = predicate("_arithmetic",atom_list(predicate("law",atom_list(str(self.my_id),self.variables))))
             assignment = update.is_in_head()
             dynamic_law_part = update.is_in_dynamic_law()
-            # TODO: During Flattenning, we should identify INTEGERS that we know and others
-            # That we can handle them differently
+
+            # Create a flat structure of our arithmetics
             if type(self.left) == str: le = [arithmetic_atom(self.left,update.arith_helper_idfunction()),]
             else:
                 le = self.left.arith_flatten(negation=False,update=update)
@@ -2983,7 +2947,7 @@ class equation_where_arithmetics(parse_object):
             update.add_arithmetic_law(self.replaced_law)
             
         #Code for adding binding to where part! 
-        if self.binding is not None:#TODO: Add to other parse_objects!
+        if self.binding is not None:
             #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
@@ -3189,16 +3153,9 @@ class assignment(parse_object):
                 try:
                     head_leaf = self.head.get_bottom_elements()
                     body_leaf = self.body.get_bottom_elements()
-                except Exception as e:
+                except Exception:
                     self.replacement = None
                     return self.variables
-#                     flu = self.head
-#                     val = self.body
-#                     if type(flu) == str:
-#                         val=flu
-#                         flu=self.body
-#                     self.replacement=assignment(flu,val) #TODO: check!!!
-#                     return self.variables
                 
                 # generate variables
                 
@@ -3293,7 +3250,7 @@ class assignment(parse_object):
                 update.add_arithmetic_law(law)
             
         #Code for adding binding to where part! 
-        if self.binding is not None:#TODO: Add to other parse_objects!
+        if self.binding is not None:
             #update.add_to_where(self.binding)
             variables = self.binding.get_variables()
             for v in variables:
@@ -3317,7 +3274,7 @@ class assignment(parse_object):
             if binding is not None:
                 result.binding = binding
                 if self.binding is not None:
-                    result.binding += self.binding #TODO: Test!
+                    result.binding += self.binding
             else:
                 result.binding = self.binding
             return result
@@ -3564,7 +3521,7 @@ class variable(parse_object):
                     found = True
                     self.unbound = False
                     break
-            for x in ins:#TODO: Use if in where but not in fluent/action binding
+            for x in ins:
                 if str(self) == str(x[1]):
                     self.type = "fluent" # integer!!
                     found = True
@@ -3925,7 +3882,7 @@ class update_passdown(object):
         if not elem in self.where_actions:
             self.where_actions.append(elem)
     
-    def add_to_where(self,elem):#TODO: Check!!!
+    def add_to_where(self,elem):
         if self.where_part is not None:
             if not elem in self.where_part:
                 self.where_part.append(elem)

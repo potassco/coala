@@ -426,7 +426,6 @@ class Parser(object):
             self.parser = yacc.yacc(module=self, debug=False, outputdir=mypath, **kwargs) # SILENT MODE!
         else:
             self.parser = yacc.yacc(module=self, debug=False, optimize=False, write_tables=False, outputdir=mypath, **kwargs)
-        #TODO: Assign lexer?
         
     def reset_data(self):
         self.data = { 'actions' : [] ,

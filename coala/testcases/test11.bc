@@ -1,0 +1,11 @@
+<asp>
+asp(1..10).
+</asp>
+
+<action> do(Stuff) where asp(Stuff).
+fluent state=S where asp(S).
+
+state=Su after do(Su) where asp(Su).
+
+% 10 State
+% 100 Transitions
